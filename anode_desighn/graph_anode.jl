@@ -350,7 +350,7 @@ function make_cograph(tessalation::Set{Polygon})::Tuple{Vector{Vector{Float64}},
     return vertecies, edges
 end
 
-for i in 6:2:38
+for i in 40:2:38
     filename = "anode_data/appratures_$(i).json"
     data = JSON.parsefile(filename)
     point_mat = hcat(data["points"]...)

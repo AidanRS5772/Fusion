@@ -2,69 +2,74 @@ using StaticArrays
 using Random
 using LinearAlgebra
 using PlotlyJS
+using Statistics
+using JSON
 
 function potential(points::Vector{MVector{2, Float64}})
 	N = length(points)
 	U = 0.0
 	for i in 1:N-1
 		ϕ1, θ1 = points[i]
+		sϕ1, cϕ1 = sincos(ϕ1)
 		for j in i+1:N
 			ϕ2, θ2 = points[j]
-			d = acos(sin(ϕ1) * sin(ϕ2) + cos(ϕ1) * cos(ϕ2) * cos(θ1 - θ2))
-			U += 1 / d + 1 / (π - d) - 4/π
+			sϕ2, cϕ2 = sincos(ϕ2)
+			d = acos(cϕ1 * cϕ2 + sϕ1 * sϕ2 * cos(θ1 - θ2))
+			U += 1 / d + 1 / (π - d) - 4 / π
 		end
 	end
 
 	return U
 end
 
-function grad_a(i::Int, points::Vector{MVector{2, Float64}})::MVector{2, Float64}
-	ϕ1, θ1 = points[i]
-	sϕ1, cϕ1 = sincos(ϕ1)
-	dϕ, dθ = 0.0, 0.0
-	for j in 1:length(points)
-		if i != j
-			ϕ2, θ2 = points[j]
-			sϕ2, cϕ2 = sincos(ϕ2)
-			sθ, cθ = sincos(θ1 - θ2)
-			d = acos(sϕ1 * sϕ2 + cϕ1 * cϕ2 * cθ)
+function gradient(points::Vector{MVector{2, Float64}})
+	N = length(points)
+	scϕ = [sincos(p[1]) for p in points]
+	sθ, cθ, val_mat = zeros(N, N), zeros(N, N), zeros(N, N)
+	@inbounds @simd for i in 1:N-1
+		sϕ1, cϕ1 = scϕ[i]
+		_, θ1 = points[i]
+		@inbounds @simd for j in i+1:N
+			_, θ2 = points[j]
+			sθ_val, cθ_val = sincos(θ1 - θ2)
+			sϕ2, cϕ2 = scϕ[j]
+			d = acos(cϕ1 * cϕ2 + sϕ1 * sϕ2 * cθ_val)
 			val = (1 / (π - d)^2 - 1 / d^2) / sin(d)
-			dϕ += (sϕ1 * cϕ2 * cθ - cϕ1 * sϕ2) * val
-			dθ += cϕ2 * sθ * val
+
+			val_mat[i, j] = val
+			val_mat[j, i] = val
+			cθ[i, j] = cθ_val
+			cθ[j, i] = cθ_val
+			sθ[i, j] = sθ_val
+			sθ[j, i] = -sθ_val
 		end
 	end
 
-	return MVector(dϕ, (cϕ1 / sϕ1) * dθ)
+	grad = Vector{MVector{2, Float64}}(undef, N)
+	@inbounds @simd for i in 1:N
+		sϕ1, cϕ1 = scϕ[i]
+		dϕ1, dϕ2, dθ = 0.0, 0.0, 0.0
+		@inbounds @simd for j in 1:N
+			if i != j
+				sϕ2, cϕ2 = scϕ[j]
+				dϕ1 += cϕ2 * val_mat[i, j]
+				dϕ2 += sϕ2 * cθ[i, j] * val_mat[i, j]
+				dθ += sϕ2 * sθ[i, j] * val_mat[i, j]
+			end
+		end
+		grad[i] = MVector(sϕ1 * dϕ1 - cϕ1 * dϕ2, dθ)
+	end
+
+	return grad
 end
 
-function grad_n(i::Int, points::Vector{MVector{2, Float64}}; h = 1e-8)::MVector{2, Float64}
-	points[i][1] += h
-	pos_ϕ = potential(points)
-	points[i][1] -= 2*h
-	neg_ϕ = potential(points)
-	points[i][1] += h
-	dϕ = (pos_ϕ - neg_ϕ)/(2*h)
-
-	points[i][2] += h
-	pos_θ = potential(points)
-	points[i][2] -= 2*h
-	neg_θ = potential(points)
-	points[i][2] += h
-	dθ = (pos_θ - neg_θ)/(2*h)
-	dθ /= sin(points[i][1])
-
-	return MVector(dϕ, dθ)
-end
-
-function evolve!(points::Vector{MVector{2, Float64}}; γ = 1e-4, min_grad = 1e-12, max_iter = 10_000_000)
-	N = length(points)
+function evolve!(points::Vector{MVector{2, Float64}}; γ = 1e-3, min_grad = 1e-3, max_iter = 10_000_000)
 	iter = 0
 	grad_norm = Inf
 	while (iter < max_iter) && (grad_norm > min_grad)
-		grad_norm = 0.0
-		grad = [grad_a(i, points) for i in 1:N]
+		grad = gradient(points)
+		grad_norm = sqrt(sum(norm.(grad) .^ 2))
 		for (p, g) in zip(points, grad)
-			grad_norm += g[1]^2 + g[2]^2
 			p[1] -= γ * g[1]
 			p[2] -= γ * g[2]
 
@@ -75,23 +80,26 @@ function evolve!(points::Vector{MVector{2, Float64}}; γ = 1e-4, min_grad = 1e-1
 				p[2] = mod(p[2] + π, 2 * π)
 			end
 		end
-		iter += 1
 	end
 end
 
 function optimal(T::Int, N::Int)
 	all_points = []
-	for _ in 1:T
+	print("Trials: 0/$(T)")
+	for i in 1:T
 		points = [MVector(acos(uϕ), 2 * π * uθ) for (uϕ, uθ) in zip(rand(N), rand(N))]
 		evolve!(points)
 		push!(all_points, points)
+		print("\rTrials: $(i)/$(T)")
 	end
+	print("\rDone")
+	println("")
 
 	potentials = potential.(all_points)
-	min_U, idx = findmin(potentials)
-	min_points = all_points[idx]
+	_, idx = findmin(potentials)
+	min_points = popat!(all_points, idx)
 
-	return min_points, min_U, min_points
+	return min_points, std(potentials)
 end
 
 function embed_points_R3(points::Vector{MVector{2, Float64}})
@@ -103,41 +111,33 @@ function embed_points_R3(points::Vector{MVector{2, Float64}})
 		push!(vecs, -1 .* vec)
 	end
 
+	return hcat(vecs...)
+end
+
+function orient!(points_R3::Matrix{Float64})
 	z = [0.0, 0.0, 1.0]
-	_, idx = findmin([norm(v .- z) for v in vecs])
-	v = vecs[idx]
-	point_mat = hcat(vecs...)
+	_, idx = findmin([norm(v .- z) for v in eachcol(points_R3)])
+	v = points_R3[:, idx]
 
 	K = z * v' - v * z'
 	R = I(3) .+ K .+ K^2 ./ (1 + v[3])
-	return R * point_mat
+	points_R3 .= R * points_R3
 end
 
-points, U, all_points = optimal(1, 3)
 
-println("potential: ", U)
-display(points)
+for i in 45:200
+	println("\n$(2*i) Appratures:")
+	min_points , std_dev = optimal(64, i)
+	points_R3 = embed_points_R3(min_points)
+	orient!(points_R3)
+	println("Std. Dev. = ", std_dev)
+	println("Points: ")
+	display(points_R3)
+	data = Dict("points" => points_R3, "σ" => std_dev)
+	open("anode_data/appratures_$(2*i).json", "w") do io
+		JSON.print(io, data)
+	end
+end
 
-points_R3 = embed_points_R3(points)
 
-plot(
-	scatter3d(
-		x = points_R3[1, :],
-		y = points_R3[2, :],
-		z = points_R3[3, :],
-		mode = "markers",
-		marker = attr(
-			color = "blue",
-			size = "3",
-		),
-	),
-	Layout(
-		scene = attr(
-			aspectratio = attr(x = 1, y = 1, z = 1),
-			xaxis = attr(range = [-1.2, 1.2]),
-			yaxis = attr(range = [-1.2, 1.2]),
-			zaxis = attr(range = [-1.2, 1.2]),
-		),
-	),
-)
 
