@@ -350,23 +350,19 @@ function make_cograph(tessalation::Set{Polygon})::Tuple{Vector{Vector{Float64}},
     return vertecies, edges
 end
 
-for i in 40:2:38
-    filename = "anode_data/appratures_$(i).json"
-    data = JSON.parsefile(filename)
-    point_mat = hcat(data["points"]...)
-    points = [Point(uuid4(), col) for col in eachcol(point_mat)]
-    stereos = stereo_proj(points)
-    triangulations = triangulate.(stereos)
-    tessalation = inv_stereo(triangulations...)
-    pruned_tessalation = prune(tessalation)
-    v, e = make_cograph(pruned_tessalation)
-    data["vertices"] = v
-    data["edges"] = e
-    open(filename, "w") do io
-        JSON.print(io, data)
-    end
-end
 
+filename = "anode_data/appratures_8.json"
+data = JSON.parsefile(filename)
+point_mat = hcat(data["points"]...)
+points = [Point(uuid4(), col) for col in eachcol(point_mat)]
+stereos = stereo_proj(points)
+triangulations = triangulate.(stereos)
+tessalation = inv_stereo(triangulations...)
+pruned_tessalation = prune(tessalation)
+v, e = make_graph(tessalation)
+
+traces = plot_graph_3d(v,e)
+plot(traces)
 
 
 

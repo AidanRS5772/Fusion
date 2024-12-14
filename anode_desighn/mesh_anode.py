@@ -62,14 +62,14 @@ def plot_mesh_with_plotly(mesh):
     fig = go.Figure(data=[mesh_plotly], layout=layout)
     fig.show()
 
-with open('anode_data/appratures_30.json', 'r') as file:
+with open('anode_data/appratures_300.json', 'r') as file:
     data = json.load(file) 
 
 vertices = [np.array(p) for p in data['vertices']]
 edges = [(np.array(pair[0]), np.array(pair[1])) for pair in data['edges']]
 
-radius = .002*15
-sections = 16
+radius = .002*10
+sections = 10
 subdivisions = 4
 cylinders = [create_cylinder(e[0], e[1], radius, sections) for e in edges]
 spheres = [create_sphere(v, radius, subdivisions) for v in vertices]
