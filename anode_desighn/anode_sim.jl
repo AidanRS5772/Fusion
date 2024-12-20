@@ -66,14 +66,9 @@ function plot_path(mesh, path)
 end
 
 function scale_mesh(mesh, scale_factor)
-    verts = coordinates(mesh)
-
-    new_vertices = StructVector{typeof(verts[1])}((
-        position=[Point{3,Float32}(v.position .* scale_factor) for v in verts],
-        normals=verts.normals
-    ))
-
-    return GeometryBasics.Mesh(new_vertices, faces(mesh))
+    verts = coordinates(mesh) # likely a Vector of Point{3, Float32} or similar
+    scaled_vertices = [Point{3,Float32}(v .* scale_factor) for v in verts]
+    return GeometryBasics.Mesh(scaled_vertices, faces(mesh))
 end
 
 function bounding_box_idxs(points...; bound, N)
