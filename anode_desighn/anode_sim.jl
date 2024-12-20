@@ -66,9 +66,14 @@ function plot_path(mesh, path)
 end
 
 function scale_mesh(mesh, scale_factor)
-    verts = coordinates(mesh) # likely a Vector of Point{3, Float32} or similar
-    scaled_vertices = [Point{3,Float32}(v .* scale_factor) for v in verts]
-    return GeometryBasics.Mesh(scaled_vertices, faces(mesh))
+    verts = coordinates(mesh)
+
+    new_vertices = StructVector{typeof(verts[1])}((
+        position=[Point{3,Float32}(v.position .* scale_factor) for v in verts],
+        normals=verts.normals
+    ))
+
+    return GeometryBasics.Mesh(new_vertices, faces(mesh))
 end
 
 function bounding_box_idxs(points...; bound, N)
@@ -305,11 +310,11 @@ function do_analysis(r, R, V, T, app_cnt, N_cell, N_samples, max_orbit)
     savefig(fig, "anode_data_plots/appratures_$(app_cnt).html")
 end
 
-r, R, V, T = 0.05, 0.25, 1e5, 300
+r, R, V, T = 0.05, 0.5, 1e5, 300
 N_cell = 20
 N_samples = 10000
 max_pass = 50
 
-for i in 14:2:362
+for i in 6:2:362
     do_analysis(r, R, V, T, i, N_cell, N_samples, max_pass)
 end
