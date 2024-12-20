@@ -4,8 +4,6 @@ using FileIO
 using LinearAlgebra
 using DifferentialEquations
 using StructArrays
-using BenchmarkTools
-using .Threads
 using StaticArrays
 using PlotlyJS
 using Random
@@ -239,7 +237,7 @@ function make_point(u, r, R, T)
 end
 
 function do_analysis(r, R, V, T, app_cnt, N_cell, N_samples, max_orbit)
-    #println("Analysis For $(app_cnt) Appratures:")
+    println("Analysis For $(app_cnt) Appratures:")
     mesh = scale_mesh(load("anode_meshes/appratures_$(app_cnt).stl"), r)
     prox_map_intersection = make_prox_map_intersection(mesh, N_cell)
     c, a = centroid_areas(mesh)
@@ -249,12 +247,12 @@ function do_analysis(r, R, V, T, app_cnt, N_cell, N_samples, max_orbit)
     initials = Vector{MVector{6}}(undef, N_samples)
     pass_cnts = Vector{Int}(undef, N_samples)
     uni = rand(6 * N_samples)
-    #print("0%")
+    print("0%")
     @inbounds for i in 1:N_samples
         u0 = make_point(uni[6*i-5:6*i], r, R, T)
         initials[i] = u0
         pass_cnts[i], _ = find_path(mesh, prox_map_intersection, r, 2 * max_orbit + 1, E_feild, B_feild, u0)
-        #print("\r$(round(i*100/N_samples, digits = 2))%")
+        print("\r$(round(i*100/N_samples, digits = 2))%")
     end
 
     full_orbits = []
@@ -281,9 +279,9 @@ function do_analysis(r, R, V, T, app_cnt, N_cell, N_samples, max_orbit)
     )
 
     no_pass_rate = partial_orbit_cnt / sum(full_orbits)
-    #println("\nNo Pass Rate: ", no_pass_rate)
+    println("\nNo Pass Rate: ", no_pass_rate)
     mean_orbit = mean(full_orbits)
-    #println("Mean Orbit Count: ", mean_orbit)
+    println("Mean Orbit Count: ", mean_orbit)
 
     full_orbits .+= 1
     α, β = Distributions.params(fit(Gamma, Float64.(full_orbits)))
