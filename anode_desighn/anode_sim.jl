@@ -219,7 +219,7 @@ function make_point(u, r, R, T)
     ρ = (u[1] * (R^3 - r^3) + r^3)^(1 / 3)
     θ = 2 * π * u[2]
     sϕ = 2 * sqrt(1 - u[3]) * sqrt(u[3])
-    v = (0.01100397172 / sqrt(T)) .* erfinv.(2 .* u[3:6] .- 1)
+    v = (0.01100397172 / sqrt(T)) .* erfinv.(2 .* u[4:6] .- 1)
 
     return MVector{6}(
         ρ * cos(θ) * sϕ,

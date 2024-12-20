@@ -142,10 +142,11 @@ function plot_vectors(M; scale=0.02)
     return traces
 end
 
-app_cnt = 12
+app_cnt = 8
 data = JSON.parsefile("anode_data/appratures_$(app_cnt).json")
 mesh = scale_mesh(load("anode_meshes/appratures_$(app_cnt).stl"), 0.05)
 
-eternals = hcat(data["eternal_initials"]...)
-clusters = dbscan(eternals, 0.05)
-display(clusters.counts)
+mesh_trace = plot_mesh(mesh)
+vec_trace = plot_vectors(hcat(data["eternal_initials"]...))
+
+plot([mesh_trace, vec_trace...])
