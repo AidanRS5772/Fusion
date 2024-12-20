@@ -9,6 +9,10 @@ using .Threads
 using StaticArrays
 using PlotlyJS
 using Random
+using SpecialFunctions
+using Distributions
+using Statistics
+using JSON
 
 function plot_path(mesh, path)
     # For each triangle, get its three vertices
@@ -30,10 +34,10 @@ function plot_path(mesh, path)
         push!(z, v1[3], v2[3], v3[3])
 
         # Add face indices (3 vertices per triangle)
-        base = (idx-1)*3  # each triangle starts 3 vertices after the previous
+        base = (idx - 1) * 3  # each triangle starts 3 vertices after the previous
         push!(i, base)
-        push!(j, base+1)
-        push!(k, base+2)
+        push!(j, base + 1)
+        push!(k, base + 2)
     end
 
     # Create mesh trace
@@ -84,7 +88,7 @@ function bounding_box_idxs(points...; bound, N)
     y_min, y_max = clamp.(floor.(Int, (extrema(p[2] for p in points) .+ bound) ./ len), 0, N - 1)
     z_min, z_max = clamp.(floor.(Int, (extrema(p[3] for p in points) .+ bound) ./ len), 0, N - 1)
 
-    result = Vector{Int}(undef, (x_max-x_min+1)*(y_max-y_min+1)*(z_max-z_min+1))
+    result = Vector{Int}(undef, (x_max - x_min + 1) * (y_max - y_min + 1) * (z_max - z_min + 1))
     idx = 1
     for z in z_min:z_max, y in y_min:y_max, x in x_min:x_max
         result[idx] = 1 + x + y * N + z * N^2
@@ -125,8 +129,8 @@ function intersect(p1, p2, v1, v2, v3)
     end
 
     M = @SMatrix [-d[1] e1[1] e2[1]
-                  -d[2] e1[2] e2[2]
-                  -d[3] e1[3] e2[3]]
+        -d[2] e1[2] e2[2]
+        -d[3] e1[3] e2[3]]
     b = SVector{3}(p1 .- v1)
     t, u, v = M \ b
 
@@ -137,7 +141,7 @@ function intersect(p1, p2, v1, v2, v3)
     return false
 end
 
-function find_path(mesh, prox_map, sphere_radius, max_pass, E, B, ρ0, v0)
+function find_path(mesh, prox_map, sphere_radius, max_pass, E, B, u0)
     function collision_condition(u, t, integrator)
         p1 = @view u[1:3]
         if length(integrator.sol) > 1
@@ -156,14 +160,14 @@ function find_path(mesh, prox_map, sphere_radius, max_pass, E, B, ρ0, v0)
         return false
     end
 
-    pass = 0
+    pass_cnt = 0
     last_r = 0.0
     function sphere_condition(u, t, integrator)
         r = norm(u[1:3])
         if last_r != 0  # skip first point
             if (last_r < sphere_radius && r >= sphere_radius) || (last_r > sphere_radius && r <= sphere_radius)
-                pass += 1
-                if pass >= max_pass
+                pass_cnt += 1
+                if pass_cnt >= max_pass
                     return true
                 end
             end
@@ -176,11 +180,10 @@ function find_path(mesh, prox_map, sphere_radius, max_pass, E, B, ρ0, v0)
     cb2 = DiscreteCallback(sphere_condition, terminate!)
     cb = CallbackSet(cb1, cb2)
 
-    u0 = MVector{6,Float64}([ρ0..., v0...])
-    prob = ODEProblem(lorenz!, u0, (0.0, Inf), (E, B))
-    sol = hcat(solve(prob, Tsit5(), callback=cb, abstol = 1e-9, adaptive=true).u...)
+    prob = ODEProblem(lorenz!, u0, (0.0, 1.0), (E, B))
+    sol = solve(prob, Rodas5P(autodiff=false), callback=cb)
 
-    return sol[1:3, :], sol[4:6, :]
+    return pass_cnt, sol
 end
 
 function centroid_areas(mesh)
@@ -219,29 +222,101 @@ end
     du[4:6] = e_m .* (E(r) .+ cross(dr, B(r)))
 end
 
-r, R, V = 0.05, 0.25, 1e5
-mesh = scale_mesh(load("anode_meshes/appratures_14.stl"), r)
-N_cell = 20
-prox_map_intersection = make_prox_map_intersection(mesh, N_cell)
+function make_point(u, r, R, T)
+    ρ = (u[1] * (R^3 - r^3) + r^3)^(1 / 3)
+    θ = 2 * π * u[2]
+    sϕ = 2 * sqrt(1 - u[3]) * sqrt(u[3])
+    v = (0.01100397172 / sqrt(T)) .* erfinv.(2 .* u[3:6] .- 1)
 
-c, a = centroid_areas(mesh)
-E_feild(ρ) = E(ρ, c, a, r, R, V)
-B_feild(ρ) = SVector{3,Float64}(0.0, 0.0, 0.0)
-
-ρ0 = [0, 0.00, 0.07]
-v0 = [0, 0, 0]
-max_pass = 100
-path, vel = find_path(mesh, prox_map_intersection, r, max_pass, E_feild, B_feild, ρ0, v0)
-
-traces = plot_path(mesh, path)
-layout = Layout(
-    scene=attr(
-        aspectmode="cube",  # This forces cubic aspect ratio
-        aspectratio=attr(x=1, y=1, z=1),  # Equal scaling on all axes
-        xaxis=attr(range=[-R, R]),
-        yaxis=attr(range=[-R, R]),
-        zaxis=attr(range=[-R, R])
+    return MVector{6}(
+        ρ * cos(θ) * sϕ,
+        ρ * sin(θ) * sϕ,
+        ρ * (1 - 2 * u[3]),
+        v[1],
+        v[2],
+        v[3]
     )
-)
+end
 
-plot(traces, layout)
+function do_analysis(r, R, V, T, app_cnt, N_cell, N_samples, max_orbit)
+    #println("Analysis For $(app_cnt) Appratures:")
+    mesh = scale_mesh(load("anode_meshes/appratures_$(app_cnt).stl"), r)
+    prox_map_intersection = make_prox_map_intersection(mesh, N_cell)
+    c, a = centroid_areas(mesh)
+    E_feild(ρ) = E(ρ, c, a, r, R, V)
+    B_feild(_) = SVector{3,Float64}(0.0, 0.0, 0.0)
+
+    initials = Vector{MVector{6}}(undef, N_samples)
+    pass_cnts = Vector{Int}(undef, N_samples)
+    uni = rand(6 * N_samples)
+    #print("0%")
+    @inbounds for i in 1:N_samples
+        u0 = make_point(uni[6*i-5:6*i], r, R, T)
+        initials[i] = u0
+        pass_cnts[i], _ = find_path(mesh, prox_map_intersection, r, 2 * max_orbit + 1, E_feild, B_feild, u0)
+        #print("\r$(round(i*100/N_samples, digits = 2))%")
+    end
+
+    full_orbits = []
+    partial_orbit_cnt = 0
+    eternal_initials = []
+    for i in 1:N_samples
+        orbit_cnt = pass_cnts[i] ÷ 2
+        if orbit_cnt != max_orbit
+            push!(full_orbits, orbit_cnt)
+        else
+            push!(eternal_initials, initials[i])
+        end
+        if pass_cnts[i] % 2 == 0
+            partial_orbit_cnt += 1
+        end
+    end
+
+    pdf_trace = histogram(
+        x=full_orbits,
+        opacity=0.5,
+        nbinsx=max_orbit,
+        histnorm="probability",
+        marker_color="rgb(100, 150, 200)"
+    )
+
+    no_pass_rate = partial_orbit_cnt / sum(full_orbits)
+    #println("\nNo Pass Rate: ", no_pass_rate)
+    mean_orbit = mean(full_orbits)
+    #println("Mean Orbit Count: ", mean_orbit)
+
+    full_orbits .+= 1
+    α, β = Distributions.params(fit(Gamma, Float64.(full_orbits)))
+    #println("α: $(α)")
+    #println("β: $(β)")
+
+    P_expected_tail = 1 - cdf(Gamma(α, β), max_orbit + 1)
+    P_observed_tail = length(eternal_initials) / N_samples
+    eternal_prop = P_observed_tail - P_expected_tail
+    #println("Proportionl of Phase Space with an Eternal Path: ", eternal_prop)
+
+    file = "anode_data/appratures_$(app_cnt).json"
+    data = JSON.parsefile(file)
+    data["mean_orbit"] = mean_orbit
+    data["α"] = α
+    data["β"] = β
+    data["eternal_prop"] = eternal_prop
+    data["eternal_initials"] = eternal_initials
+    data["no_pass_rate"] = no_pass_rate
+
+    open(file, "w") do f
+        JSON.print(f, data)
+    end
+
+    fig = plot(pdf_trace)
+    savefig(fig, "anode_data_plots/appratures_$(app_cnt).html")
+end
+
+r, R, V, T = 0.05, 0.25, 1e5, 300
+N_cell = 20
+N_samples = 10000
+max_pass = 50
+
+@threads for i in 8:2:362
+    do_analysis(r, R, V, T, i, N_cell, N_samples, max_pass)
+end
