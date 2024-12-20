@@ -317,6 +317,6 @@ N_cell = 20
 N_samples = 10000
 max_pass = 50
 
-@threads for i in 8:2:362
+@threads for i in 14:2:362
     do_analysis(r, R, V, T, i, N_cell, N_samples, max_pass)
 end
