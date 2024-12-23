@@ -140,43 +140,35 @@ function intersect(p1, p2, v1, v2, v3)
 end
 
 function find_path(mesh, prox_map, sphere_radius, max_pass, E, B, u0)
-    function collision_condition(u, t, integrator)
-        p1 = @view u[1:3]
-        if length(integrator.sol) > 1
-            p2 = @view integrator.sol[end-1][1:3]
-
-            valid_idxs = unique!(vcat(prox_map.cells[bounding_box_idxs(p1, p2, bound=prox_map.bound, N=prox_map.N)]...))
-            @inbounds for j in valid_idxs
-                v1 = SVector{3}(mesh[j][1].position)
-                v2 = SVector{3}(mesh[j][2].position)
-                v3 = SVector{3}(mesh[j][3].position)
-                if intersect(p2, p1, v1, v2, v3)
-                    return true
-                end
-            end
-        end
-        return false
-    end
-
     pass_cnt = 0
-    last_r = 0.0
-    function sphere_condition(u, t, integrator)
-        r = norm(u[1:3])
-        if last_r != 0  # skip first point
-            if (last_r < sphere_radius && r >= sphere_radius) || (last_r > sphere_radius && r <= sphere_radius)
-                pass_cnt += 1
-                if pass_cnt >= max_pass
-                    return true
-                end
+    p2 = u0[1:3]
+    r2 = norm(p2)
+    function condition(u, t, integrator)
+        p1 = u[1:3]
+        r1 = norm(p1)
+        if (r1 <= sphere_radius <= r2) || (r2 <= sphere_radius <= r1)
+            pass_cnt += 1
+            if pass_cnt >= max_pass
+                return true
             end
         end
-        last_r = r
+
+        valid_idxs = unique!(vcat(prox_map.cells[bounding_box_idxs(p1, p2, bound=prox_map.bound, N=prox_map.N)]...))
+        @inbounds for j in valid_idxs
+            v1 = SVector{3}(mesh[j][1].position)
+            v2 = SVector{3}(mesh[j][2].position)
+            v3 = SVector{3}(mesh[j][3].position)
+            if intersect(p2, p1, v1, v2, v3)
+                return true
+            end
+        end
+
+        p2 = p1
+        r2 = r1
         return false
     end
 
-    cb1 = DiscreteCallback(collision_condition, terminate!)
-    cb2 = DiscreteCallback(sphere_condition, terminate!)
-    cb = CallbackSet(cb1, cb2)
+    cb = DiscreteCallback(condition, terminate!)
 
     prob = ODEProblem(lorenz!, u0, (0.0, 1.0), (E, B))
     sol = solve(prob, Rodas5P(autodiff=false), callback=cb)
@@ -308,13 +300,26 @@ function do_analysis(r, R, V, T, app_cnt, N_cell, N_samples, max_orbit)
 
     fig = plot(pdf_trace)
     savefig(fig, "anode_data_plots/appratures_$(app_cnt).html")
+    run(`open anode_data_plots/appratures_$(app_cnt).html`)
 end
 
 r, R, V, T = 0.05, 0.5, 1e5, 300
 N_cell = 20
-N_samples = 10000
-max_pass = 50
+N_samples = 100
+max_orbit = 50
+app_cnt = 6
 
-for i in 6:2:362
-    do_analysis(r, R, V, T, i, N_cell, N_samples, max_pass)
-end
+
+mesh = scale_mesh(load("anode_meshes/appratures_$(app_cnt).stl"), r)
+prox_map_intersection = make_prox_map_intersection(mesh, N_cell)
+c, a = centroid_areas(mesh)
+E_feild(ρ) = E(ρ, c, a, r, R, V)
+B_feild(_) = SVector{3,Float64}(0.0, 0.0, 0.0)
+
+u0 = make_point(rand(6), r, R, T)
+pass_cnt, sol = find_path(mesh, prox_map_intersection, r, 2 * max_orbit, E_feild, B_feild, u0)
+
+println(pass_cnt)
+
+sol = hcat(sol.u...)
+plot(plot_path(mesh, scale))
