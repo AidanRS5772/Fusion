@@ -11,6 +11,8 @@ using SpecialFunctions
 using Distributions
 using Statistics
 using JSON
+using NearestNeighbors
+using BenchmarkTools
 
 function cube_layout(lim)
     return Layout(
@@ -87,45 +89,32 @@ function scale_mesh(mesh, scale_factor)
     return GeometryBasics.Mesh(new_vertices, faces(mesh))
 end
 
-function bounding_box_idxs(points...; bound, N)
-    if all([any(abs.(p) .> bound) for p in points])
-        return Int[]
+function sample_triangle(v1, v2, v3, N)
+    points = [v1, v2, v3]
+    e1 = v2 .- v1
+    e2 = v3 .- v1
+    r1 = rand(N)
+    r2 = rand(N)
+
+    for i in 1:N
+        u = r1[i] * (1 - r2[i])
+        v = r2[i] * (1 - r1[i])
+        push!(points, e1 .* u .+ e2 .* v .+ v1)
     end
 
-    len = 2 * bound / N
-    x_min, x_max = clamp.(floor.(Int, (extrema(p[1] for p in points) .+ bound) ./ len), 0, N - 1)
-    y_min, y_max = clamp.(floor.(Int, (extrema(p[2] for p in points) .+ bound) ./ len), 0, N - 1)
-    z_min, z_max = clamp.(floor.(Int, (extrema(p[3] for p in points) .+ bound) ./ len), 0, N - 1)
-
-    result = Vector{Int}(undef, (x_max - x_min + 1) * (y_max - y_min + 1) * (z_max - z_min + 1))
-    idx = 1
-    for z in z_min:z_max, y in y_min:y_max, x in x_min:x_max
-        result[idx] = 1 + x + y * N + z * N^2
-        idx += 1
-    end
-    return result
+    return points
 end
 
-struct ProxMap
-    cells::Vector{Vector{Int}}
-    bound::Float64
-    N::Int
-end
-
-function make_prox_map_intersection(mesh, N)
-    b = maximum([p for point in coordinates(mesh) for p in point])
-    cell_sets = [Set() for _ in 1:N^3]
+function build_kd_tree(mesh, N)
+    bb_vertices = [0, 0, 0]
     for i in eachindex(mesh)
-        v1 = Vector(mesh[i][1])
-        v2 = Vector(mesh[i][2])
-        v3 = Vector(mesh[i][3])
-        for idx in bounding_box_idxs(v1, v2, v3, bound=b, N=N)
-            push!(cell_sets[idx], i)
-        end
+        v1 = mesh[i][1].position
+        v2 = mesh[i][2].position
+        v3 = mesh[i][3].position
+        bb_vertices = hcat(bb_vertices, sample_triangle(v1, v2, v3, N)...)
     end
-    cells = [sort(collect(S)) for S in cell_sets]
 
-    return ProxMap(cells, b, N)
+    return KDTree(bb_vertices[:, 2:end])
 end
 
 function intersect(p1, p2, v1, v2, v3)
@@ -150,7 +139,7 @@ function intersect(p1, p2, v1, v2, v3)
     return false
 end
 
-function find_path(mesh, prox_map, sphere_radius, max_orbit, E, u0)
+function find_path(mesh, kd_tree, N_kd, sphere_radius, max_orbit, E, u0)
     orbit_cnt = 0
     p0 = u0[1:3]
     p1 = u0[1:3]
@@ -166,8 +155,13 @@ function find_path(mesh, prox_map, sphere_radius, max_orbit, E, u0)
             end
         end
 
-        valid_idxs = unique!(vcat(prox_map.cells[bounding_box_idxs(p, p1, bound=prox_map.bound, N=prox_map.N)]...))
-        @inbounds for j in valid_idxs
+        idxs = inrange(kd_tree, p, norm(p1 .- p))
+        idxs .-= 1
+        idxs .÷= 3 + N_kd
+        idxs .+= 1
+        unique!(idxs)
+
+        @inbounds for j in idxs
             v1 = SVector{3}(mesh[j][1].position)
             v2 = SVector{3}(mesh[j][2].position)
             v3 = SVector{3}(mesh[j][3].position)
@@ -238,10 +232,10 @@ function make_point(u, r, R, T)
     )
 end
 
-function do_analysis(r, R, V, T, app_cnt, N_cell, N_samples, max_orbit)
+function do_analysis(r, R, V, T, app_cnt, N_kd, N_samples, max_orbit)
     println("Analysis For $(app_cnt) Appratures:")
     mesh = scale_mesh(load("anode_meshes/appratures_$(app_cnt).stl"), r)
-    prox_map_intersection = make_prox_map_intersection(mesh, N_cell)
+    kd_tree = build_kd_tree(mesh, N_kd)
     c, a = centroid_areas(mesh)
     E_feild(ρ) = E(ρ, c, a, r, R, V)
 
@@ -252,7 +246,7 @@ function do_analysis(r, R, V, T, app_cnt, N_cell, N_samples, max_orbit)
     @inbounds for i in 1:N_samples
         u0 = make_point(uni[6*i-5:6*i], r, R, T)
         initials[i] = u0
-        orbit_cnts[i], _ = find_path(mesh, prox_map_intersection, r, max_orbit, E_feild, u0)
+        orbit_cnts[i], _ = find_path(mesh, kd_tree, N_kd, r, max_orbit, E_feild, u0)
         print("\r$(round(i*100/N_samples, digits = 2))%")
     end
 
@@ -306,19 +300,19 @@ end
 r, R, V, T = 0.05, 0.5, 1e5, 300
 N_cell = 20
 N_samples = 100
-max_orbit = 10
-app_cnt = 6
+max_orbit = 5
+app_cnt = 10
 
 
 mesh = scale_mesh(load("anode_meshes/appratures_$(app_cnt).stl"), r)
-prox_map_intersection = make_prox_map_intersection(mesh, N_cell)
+N_kd = 4
+kd_tree = build_kd_tree(mesh, N_kd)
 c, a = centroid_areas(mesh)
 E_feild(ρ) = E(ρ, c, a, r, R, V)
 
 u0 = make_point(rand(6), r, R, T)
-orbit_cnt, sol = find_path(mesh, prox_map_intersection, r, max_orbit, E_feild, u0)
+orbit_cnt, sol = find_path(mesh, kd_tree, N_kd, r, max_orbit, E_feild, u0)
 
 println(orbit_cnt)
-
 sol = hcat(Vector.(sol.u)...)
 plot(plot_path(mesh, sol), cube_layout(R))
