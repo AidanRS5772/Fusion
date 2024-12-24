@@ -12,7 +12,7 @@ using Distributions
 using Statistics
 using JSON
 using NearestNeighbors
-using BenchmarkTools
+using Base.Threads
 
 function cube_layout(lim)
     return Layout(
@@ -232,22 +232,21 @@ function make_point(u, r, R, T)
     )
 end
 
-function do_analysis(r, R, V, T, app_cnt, N_kd, N_samples, max_orbit)
-    println("Analysis For $(app_cnt) Appratures:")
+function do_analysis(r, R, V, T, N_kd, N_samples, max_orbit, app_cnt)
     mesh = scale_mesh(load("anode_meshes/appratures_$(app_cnt).stl"), r)
     kd_tree = build_kd_tree(mesh, N_kd)
     c, a = centroid_areas(mesh)
     E_feild(ρ) = E(ρ, c, a, r, R, V)
 
+    println("Start Simulation for $(app_cnt) Appratures")
     initials = Vector{MVector{6}}(undef, N_samples)
     orbit_cnts = Vector{Int}(undef, N_samples)
     uni = rand(6 * N_samples)
-    print("0%")
+
     @inbounds for i in 1:N_samples
         u0 = make_point(uni[6*i-5:6*i], r, R, T)
         initials[i] = u0
         orbit_cnts[i], _ = find_path(mesh, kd_tree, N_kd, r, max_orbit, E_feild, u0)
-        print("\r$(round(i*100/N_samples, digits = 2))%")
     end
 
     pdf_trace = histogram(
@@ -268,6 +267,7 @@ function do_analysis(r, R, V, T, app_cnt, N_kd, N_samples, max_orbit)
     end
     deleteat!(orbit_cnts, del_idxs)
 
+    println("Analysis For $(app_cnt) Appratures:")
     mean_orbit = mean(orbit_cnts)
     println("Mean Orbit Count: ", mean_orbit)
 
@@ -297,22 +297,20 @@ function do_analysis(r, R, V, T, app_cnt, N_kd, N_samples, max_orbit)
     run(`open anode_data_plots/appratures_$(app_cnt).html`)
 end
 
+function do_analysis_on_chunk(r, R, V, T, N_samples, N_kd, max_orbit, chunk)
+    for app_cnt in chunk
+        do_analysis(r, R, V, T, N_kd, N_samples, max_orbit, app_cnt)
+    end
+end
+
 r, R, V, T = 0.05, 0.5, 1e5, 300
-N_cell = 20
-N_samples = 100
-max_orbit = 5
-app_cnt = 10
-
-
-mesh = scale_mesh(load("anode_meshes/appratures_$(app_cnt).stl"), r)
+N_samples = 10000
 N_kd = 4
-kd_tree = build_kd_tree(mesh, N_kd)
-c, a = centroid_areas(mesh)
-E_feild(ρ) = E(ρ, c, a, r, R, V)
+max_orbit = 50
 
-u0 = make_point(rand(6), r, R, T)
-orbit_cnt, sol = find_path(mesh, kd_tree, N_kd, r, max_orbit, E_feild, u0)
-
-println(orbit_cnt)
-sol = hcat(Vector.(sol.u)...)
-plot(plot_path(mesh, sol), cube_layout(R))
+nt = nthreads()
+println("$(nt) Threads Running...")
+chunks = [(6+2*i):2*nt:362 for i in 0:(nt-1)]
+for chunk in chunks
+    @spawn do_analysis_on_chunk(r, R, V, T, N_samples, N_kd, max_orbit, chunk)
+end
