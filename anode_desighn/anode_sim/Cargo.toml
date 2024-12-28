@@ -1,0 +1,9 @@
+[package]
+name = "anode_sim"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+kiddo = "5.0.3"
+nalgebra = "0.33.2"
+stl = "0.2.1"

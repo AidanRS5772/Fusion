@@ -80,41 +80,12 @@ end
 
 function scale_mesh(mesh, scale_factor)
     verts = coordinates(mesh)
-    b_radius = maximum([norm(v.position) for v in verts])
     new_vertices = StructVector{typeof(verts[1])}((
-        position=[Point{3,Float32}(v.position .* scale_factor ./ b_radius) for v in verts],
+        position=[Point{3,Float32}(v.position .* scale_factor) for v in verts],
         normals=verts.normals
     ))
 
     return GeometryBasics.Mesh(new_vertices, faces(mesh))
-end
-
-function sample_triangle(v1, v2, v3, N)
-    points = [v1, v2, v3]
-    e1 = v2 .- v1
-    e2 = v3 .- v1
-    r1 = rand(N)
-    r2 = rand(N)
-
-    for i in 1:N
-        u = r1[i] * (1 - r2[i])
-        v = r2[i] * (1 - r1[i])
-        push!(points, e1 .* u .+ e2 .* v .+ v1)
-    end
-
-    return points
-end
-
-function build_kd_tree(mesh, N)
-    bb_vertices = [0, 0, 0]
-    for i in eachindex(mesh)
-        v1 = mesh[i][1].position
-        v2 = mesh[i][2].position
-        v3 = mesh[i][3].position
-        bb_vertices = hcat(bb_vertices, sample_triangle(v1, v2, v3, N)...)
-    end
-
-    return KDTree(bb_vertices[:, 2:end])
 end
 
 function intersect(p1, p2, v1, v2, v3)
@@ -139,50 +110,54 @@ function intersect(p1, p2, v1, v2, v3)
     return false
 end
 
-function find_path(mesh, kd_tree, N_kd, sphere_radius, max_orbit, E, u0)
+function find_path(mesh, bounds, max_orbit, c, a, u0)
     orbit_cnt = 0
-    p0 = u0[1:3]
     p1 = u0[1:3]
     n0 = norm(p1)
     n1 = n0
-    function condition(u, t, integrator)
-        p = u[1:3]
-        n = norm(u[1:3])
-        if n0 < n1 && n < n1 && sphere_radius < n1
+    function condition(v, u, t, integrator)
+        p = u
+        n = norm(u)
+        if n0 < n1 && n < n1 && bounds[2] < n1
             orbit_cnt += 1
             if orbit_cnt >= max_orbit
                 return true
             end
         end
 
-        idxs = inrange(kd_tree, p, norm(p1 .- p))
-        idxs .-= 1
-        idxs .÷= 3 + N_kd
-        idxs .+= 1
-        unique!(idxs)
-
-        @inbounds for j in idxs
-            v1 = SVector{3}(mesh[j][1].position)
-            v2 = SVector{3}(mesh[j][2].position)
-            v3 = SVector{3}(mesh[j][3].position)
-            if intersect(p, p1, v1, v2, v3)
-                return true
+        if (min(n1, n) <= bounds[2] || max(n1, n) >= bounds[1])
+            @inbounds for j in eachindex(mesh)
+                v1 = SVector{3}(mesh[j][1].position)
+                v2 = SVector{3}(mesh[j][2].position)
+                v3 = SVector{3}(mesh[j][3].position)
+                if intersect(p, p1, v1, v2, v3)
+                    return true
+                end
             end
         end
 
-        p0, p1, n0, n1 = p1, p, n1, n
+        p1, n0, n1 = p, n1, n
 
         return false
     end
 
     cb = DiscreteCallback(condition, terminate!)
-    prob = ODEProblem(lorenz!, u0, (0.0, 1.0), (E))
-    sol = solve(prob, Rodas5P(autodiff=false), callback=cb)
+    prob = SecondOrderODEProblem(lorenz!, u0[4:6], u0[1:3], (0.0, 10000.0), (c, a))
+    sol = solve(prob, DPRKN6(), callback=cb)
 
     return orbit_cnt, sol
 end
 
-function centroid_areas(mesh)
+@fastmath function lorenz!(dv, v, u, p, t)
+    c, a = p
+    dv .= 0
+    @inbounds @simd for i in eachindex(c)
+        diff = u .- c[i]
+        dv .+= (a[i] .* diff) ./ norm(diff)^3
+    end
+end
+
+function centroid_areas(mesh, r, R, V)
     centroids = []
     areas = []
 
@@ -197,23 +172,7 @@ function centroid_areas(mesh)
         push!(areas, norm(cross(e1, e2)) / 2)
     end
 
-    return centroids, areas ./ sum(areas)
-end
-
-@fastmath function E(p, c, a, r, R, V)
-    E_tot = @MVector zeros(3)
-    @inbounds @simd for i in eachindex(c)
-        diff = p .- c[i]
-        E_tot .+= (a[i] .* diff) ./ norm(diff)^3
-    end
-    return E_tot .* (-V / (1 / r - 1 / R))
-end
-
-@fastmath function lorenz!(du, u, p, t)
-    e_m = 47917944.84
-    E = p
-    du[1:3] = u[4:6]
-    du[4:6] = e_m .* E(u[1:3])
+    return centroids, areas .* (-47917944.84 * V / ((1 / r - 1 / R) * sum(areas)))
 end
 
 function make_point(u, r, R, T)
@@ -234,8 +193,9 @@ end
 
 function do_analysis(r, R, V, T, N_kd, N_samples, max_orbit, app_cnt)
     mesh = scale_mesh(load("anode_meshes/appratures_$(app_cnt).stl"), r)
-    kd_tree = build_kd_tree(mesh, N_kd)
     c, a = centroid_areas(mesh)
+    kd_tree = KDTree(hcat(Vector.(c)...))
+    bounds = extrema([norm(v.position) for v in coordinates(mesh)])
     E_feild(ρ) = E(ρ, c, a, r, R, V)
 
     println("Start Simulation for $(app_cnt) Appratures")
@@ -246,8 +206,10 @@ function do_analysis(r, R, V, T, N_kd, N_samples, max_orbit, app_cnt)
     @inbounds for i in 1:N_samples
         u0 = make_point(uni[6*i-5:6*i], r, R, T)
         initials[i] = u0
-        orbit_cnts[i], _ = find_path(mesh, kd_tree, N_kd, r, max_orbit, E_feild, u0)
+        orbit_cnts[i], _ = find_path(mesh, kd_tree, N_kd, bounds, max_orbit, E_feild, u0)
     end
+
+    display(orbit_cnts)
 
     pdf_trace = histogram(
         x=orbit_cnts,
@@ -256,6 +218,10 @@ function do_analysis(r, R, V, T, N_kd, N_samples, max_orbit, app_cnt)
         histnorm="probability",
         marker_color="rgb(100, 150, 200)"
     )
+
+    fig = plot(pdf_trace)
+    savefig(fig, "anode_data_plots/appratures_$(app_cnt).html")
+    run(`open anode_data_plots/appratures_$(app_cnt).html`)
 
     eternal_initials = []
     del_idxs = []
@@ -291,26 +257,20 @@ function do_analysis(r, R, V, T, N_kd, N_samples, max_orbit, app_cnt)
     open(file, "w") do f
         JSON.print(f, data)
     end
-
-    fig = plot(pdf_trace)
-    savefig(fig, "anode_data_plots/appratures_$(app_cnt).html")
-    run(`open anode_data_plots/appratures_$(app_cnt).html`)
 end
 
-function do_analysis_on_chunk(r, R, V, T, N_samples, N_kd, max_orbit, chunk)
-    for app_cnt in chunk
-        do_analysis(r, R, V, T, N_kd, N_samples, max_orbit, app_cnt)
-    end
-end
-
-r, R, V, T = 0.05, 0.5, 1e5, 300
-N_samples = 10000
-N_kd = 4
+r, R, V, T = 0.05, 0.2, 1e5, 300
+N_samples = 100
+N_kd = 20
 max_orbit = 50
+app_cnt = 6
 
-nt = nthreads()
-println("$(nt) Threads Running...")
-chunks = [(6+2*i):2*nt:362 for i in 0:(nt-1)]
-for chunk in chunks
-    @spawn do_analysis_on_chunk(r, R, V, T, N_samples, N_kd, max_orbit, chunk)
-end
+mesh = scale_mesh(load("anode_meshes/appratures_$(app_cnt).stl"), r)
+c, a = centroid_areas(mesh, r, R, V)
+bounds = extrema([norm(v.position) for v in coordinates(mesh)])
+
+u0 = make_point(rand(6), r, R, T)
+@time orbit_cnt, sol = find_path(mesh, bounds, max_orbit, c, a, u0)
+
+sol = hcat(Vector.(sol.u)...)
+plot(plot_path(mesh, sol), cube_layout(R))
