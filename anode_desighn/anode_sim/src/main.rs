@@ -207,5 +207,3 @@ where
 
     return (orbit_cnt, u);
 }
-
-fn make_point()
