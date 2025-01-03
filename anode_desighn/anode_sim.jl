@@ -1,18 +1,16 @@
-using MeshIO
-using GeometryBasics
-using FileIO
+using Base: Process
 using LinearAlgebra
-using DifferentialEquations
-using StructArrays
-using StaticArrays
-using PlotlyJS
-using Random
-using SpecialFunctions
-using Distributions
-using Statistics
 using JSON
-using NearestNeighbors
-using Base.Threads
+using PlotlyJS
+using StaticArrays
+using JacobiElliptic
+using SpecialFunctions
+using BenchmarkTools
+using DifferentialEquations
+using Cubature
+using .Threads
+using Distributions
+
 
 function cube_layout(lim)
     return Layout(
@@ -25,292 +23,408 @@ function cube_layout(lim)
     )
 end
 
-function plot_path(mesh, path)
-    # For each triangle, get its three vertices
-    x = Float64[]
-    y = Float64[]
-    z = Float64[]
-    i = Int[]
-    j = Int[]
-    k = Int[]
+function plot_cylinder(radius, length, direction, midpoint; color="grey", opacity=0.7, res=5)
+    direction = direction / norm(direction)
+    temp = direction ≈ [1.0, 0.0, 0.0] ? [0.0, 1.0, 0.0] : [1.0, 0.0, 0.0]
+    orthogonal1 = normalize(cross(direction, temp))
+    orthogonal2 = normalize(cross(direction, orthogonal1))
 
-    # For each triangle in the mesh
-    for (idx, triangle) in enumerate(mesh)
-        # Get the three vertices
-        v1, v2, v3 = triangle[1], triangle[2], triangle[3]
+    n_theta, n_z = res, res
+    theta = range(0, 2π, length=n_theta)
+    z = range(-length / 2, length / 2, length=n_z)
 
-        # Add vertex coordinates
-        push!(x, v1[1], v2[1], v3[1])
-        push!(y, v1[2], v2[2], v3[2])
-        push!(z, v1[3], v2[3], v3[3])
+    Θ = repeat(theta, 1, n_z)
+    Z_local = repeat(z', n_theta, 1)
 
-        # Add face indices (3 vertices per triangle)
-        base = (idx - 1) * 3  # each triangle starts 3 vertices after the previous
-        push!(i, base)
-        push!(j, base + 1)
-        push!(k, base + 2)
+    X_local = radius .* cos.(Θ)
+    Y_local = radius .* sin.(Θ)
+
+    X = midpoint[1] .+ X_local .* orthogonal1[1] .+ Y_local .* orthogonal2[1] .+ Z_local .* direction[1]
+    Y = midpoint[2] .+ X_local .* orthogonal1[2] .+ Y_local .* orthogonal2[2] .+ Z_local .* direction[2]
+    Z = midpoint[3] .+ X_local .* orthogonal1[3] .+ Y_local .* orthogonal2[3] .+ Z_local .* direction[3]
+
+    return PlotlyJS.surface(
+        x=X,
+        y=Y,
+        z=Z,
+        colorscale=[[0, color], [1, color]],
+        opacity=opacity,
+        showscale=false
+    )
+end
+
+function plot_anode(edges, ω)
+    traces = [plot_cylinder(ω, norm(edges[1][2]), edges[1][2], edges[1][1])]
+    for e in edges[2:end]
+        trace = plot_cylinder(ω, norm(e[2]), e[2], e[1])
+        push!(traces, trace)
     end
 
-    # Create mesh trace
-    mesh_trace = mesh3d(
-        x=x,
-        y=y,
-        z=z,
-        i=i,
-        j=j,
-        k=k,
-        opacity=0.5,
-        color="grey"
-    )
+    return traces
+end
 
-    # Create path trace
-    path_trace = scatter3d(
-        x=path[1, :],
-        y=path[2, :],
-        z=path[3, :],
+function plot_path(sol)
+    return scatter3d(
+        x=sol[1, :],
+        y=sol[2, :],
+        z=sol[3, :],
         mode="lines",
         line=attr(
-            color="red",
-            width=2
+            size=2,
+            color="red"
         )
     )
-
-    return [mesh_trace, path_trace]
 end
 
-function scale_mesh(mesh, scale_factor)
-    verts = coordinates(mesh)
-    b_radius = maximum([norm(v.position) for v in verts])
-    new_vertices = StructVector{typeof(verts[1])}((
-        position=[Point{3,Float32}(v.position .* scale_factor ./ b_radius) for v in verts],
-        normals=verts.normals
-    ))
+function make_edges(data_edges, r)
+    edges = []
+    L = 0.0
+    lb = Inf
+    hb = 0.0
+    for e in data_edges
+        e1, e2 = e[1] .* r, e[2] .* r
+        m = (e1 .+ e2) ./ 2
+        z = e1 .- e2
+        L += norm(z)
+        if norm(m) < lb
+            lb = norm(m)
+        end
+        if norm(e1) > hb
+            hb = norm(e1)
+        end
+        if norm(e2) > hb
+            hb = norm(e2)
+        end
+        push!(edges, (SVector{3,Float64}(m...), SVector{3,Float64}(z...)))
+    end
 
-    return GeometryBasics.Mesh(new_vertices, faces(mesh))
+    return SVector{length(edges),Tuple{SVector{3,Float64},SVector{3,Float64}}}(edges...), L, lb - ω, hb + ω
 end
 
-function sample_triangle(v1, v2, v3, N)
-    points = [v1, v2, v3]
-    e1 = v2 .- v1
-    e2 = v3 .- v1
-    r1 = rand(N)
-    r2 = rand(N)
-
-    for i in 1:N
-        u = r1[i] * (1 - r2[i])
-        v = r2[i] * (1 - r1[i])
-        push!(points, e1 .* u .+ e2 .* v .+ v1)
+#Scaled by one 1/ε_0
+function capacitence(edges, L, R, ω; rtol=1e-4)
+    @inline function V_int(ρ, ζ, z)
+        val = (ζ - z)^2 + (ρ + ω)^2
+        return ellipk(clamp(4 * ρ * ω / val, 0.0, 1.0 - eps())) / sqrt(val)
     end
 
-    return points
+    global u = MVector{3,Float64}(0.0, 0.0, 0.0)
+    V1 = 0.0
+    V2 = 0.0
+
+    V1_int(x::Vector{Float64}) = V_int(ω, x[1], x[2])
+
+    for (m, z_vec) in edges
+        l = norm(z_vec)
+        function V2_int(x::Vector{Float64})
+            z, θ, ϕ = x
+
+            u[1] = cos(θ) * sin(ϕ)
+            u[2] = sin(θ) * sin(ϕ)
+            u[3] = cos(ϕ)
+            u .*= R
+
+            ζ = dot(z_vec, u .- m) / l
+            ρ = norm(u .- m .- ζ .* z_vec ./ l)
+            return V_int(ρ, ζ, z) * sin(ϕ)
+        end
+
+        V1 += hcubature(V1_int, (-l / 2, -l / 2), (l / 2, l / 2), reltol=rtol)[1]
+        V2 += hcubature(V2_int, (-l / 2, 0.0, 0.0), (l / 2, 2 * π, π), reltol=rtol)[1]
+    end
+
+    V1 /= 19.7392088 * L^2
+    V2 /= 11.62735376 * R * L
+
+    return 1 / abs(V1 - V2)
 end
 
-function build_kd_tree(mesh, N)
-    bb_vertices = [0, 0, 0]
-    for i in eachindex(mesh)
-        v1 = mesh[i][1].position
-        v2 = mesh[i][2].position
-        v3 = mesh[i][3].position
-        bb_vertices = hcat(bb_vertices, sample_triangle(v1, v2, v3, N)...)
-    end
-
-    return KDTree(bb_vertices[:, 2:end])
+function make_initial(u, hb, R, T)
+    r = (u[1] * (R^3 - hb^3) + hb^3)^(1 / 3)
+    sϕ = 2 * sqrt(u[2]) * sqrt(1 - u[2])
+    θ = 2 * π * u[3]
+    v = (90.87627864 * sqrt(T)) * erfinv.(1 .- 2 .* u[4:6])
+    return (MVector{3,Float64}(
+            r * cos(θ) * sϕ,
+            r * sin(θ) * sϕ,
+            r * (1 - 2 * u[2])
+        ),
+        MVector{3,Float64}(v...))
 end
 
-function intersect(p1, p2, v1, v2, v3)
-    d = p2 .- p1
-    e1 = v2 .- v1
-    e2 = v3 .- v1
-    n = cross(e1, e2)
-    if abs(d ⋅ n) / (norm(d) * norm(n)) < 1e-6
-        return false
+function lorenz!(ddu, du, u, p, t)
+    edges, ω, scale = p
+    ddu .= 0.0
+    for (m, e) in edges
+        z_vec = MVector(e)
+        l = norm(z_vec)
+        z_vec ./= l
+        d = u .- m
+        ζ = dot(z_vec, d)
+        r_vec = d .- ζ .* z_vec
+        ρ = norm(r_vec)
+        r_vec ./= ρ
+
+        a = 4 * ρ * ω
+        b = (ρ + ω)^2
+        zp, zm = ζ + l / 2, ζ - l / 2
+        cp, cm = zp^2 + b, zm^2 + b
+        Kp, Km = ellipk(a / cp), ellipk(a / cm)
+        ds = (ρ - ω) / (ρ + ω)
+        scp, scm = sqrt(cp), sqrt(cm)
+
+        Ez = Kp / scp - Km / scm
+        Er = (zp / scp) * (ds * Pi(a / b, a / cp) + Kp) - (zm / scm) * (ds * Pi(a / b, a / cm) + Km)
+        Er /= 2 * ρ
+
+        ddu .+= Er .* r_vec - Ez .* z_vec
     end
+    ddu .*= -scale
+end
 
-    M = @SMatrix [-d[1] e1[1] e2[1]
-        -d[2] e1[2] e2[2]
-        -d[3] e1[3] e2[3]]
-    b = SVector{3}(p1 .- v1)
-    t, u, v = M \ b
-
-    if (0.0 <= t <= 1.0) && (0.0 <= u) && (0.0 <= v) && (u + v <= 1.0)
-        return true
+function intersect(p, m, z, ω)
+    v1 = m .+ z ./ 2
+    v2 = m .- z ./ 2
+    n = norm(z)
+    r = norm(cross(p .- v1, p .- v2)) / n
+    if r <= ω
+        t = dot(p - m, z) / n
+        if -n / 2 <= t <= n / 2
+            return true
+        end
     end
-
     return false
 end
 
-function find_path(mesh, kd_tree, N_kd, sphere_radius, max_orbit, E, u0)
+function find_path(edges, hb, lb, max_orbit, ω, scale, u0, v0; dt=1e-9)
     orbit_cnt = 0
-    p0 = u0[1:3]
-    p1 = u0[1:3]
-    n0 = norm(p1)
-    n1 = n0
-    function condition(u, t, integrator)
-        p = u[1:3]
-        n = norm(u[1:3])
-        if n0 < n1 && n < n1 && sphere_radius < n1
+    n1 = norm(u0)
+    n2 = n1
+    function condition(val, _, _)
+        _, u = val.x
+        n = norm(u)
+        if (n < n1) && (n2 < n1) && (n1 > hb)
             orbit_cnt += 1
             if orbit_cnt >= max_orbit
                 return true
             end
         end
 
-        idxs = inrange(kd_tree, p, norm(p1 .- p))
-        idxs .-= 1
-        idxs .÷= 3 + N_kd
-        idxs .+= 1
-        unique!(idxs)
-
-        @inbounds for j in idxs
-            v1 = SVector{3}(mesh[j][1].position)
-            v2 = SVector{3}(mesh[j][2].position)
-            v3 = SVector{3}(mesh[j][3].position)
-            if intersect(p, p1, v1, v2, v3)
-                return true
+        if min(n, n1) < hb || max(n, n1) > lb
+            for (m, z) in edges
+                if intersect(u, m, z, ω)
+                    return true
+                end
             end
         end
 
-        p0, p1, n0, n1 = p1, p, n1, n
+        n1, n2 = n, n1
 
         return false
     end
 
     cb = DiscreteCallback(condition, terminate!)
-    prob = ODEProblem(lorenz!, u0, (0.0, 1.0), (E))
-    sol = solve(prob, Rodas5P(autodiff=false), callback=cb)
+    prob = SecondOrderODEProblem(lorenz!, v0, u0, (0.0, 1e-2), (edges, ω, scale))
+    _ = solve(prob, KahanLi8(), dt=dt, callback=cb, save_everystep=false)
 
-    return orbit_cnt, sol
+    return orbit_cnt
 end
 
-function centroid_areas(mesh)
-    centroids = []
-    areas = []
-
-    for i in eachindex(mesh)
-        v1 = SVector{3,Float64}(mesh[i][1])
-        v2 = SVector{3,Float64}(mesh[i][2])
-        v3 = SVector{3,Float64}(mesh[i][3])
-        push!(centroids, (v1 .+ v2 .+ v3) ./ 3)
-
-        e1 = v2 .- v1
-        e2 = v3 .- v1
-        push!(areas, norm(cross(e1, e2)) / 2)
+function process_sol(sol)
+    position = []
+    for val in sol.u
+        v, u = val.x
+        push!(position, Vector(u))
     end
 
-    return centroids, areas ./ sum(areas)
+    return hcat(position...)
 end
 
-@fastmath function E(p, c, a, r, R, V)
-    E_tot = @MVector zeros(3)
-    @inbounds @simd for i in eachindex(c)
-        diff = p .- c[i]
-        E_tot .+= (a[i] .* diff) ./ norm(diff)^3
-    end
-    return E_tot .* (-V / (1 / r - 1 / R))
-end
-
-@fastmath function lorenz!(du, u, p, t)
-    e_m = 47917944.84
-    E = p
-    du[1:3] = u[4:6]
-    du[4:6] = e_m .* E(u[1:3])
-end
-
-function make_point(u, r, R, T)
-    ρ = (u[1] * (R^3 - r^3) + r^3)^(1 / 3)
-    θ = 2 * π * u[2]
-    sϕ = 2 * sqrt(1 - u[3]) * sqrt(u[3])
-    v = (0.01100397172 / sqrt(T)) .* erfinv.(2 .* u[4:6] .- 1)
-
-    return MVector{6}(
-        ρ * cos(θ) * sϕ,
-        ρ * sin(θ) * sϕ,
-        ρ * (1 - 2 * u[3]),
-        v[1],
-        v[2],
-        v[3]
-    )
-end
-
-function do_analysis(r, R, V, T, N_kd, N_samples, max_orbit, app_cnt)
-    mesh = scale_mesh(load("anode_meshes/appratures_$(app_cnt).stl"), r)
-    kd_tree = build_kd_tree(mesh, N_kd)
-    c, a = centroid_areas(mesh)
-    E_feild(ρ) = E(ρ, c, a, r, R, V)
-
-    println("Start Simulation for $(app_cnt) Appratures")
-    initials = Vector{MVector{6}}(undef, N_samples)
-    orbit_cnts = Vector{Int}(undef, N_samples)
-    uni = rand(6 * N_samples)
-
-    @inbounds for i in 1:N_samples
-        u0 = make_point(uni[6*i-5:6*i], r, R, T)
-        initials[i] = u0
-        orbit_cnts[i], _ = find_path(mesh, kd_tree, N_kd, r, max_orbit, E_feild, u0)
+function do_analysis(app_cnt, N_samples, max_orbit, r, R, ω, V, T)
+    data = open("anode_data/appratures_$(app_cnt).json", "r") do file
+        JSON.parse(file)
     end
 
-    pdf_trace = histogram(
-        x=orbit_cnts,
-        opacity=0.5,
-        nbinsx=max_orbit,
-        histnorm="probability",
-        marker_color="rgb(100, 150, 200)"
-    )
+    edges, L, lb, hb = make_edges(data["edges"], r)
+
+    C = capacitence(edges, L, R, ω)
+    data["capacitence"] = C
+    s = 2427551.451 * V * C / L
+
+    seeds = rand(6 * N_samples)
+
+    orbits = Vector{Float64}(undef, N_samples)
+    initials = Vector{Tuple{Vector{Float64},Vector{Float64}}}(undef, N_samples)
+
+    println("Starting Sampling for $(app_cnt) Appratures...")
+    @threads for i in 1:N_samples
+        u0, v0 = make_initial(seeds[6*i-5:6*i], hb, R, T)
+        initials[i] = (Vector(u0), Vector(v0))
+        orbits[i] = find_path(edges, hb, lb, max_orbit, ω, s, u0, v0)
+    end
+    println("Done.")
+
+    data["raw_orbit_counts"] = sort(orbits, rev = true)
 
     eternal_initials = []
-    del_idxs = []
-    for i in eachindex(orbit_cnts)
-        if orbit_cnts[i] == max_orbit
-            push!(del_idxs, i)
+    filtered_orbits = []
+    for i in eachindex(orbits)
+        if orbits[i] == max_orbit
             push!(eternal_initials, initials[i])
+        else
+            push!(filtered_orbits, orbits[i])
         end
     end
-    deleteat!(orbit_cnts, del_idxs)
+    filtered_orbits = convert(Vector{Float64}, filtered_orbits)
+    eternal_orbit_cnt = length(eternal_initials)
 
-    println("Analysis For $(app_cnt) Appratures:")
-    mean_orbit = mean(orbit_cnts)
-    println("Mean Orbit Count: ", mean_orbit)
+    # Fit gamma and calculate statistics
+    gamma_fit = fit_mle(Gamma, filtered_orbits .+ 1.0)
+    adj_eternal_prop = (length(eternal_initials) / N_samples) - ccdf(gamma_fit, max_orbit .+ 1.0)
 
-    α, β = Distributions.params(fit(Gamma, Float64.(orbit_cnts)))
-    println("α: $(α)")
-    println("β: $(β)")
+    # Basic statistics
+    mean_val = mean(filtered_orbits)
+    median_val = median(filtered_orbits)
+    mode_val = mode(filtered_orbits)
+    std_val = std(filtered_orbits)
+    skewness_val = skewness(filtered_orbits)
+    kurtosis_val = kurtosis(filtered_orbits)
 
-    P_expected_tail = 1 - cdf(Gamma(α, β), max_orbit)
-    P_observed_tail = length(eternal_initials) / N_samples
-    eternal_prop = P_observed_tail - P_expected_tail
-    println("Proportionl of Phase Space with an Eternal Path: ", eternal_prop)
+    # Quantile analysis
+    quantiles = [0.25, 0.5, 0.75, 0.9, 0.95, 0.99]
+    q_values = quantile(filtered_orbits, quantiles)
 
-    file = "anode_data/appratures_$(app_cnt).json"
-    data = JSON.parsefile(file)
-    data["mean_orbit"] = mean_orbit
-    data["α"] = α
-    data["β"] = β
-    data["eternal_prop"] = eternal_prop
+    # Gamma distribution parameters
+    α = shape(gamma_fit)
+    θ = scale(gamma_fit)
+
+    # Create visualization
+    # Histogram of data
+    h = histogram(
+        x=orbits,
+        nbinsx=max_orbit,
+        opacity=0.5,
+        marker_color="blue",
+        histnorm="probability",
+        name="Data"
+    )
+
+    # Overlay fitted gamma distribution
+    x_range = range(0, max_orbit, length=100)
+    y_fitted = pdf.(gamma_fit, x_range .+ 1.0)
+
+    # Create vertical lines as shapes in the layout
+    shapes = [
+        vline(mean_val, line_dash="dash", line_color="red"),
+        vline(median_val, line_dash="dash", line_color="red"),
+        vline(mode_val, line_dash="dash", line_color="red")
+    ]
+
+    analysis_plot = plot([
+            h,
+            scatter(x=x_range, y=y_fitted, mode="lines",
+                name="Fitted Gamma", line_color="red")
+        ],
+        Layout(
+            title="Orbit Distribution Analysis",
+            xaxis_title="Number of Orbits",
+            yaxis_title="Probability Density",
+            showlegend=true,
+            shapes=shapes,
+            # Add annotations for the lines
+            annotations=[
+                attr(
+                    x=mean_val,
+                    y=0.9,
+                    text="Mean = $(round(mean_val, digits = 2))",
+                    showarrow=false,
+                    yref="paper",
+                    font_color="red"
+                ),
+                attr(
+                    x=median_val,
+                    y=0.95,
+                    text="Median = $(round(median_val, digits = 2))",
+                    showarrow=false,
+                    yref="paper",
+                    font_color="red"
+                ),
+                attr(
+                    x=mode_val,
+                    y=1.0,
+                    text="Mode = $(round(mode_val, digits = 2))",
+                    showarrow=false,
+                    yref="paper",
+                    font_color="red"
+                )
+            ]
+        )
+    )
+
+    # Print comprehensive analysis
+    println("\nAnalysis Results:")
+
+    println("Sample Size: ", length(filtered_orbits))
+    println("Number of Eternal Orbits: ", eternal_orbit_cnt, " (",
+        100 * eternal_orbit_cnt / N_samples, "%)")
     data["eternal_initials"] = eternal_initials
 
-    open(file, "w") do f
+    println("\nBasic Statistics:")
+
+    println("Mean: ", mean_val)
+    data["mean"] = mean_val
+
+    println("Median: ", median_val)
+    data["median"] = median_val
+
+    println("Mode: ", mode_val)
+    data["mode"] = mode_val
+
+    println("Standard Deviation: ", std_val)
+    data["std"] = std_val
+
+    println("Skewness: ", skewness_val)
+    data["skew"] = skewness_val
+
+    println("Kurtosis: ", kurtosis_val)
+    data["Kurtosis"] = kurtosis_val
+
+    println("\nQuantiles:")
+    for (q, v) in zip(quantiles, q_values)
+        println(q * 100, "th percentile: ", v)
+    end
+    data["quantiles"] = collect(zip(quantiles, q_values))
+
+    println("\nGamma Distribution Parameters:")
+
+    println("Shape (α): ", α)
+    data["gamma_shape"] = α
+
+    println("Scale (θ): ", θ)
+    data["gamma_scale"] = θ
+
+    println("\nTail Analysis:")
+    println("Probability of exceeding ", max_orbit, " orbits with Gamma fit: ",
+        ccdf(gamma_fit, max_orbit .+ 1))
+    println("Adjusted proportion of eternal orbits: ", adj_eternal_prop)
+    data["adj_prop_eternal"] = adj_eternal_prop
+
+    println("")
+
+    open("anode_data/appratures_$(app_cnt).json", "w") do f
         JSON.print(f, data)
     end
 
-    fig = plot(pdf_trace)
-    savefig(fig, "anode_data_plots/appratures_$(app_cnt).html")
+    savefig(analysis_plot, "anode_data_plots/appratures_$(app_cnt).html")
     run(`open anode_data_plots/appratures_$(app_cnt).html`)
 end
 
-function do_analysis_on_chunk(r, R, V, T, N_samples, N_kd, max_orbit, chunk)
-    for app_cnt in chunk
-        do_analysis(r, R, V, T, N_kd, N_samples, max_orbit, app_cnt)
-    end
-end
 
-r, R, V, T = 0.05, 0.5, 1e5, 300
-N_samples = 10000
-N_kd = 4
+r, R, ω, V, T = 0.05, 0.5, 0.001, 1e5, 3e2
+app_cnt = 6
+N_samples = 100
 max_orbit = 50
 
-nt = nthreads()
-println("$(nt) Threads Running...")
-chunks = [(6+2*i):2*nt:362 for i in 0:(nt-1)]
-for chunk in chunks
-    @spawn do_analysis_on_chunk(r, R, V, T, N_samples, N_kd, max_orbit, chunk)
+for i in 6:2:362
+    do_analysis(app_cnt, N_samples, max_orbit, r, R, ω, V, T)
 end
