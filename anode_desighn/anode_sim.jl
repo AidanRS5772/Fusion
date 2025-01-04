@@ -76,7 +76,7 @@ function plot_path(sol)
     )
 end
 
-function make_edges(data_edges, r)
+function make_edges(data_edges, r, ω)
     edges = []
     L = 0.0
     lb = Inf
@@ -245,7 +245,7 @@ function do_analysis(app_cnt, N_samples, max_orbit, r, R, ω, V, T)
         JSON.parse(file)
     end
 
-    edges, L, lb, hb = make_edges(data["edges"], r)
+    edges, L, lb, hb = make_edges(data["edges"], r, ω)
 
     C = capacitence(edges, L, R, ω)
     data["capacitence"] = C
@@ -264,7 +264,7 @@ function do_analysis(app_cnt, N_samples, max_orbit, r, R, ω, V, T)
     end
     println("Done.")
 
-    data["raw_orbit_counts"] = sort(orbits, rev = true)
+    data["raw_orbit_counts"] = sort(orbits, rev=true)
 
     eternal_initials = []
     filtered_orbits = []
@@ -278,11 +278,9 @@ function do_analysis(app_cnt, N_samples, max_orbit, r, R, ω, V, T)
     filtered_orbits = convert(Vector{Float64}, filtered_orbits)
     eternal_orbit_cnt = length(eternal_initials)
 
-    # Fit gamma and calculate statistics
     gamma_fit = fit_mle(Gamma, filtered_orbits .+ 1.0)
     adj_eternal_prop = (length(eternal_initials) / N_samples) - ccdf(gamma_fit, max_orbit .+ 1.0)
 
-    # Basic statistics
     mean_val = mean(filtered_orbits)
     median_val = median(filtered_orbits)
     mode_val = mode(filtered_orbits)
@@ -290,26 +288,25 @@ function do_analysis(app_cnt, N_samples, max_orbit, r, R, ω, V, T)
     skewness_val = skewness(filtered_orbits)
     kurtosis_val = kurtosis(filtered_orbits)
 
-    # Quantile analysis
     quantiles = [0.25, 0.5, 0.75, 0.9, 0.95, 0.99]
     q_values = quantile(filtered_orbits, quantiles)
 
-    # Gamma distribution parameters
     α = shape(gamma_fit)
     θ = scale(gamma_fit)
 
-    # Create visualization
-    # Histogram of data
     h = histogram(
         x=orbits,
-        nbinsx=max_orbit,
         opacity=0.5,
         marker_color="blue",
         histnorm="probability",
-        name="Data"
+        name="Data",
+        xbins=Dict(
+            "start" => -0.5,  # Start half-way between 0 and first value
+            "end" => max_orbit + 0.5,  # End half-way after last possible value
+            "size" => 1.0    # Bin size of 1 to capture each integer value
+        )
     )
 
-    # Overlay fitted gamma distribution
     x_range = range(0, max_orbit, length=100)
     y_fitted = pdf.(gamma_fit, x_range .+ 1.0)
 
@@ -420,11 +417,10 @@ function do_analysis(app_cnt, N_samples, max_orbit, r, R, ω, V, T)
 end
 
 
-r, R, ω, V, T = 0.05, 0.5, 0.001, 1e5, 3e2
-app_cnt = 6
-N_samples = 100
+r, R, ω, V, T = 0.05, 0.25, 0.001, 1e5, 3e2
+N_samples = 5000
 max_orbit = 50
 
 for i in 6:2:362
-    do_analysis(app_cnt, N_samples, max_orbit, r, R, ω, V, T)
+    do_analysis(i, N_samples, max_orbit, r, R, ω, V, T)
 end
