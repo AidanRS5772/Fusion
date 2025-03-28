@@ -153,15 +153,13 @@ function make_initial(u, hb, R, T)
 end
 
 function lorenz!(ddu, du, u, p, t)
-    edges, ω, scale = p
+    edges, ω, scale  = p
     ddu .= 0.0
     for (m, e) in edges
-        z_vec = MVector(e)
-        l = norm(z_vec)
-        z_vec ./= l
+        l = norm(e)
         d = u .- m
-        ζ = dot(z_vec, d)
-        r_vec = d .- ζ .* z_vec
+        ζ = dot(e, d) / l
+        r_vec = d .- ζ .* e ./ l
         ρ = norm(r_vec)
         r_vec ./= ρ
 
@@ -177,7 +175,7 @@ function lorenz!(ddu, du, u, p, t)
         Er = (zp / scp) * (ds * Pi(a / b, a / cp) + Kp) - (zm / scm) * (ds * Pi(a / b, a / cm) + Km)
         Er /= 2 * ρ
 
-        ddu .+= Er .* r_vec - Ez .* z_vec
+        ddu .+= Er .* r_vec - Ez .* e ./ l
     end
     ddu .*= -scale
 end
@@ -300,11 +298,9 @@ function do_analysis(app_cnt, N_samples, max_orbit, r, R, ω, V, T)
         marker_color="blue",
         histnorm="probability",
         name="Data",
-        xbins=Dict(
-            "start" => -0.5,  # Start half-way between 0 and first value
-            "end" => max_orbit + 0.5,  # End half-way after last possible value
-            "size" => 1.0    # Bin size of 1 to capture each integer value
-        )
+        xbins_start=-0.5,
+        xbins_end=max_orbit + 0.5,
+        xbins_size=1.0
     )
 
     x_range = range(0, max_orbit, length=100)
@@ -413,7 +409,6 @@ function do_analysis(app_cnt, N_samples, max_orbit, r, R, ω, V, T)
     end
 
     savefig(analysis_plot, "anode_data_plots/appratures_$(app_cnt).html")
-    run(`open anode_data_plots/appratures_$(app_cnt).html`)
 end
 
 
@@ -421,6 +416,6 @@ r, R, ω, V, T = 0.05, 0.25, 0.001, 1e5, 3e2
 N_samples = 5000
 max_orbit = 50
 
-for i in 6:2:362
+for i in 176:2:362
     do_analysis(i, N_samples, max_orbit, r, R, ω, V, T)
 end
