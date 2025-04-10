@@ -3,11 +3,6 @@ using JSON3
 using Gmsh
 using LinearAlgebra
 
-struct Face
-    norm::Vector{Float64}
-    verticies::Tuple{Int}
-end
-
 function conectivity_analysis(vertices, edges)
     abstract_edges = []
     for edge in edges
@@ -49,55 +44,94 @@ function conectivity_analysis(vertices, edges)
         push!(connectivity, Tuple(connection[perm]))
     end
 
-    # norms = []
-    # all_vertices = []
-    # for (i, connection) in enumerate(connectivity)
-    #     vertex = vertices[i]
-    #     for c in connection
-
-    #     end
-    # end
-
     return abstract_edges, connectivity
 end
 
-struct Ellipse
-    center_idx::Int
-    cyl_idx::Tuple{Int,Int}
-    major::Vector{Float64}
-    minor::Vector{Float64}
-end
-
-function make_ellipses(center_idx, cyl_idx1, cyl_idx2, radius, vertices)
-    vertex = vertices[center_idx]
-    e1 = vertices[cyl_idx1] .- vertex
-    e2 = vertices[cyl_idx2] .- vertex
-    M = normalize(e1) .+ normalize(e2)
-    m = cross(e1, e2)
-    if dot(m, vertex) < 0
-        m .*= -1
+function find_loops!(connectivity, visited, start_vertex, vertex, path, all_loops)
+    visited[vertex] = true
+    push!(path, vertex)
+    for connection in connectivity[vertex]
+        if connection == start_vertex && length(path) > 2
+            push!(all_loops, copy(path))
+        elseif !visited[connection]
+            find_loops!(connectivity, visited, start_vertex, connection, path, all_loops)
+        end
     end
-    M .*= radius / norm(m)
-    m .*= radius / norm(m)
-    return Ellipse(center_idx, (cyl_idx1, cyl_idx2), M, m)
+    visited[vertex] = false
+    pop!(path)
 end
 
-function make_geo_ellipse(model, mesh_size, geo_vertices, vertices, ellipse::Ellipse)
-    c = vertices[ellipse.center_idx]
-    p1 = c .+ ellipse.minor
-    geo_p1 = model.geo.addPoint(p1[1], p1[2], p1[3], mesh_size)
-    p2 = c .+ ellipse.major
-    geo_p2 = model.geo.addPoint(p2[1], p2[2], p2[3], mesh_size)
+function is_loop_facial(loop, connectivity)
+    visited = falses(length(connectivity))
+    start = rand(1:length(connectivity))
+    while start in loop
+        start = rand(1:length(connectivity))
+    end
 
-    model.geo.addEllipseArc(geo_p1, geo_vertices[ellipse.center_idx], geo_p2, geo_p2)
+    visited = falses(length(connectivity))
+    visited[loop] .= true
+    queue = [start]
+    while !isempty(queue)
+        vertex = popfirst!(queue)
+        visited[vertex] = true
+        for connection in connectivity[vertex]
+            if !(connection in loop) && !visited[connection]
+                push!(queue, connection)
+            end
+        end
 
-    Tuple([
-        geo_p1,
-        geo_p2
-    ])
+        if all(visited)
+            return true
+        end
+    end
+
+    return false
 end
 
-app_cnt = 10
+function find_faces(connectivity)
+    all_loops = []
+    visited = falses(length(connectivity))
+
+    for vertex in eachindex(connectivity)
+        find_loops!(connectivity, visited, vertex, vertex, [], all_loops)
+    end
+
+    no_chord_loops = []
+    for loop in all_loops
+        chord = false
+        for i in 0:(length(loop)-1)
+            vertex = loop[i+1]
+            next_vertex = loop[mod((i + 1), length(loop))+1]
+            prev_vertex = loop[mod((i - 1), length(loop))+1]
+            for connection in connectivity[vertex]
+                if connection != next_vertex && connection != prev_vertex
+                    if connection in loop
+                        chord = true
+                        break
+                    end
+                end
+            end
+            if chord
+                break
+            end
+        end
+        if !chord
+            push!(no_chord_loops, loop)
+        end
+    end
+
+    facial_loops = []
+    for loop in no_chord_loops
+        if is_loop_facial(loop, connectivity)
+            push!(facial_loops, loop)
+        end
+    end
+
+    unique!(x -> sort(x), facial_loops)
+    return facial_loops
+end
+
+app_cnt = 12
 cathode_radius = 0.05
 anode_radius = 0.25
 wire_radius = 0.005
@@ -106,35 +140,32 @@ json_data = JSON3.read("cathode_geometry/app_$(app_cnt).json")
 edges = Vector{Vector{Vector{Float64}}}(json_data["edges"])
 vertices = Vector{Vector{Float64}}(json_data["vertices"])
 abstract_edges, connectivity = conectivity_analysis(vertices, edges)
+abstract_faces = find_faces(connectivity)
 
-scaled_anode_radius = anode_radius / cathode_radius
-scaled_wire_radius = wire_radius / cathode_radius
 
-try
-    gmsh.initialize()
-    model = gmsh.model
-    model.add("Fusion")
-    mesh_size = scaled_wire_radius / 8
+display(vertices)
+display(abstract_edges)
+display(connectivity)
+display(abstract_faces)
 
-    geo_vertices = [model.geo.addPoint(x, y, z, mesh_size) for (x, y, z) in vertices]
-    geo_edges = [model.geo.addLine(geo_vertices[i], geo_vertices[j]) for (i, j) in abstract_edges]
+# scaled_anode_radius = anode_radius / cathode_radius
+# scaled_wire_radius = wire_radius / cathode_radius
 
-    ellipses = []
-    for (i, connection) in enumerate(connectivity)
-        push!(ellipses, make_ellipses(i, connection[1], connection[end], scaled_wire_radius, vertices))
-        for j in 1:(length(connection)-1)
-            push!(ellipses, make_ellipses(i, connection[j], connection[j+1], scaled_wire_radius, vertices))
-        end
-    end
+# try
+#     gmsh.initialize()
+#     model = gmsh.model
+#     model.add("Fusion")
+#     mesh_size = scaled_wire_radius / 8
 
-    geo_ellipses = [make_geo_ellipse(model, mesh_size, geo_vertices, vertices, ellipse) for ellipse in ellipses]
+#     geo_vertices = [model.geo.addPoint(x, y, z, mesh_size) for (x, y, z) in vertices]
+#     geo_edges = [model.geo.addLine(geo_vertices[i], geo_vertices[j]) for (i, j) in abstract_edges]
 
-    model.geo.synchronize()
-    model.mesh.generate(1)
-    gmsh.fltk.run()
-catch e
-    println("Error: ", e)
-    stacktrace()
-finally
-    gmsh.finalize()
-end
+#     model.geo.synchronize()
+#     model.mesh.generate(1)
+#     gmsh.fltk.run()
+# catch e
+#     println("Error: ", e)
+#     stacktrace()
+# finally
+#     gmsh.finalize()
+# end
