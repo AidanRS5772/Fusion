@@ -257,8 +257,10 @@ function find_faces(vertices, face_centers, adj_list)
 end
 
 function add_bisections(model, mesh_size, vertices, faces, radius)
+    all_bisects = []
     all_geo_bisects = []
     for face in faces
+        bisects = []
         geo_bisects = []
         n = length(face)
         for i in 1:n
@@ -270,28 +272,124 @@ function add_bisections(model, mesh_size, vertices, faces, radius)
             e2 = normalize(v2 .- v1)
 
             b = e1 .+ e2
-            if dot(b, e1) < 0 && dot(b, e2) < 0
+            if dot(b, e1) < 0 || dot(b, e2) < 0
                 b .*= -1
             end
             b .*= radius / norm(cross(e1, e2))
             b .+= v1
 
+            push!(bisects, b)
             push!(geo_bisects, model.geo.addPoint(b[1], b[2], b[3], mesh_size))
         end
         for i in 1:n
             model.geo.addLine(geo_bisects[i], geo_bisects[mod1(i + 1, n)])
         end
-        push!(all_geo_bisects)
+        push!(all_bisects, bisects)
+        push!(all_geo_bisects, geo_bisects)
     end
 
-    return all_geo_bisects
+    return all_geo_bisects, all_bisects
 end
 
-function make_ellipses()
-
+struct Ellipse
+    center::Vector{Float64}
+    major::Vector{Float64}
+    minor::Vector{Float64}
 end
 
-app_cnt = 10
+function make_ellipse_bisects(vertex, axis, radius, b1, b2)
+    cyl1 = normalize(cross(axis, vertex))
+    cyl2 = normalize(cross(axis, cyl1))
+
+    t1 = dot(b1, axis)
+    t2 = dot(b2, axis)
+    θ1 = atan(dot(b1, cyl1), dot(b1, cyl2))
+    θ2 = atan(dot(b2, cyl1), dot(b2, cyl2))
+
+    b0 = vertex .+ axis .* (t1 + t2) ./ 2 .+ radius .* (cyl1 .* cos((θ1 + θ2) / 2) .+ cyl2 .* sin((θ1 + θ2) / 2))
+    normal = normalize(cross(b1 .- b0, b2 .- b0))
+    if dot(normal, axis) < 0
+        normal .*= -1
+    end
+
+    center = (dot(b0 .- vertex, normal) / dot(axis, normal)) .* axis .+ vertex
+    minor = normalize(cross(normal, axis)) .* radius
+    major = normalize(cross(minor, normal)) ./ dot(normal, axis)
+    return Ellipse(center, major, minor)
+end
+
+function make_full_geo_ellipse(model, mesh_size, ellipse)
+    geo_center = model.geo.addPoint(ellipse.center[1], ellipse.center[2], ellipse.center[3], mesh_size)
+
+    Mp1 = ellipse.center .+ ellipse.major
+    geo_Mp1 = model.geo.addPoint(Mp1[1], Mp1[2], Mp1[3], mesh_size)
+    Mp2 = ellipse.center .- ellipse.major
+    geo_Mp2 = model.geo.addPoint(Mp2[1], Mp2[2], Mp2[3], mesh_size)
+    mp1 = ellipse.center .+ ellipse.minor
+    geo_mp1 = model.geo.addPoint(mp1[1], mp1[2], mp1[3], mesh_size)
+    mp2 = ellipse.center .- ellipse.minor
+    geo_mp2 = model.geo.addPoint(mp2[1], mp2[2], mp2[3], mesh_size)
+
+    e1 = model.geo.addEllipseArc(geo_Mp1, geo_center, geo_Mp1, geo_mp1)
+    e2 = model.geo.addEllipseArc(geo_mp1, geo_center, geo_Mp1, geo_Mp2)
+    e3 = model.geo.addEllipseArc(geo_Mp2, geo_center, geo_Mp1, geo_mp2)
+    e4 = model.geo.addEllipseArc(geo_mp2, geo_center, geo_Mp1, geo_Mp1)
+
+    curve_loop = model.geo.addCurveLoop([e1, e2, e3, e4])
+    return curve_loop
+end
+
+function make_edge_face_list(edges, faces)
+    edge_face_list = [Vector{Int}() for _ in 1:length(edges)]
+    for (face_idx, face) in enumerate(faces)
+        n = length(face)
+        for i in 1:n
+            v1 = face[i]
+            v2 = face[mod1(i + 1, n)]
+            edge = Tuple([min(v1, v2), max(v1, v2)])
+            edge_idx = findfirst(x -> x == edge, edges)
+            push!(edge_face_list[edge_idx], face_idx)
+        end
+    end
+
+    return edge_face_list
+end
+
+function add_bisect_ellipses(model, mesh_size, vertices, radius, bisects, adj_list, edges, faces, edge_face_list)
+    all_bisect_ellipses = []
+    all_geo_bisect_ellipses = []
+    for (i, adjs) in enumerate(adj_list)
+        bisect_ellipses = []
+        geo_bisect_ellipses = []
+        vertex = vertices[i]
+        for adj in adjs
+            edge = Tuple([min(i, adj), max(i, adj)])
+            edge_idx = findfirst(x -> x == edge, edges)
+            if isnothing(edge_idx)
+                throw(ErrorException("Edge not found in edges of $(edge)"))
+            end
+            faces_idx1, faces_idx2 = edge_face_list[edge_idx]
+            face_idx1 = findfirst(x -> x == i, faces[faces_idx1])
+            face_idx2 = findfirst(x -> x == i, faces[faces_idx2])
+
+            b1 = bisects[faces_idx1][face_idx1]
+            b2 = bisects[faces_idx2][face_idx2]
+            axis = normalize(vertices[adj] .- vertex)
+
+            ellipse = make_ellipse_bisects(vertex, axis, radius, b1, b2)
+            geo_ellipse = make_full_geo_ellipse(model, mesh_size, ellipse)
+
+            push!(bisect_ellipses, ellipse)
+            push!(geo_bisect_ellipses, geo_ellipse)
+        end
+        push!(all_bisect_ellipses, bisect_ellipses)
+        push!(all_geo_bisect_ellipses, geo_bisect_ellipses)
+    end
+
+    return all_geo_bisect_ellipses, all_bisect_ellipses
+end
+
+app_cnt = 6
 cathode_radius = 0.05
 anode_radius = 0.25
 wire_radius = 0.005
@@ -302,6 +400,7 @@ vertices = Vector{Vector{Float64}}(json_data["vertices"])
 face_centers = Vector{Vector{Float64}}(json_data["points"])
 abstract_edges, adj_list = conectivity_analysis(vertices, edges)
 abstract_faces = find_faces(vertices, face_centers, adj_list)
+edge_face_list = make_edge_face_list(abstract_edges, abstract_faces)
 
 scaled_anode_radius = anode_radius / cathode_radius
 scaled_wire_radius = wire_radius / cathode_radius
@@ -310,6 +409,7 @@ display(vertices)
 display(abstract_edges)
 display(adj_list)
 display(abstract_faces)
+display(edge_face_list)
 
 try
     gmsh.initialize()
@@ -319,7 +419,7 @@ try
 
     geo_vertices = [model.geo.addPoint(x, y, z, mesh_size) for (x, y, z) in vertices]
     geo_edges = [model.geo.addLine(geo_vertices[i], geo_vertices[j]) for (i, j) in abstract_edges]
-    geo_bisects = add_bisections(model, mesh_size, vertices, abstract_faces, scaled_wire_radius)
+    geo_bisects, bisects = add_bisections(model, mesh_size, vertices, abstract_faces, scaled_wire_radius)
 
     model.geo.synchronize()
     model.mesh.generate(1)
