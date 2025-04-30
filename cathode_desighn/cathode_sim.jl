@@ -1,7 +1,10 @@
+using JSON3: Error
+using Core: OptimizedGenerics
 using JSON3
 using Gmsh
 using LinearAlgebra
 using Combinatorics
+using Optim
 
 function conectivity_analysis(vertices, edges)
     abstract_edges = []
@@ -23,10 +26,7 @@ function conectivity_analysis(vertices, edges)
             end
         end
 
-        sym_axsis = zeros(3)
-        for c in adj
-            sym_axsis .+= c
-        end
+        sym_axsis = vertices[i]
         normalize!(sym_axsis)
         b1 = normalize(cross(sym_axsis, vertices[i] - vertices[adj[1]]))
         b2 = normalize(cross(sym_axsis, b1))
@@ -256,140 +256,134 @@ function find_faces(vertices, face_centers, adj_list)
     return faces
 end
 
-function add_bisections(model, mesh_size, vertices, faces, radius)
-    all_bisects = []
-    all_geo_bisects = []
-    for face in faces
-        bisects = []
-        geo_bisects = []
-        n = length(face)
-        for i in 1:n
-            v0 = vertices[face[mod1(i - 1, n)]]
-            v1 = vertices[face[i]]
-            v2 = vertices[face[mod1(i + 1, n)]]
-
-            e1 = normalize(v0 .- v1)
-            e2 = normalize(v2 .- v1)
-
-            b = e1 .+ e2
-            if dot(b, e1) < 0 || dot(b, e2) < 0
-                b .*= -1
-            end
-            b .*= radius / norm(cross(e1, e2))
-            b .+= v1
-
-            push!(bisects, b)
-            push!(geo_bisects, model.geo.addPoint(b[1], b[2], b[3], mesh_size))
-        end
-        for i in 1:n
-            model.geo.addLine(geo_bisects[i], geo_bisects[mod1(i + 1, n)])
-        end
-        push!(all_bisects, bisects)
-        push!(all_geo_bisects, geo_bisects)
-    end
-
-    return all_geo_bisects, all_bisects
-end
-
 struct Ellipse
     center::Vector{Float64}
+    geo_center::Int
     major::Vector{Float64}
+    geo_major::Int
     minor::Vector{Float64}
+    geo_minor::Int
 end
 
-function make_ellipse_bisects(vertex, axis, radius, b1, b2)
-    cyl1 = normalize(cross(axis, vertex))
-    cyl2 = normalize(cross(axis, cyl1))
-
-    t1 = dot(b1, axis)
-    t2 = dot(b2, axis)
-    θ1 = atan(dot(b1, cyl1), dot(b1, cyl2))
-    θ2 = atan(dot(b2, cyl1), dot(b2, cyl2))
-
-    b0 = vertex .+ axis .* (t1 + t2) ./ 2 .+ radius .* (cyl1 .* cos((θ1 + θ2) / 2) .+ cyl2 .* sin((θ1 + θ2) / 2))
-    normal = normalize(cross(b1 .- b0, b2 .- b0))
-    if dot(normal, axis) < 0
-        normal .*= -1
-    end
-
-    center = (dot(b0 .- vertex, normal) / dot(axis, normal)) .* axis .+ vertex
-    minor = normalize(cross(normal, axis)) .* radius
-    major = normalize(cross(minor, normal)) .* (radius / dot(normal, axis))
-    return Ellipse(center, major, minor)
-end
-
-function make_full_geo_ellipse(model, mesh_size, ellipse)
-    geo_center = model.geo.addPoint(ellipse.center[1], ellipse.center[2], ellipse.center[3], mesh_size)
-
-    Mp1 = ellipse.center .+ ellipse.major
-    geo_Mp1 = model.geo.addPoint(Mp1[1], Mp1[2], Mp1[3], mesh_size)
-    Mp2 = ellipse.center .- ellipse.major
-    geo_Mp2 = model.geo.addPoint(Mp2[1], Mp2[2], Mp2[3], mesh_size)
-    mp1 = ellipse.center .+ ellipse.minor
-    geo_mp1 = model.geo.addPoint(mp1[1], mp1[2], mp1[3], mesh_size)
-    mp2 = ellipse.center .- ellipse.minor
-    geo_mp2 = model.geo.addPoint(mp2[1], mp2[2], mp2[3], mesh_size)
-
-    e1 = model.geo.addEllipseArc(geo_Mp1, geo_center, geo_Mp1, geo_mp1)
-    e2 = model.geo.addEllipseArc(geo_mp1, geo_center, geo_Mp1, geo_Mp2)
-    e3 = model.geo.addEllipseArc(geo_Mp2, geo_center, geo_Mp1, geo_mp2)
-    e4 = model.geo.addEllipseArc(geo_mp2, geo_center, geo_Mp1, geo_Mp1)
-
-    curve_loop = model.geo.addCurveLoop([e1, e2, e3, e4])
-    return curve_loop
-end
-
-function make_edge_face_list(edges, faces)
-    edge_face_list = [Vector{Int}() for _ in 1:length(edges)]
-    for (face_idx, face) in enumerate(faces)
-        n = length(face)
-        for i in 1:n
-            v1 = face[i]
-            v2 = face[mod1(i + 1, n)]
-            edge = Tuple([min(v1, v2), max(v1, v2)])
-            edge_idx = findfirst(x -> x == edge, edges)
-            push!(edge_face_list[edge_idx], face_idx)
-        end
-    end
-
-    return edge_face_list
-end
-
-function add_bisect_ellipses(model, mesh_size, vertices, radius, bisects, adj_list, edges, faces, edge_face_list)
-    all_bisect_ellipses = []
-    all_geo_bisect_ellipses = []
+function intersection_ellipses(model, mesh_size, vertices, geo_vertices, adj_list, radius)
+    all_ellipses = []
     for (i, adjs) in enumerate(adj_list)
-        bisect_ellipses = []
-        geo_bisect_ellipses = []
-        vertex = vertices[i]
-        for adj in adjs
-            edge = Tuple([min(i, adj), max(i, adj)])
-            edge_idx = findfirst(x -> x == edge, edges)
-            if isnothing(edge_idx)
-                throw(ErrorException("Edge not found in edges of $(edge)"))
+        ellipses = []
+        n = length(adjs)
+        v0 = vertices[i]
+        geo_v0 = geo_vertices[i]
+        for i in 1:n
+            v1 = vertices[adjs[i]]
+            v2 = vertices[adjs[mod1(i + 1, n)]]
+
+            e1 = normalize(v1 - v0)
+            e2 = normalize(v2 - v0)
+
+            m = cross(e1, e2)
+            if dot(m, v0) < 0
+                m .*= -1
             end
-            faces_idx1, faces_idx2 = edge_face_list[edge_idx]
-            face_idx1 = findfirst(x -> x == i, faces[faces_idx1])
-            face_idx2 = findfirst(x -> x == i, faces[faces_idx2])
+            M = e1 .+ e2
+            M .*= radius / norm(m)
+            normalize!(m)
+            m .*= radius
 
-            b1 = bisects[faces_idx1][face_idx1]
-            b2 = bisects[faces_idx2][face_idx2]
-            axis = normalize(vertices[adj] .- vertex)
-
-            ellipse = make_ellipse_bisects(vertex, axis, radius, b1, b2)
-            geo_ellipse = make_full_geo_ellipse(model, mesh_size, ellipse)
-
-            push!(bisect_ellipses, ellipse)
-            push!(geo_bisect_ellipses, geo_ellipse)
+            geo_M = model.geo.addPoint(M[1] + v0[1], M[2] + v0[2], M[3] + v0[3], mesh_size)
+            geo_m = model.geo.addPoint(m[1] + v0[1], m[2] + v0[2], m[3] + v0[3], mesh_size)
+            push!(ellipses, Ellipse(v0, geo_v0, M, geo_M, m, geo_m))
         end
-        push!(all_bisect_ellipses, bisect_ellipses)
-        push!(all_geo_bisect_ellipses, geo_bisect_ellipses)
+        push!(all_ellipses, ellipses)
     end
-
-    return all_geo_bisect_ellipses, all_bisect_ellipses
+    return all_ellipses
 end
 
-app_cnt = 6
+function find_ellipse_from_points(model, mesh_size, vertex, axis, b1, b2, radius)
+    t1 = dot(b1 .- vertex, axis)
+    t2 = dot(b2 .- vertex, axis)
+    tm = (t1 + t2) / 2
+    c = vertex .+ tm .* axis
+    n = normalize(cross(b1 .- c, b2 .- c))
+    m = normalize(cross(n, axis)) .* radius
+    M = normalize(cross(m, n)) .* (radius / dot(n, axis))
+
+    #check valid
+    if abs(norm(cross(M, axis)) - radius) > 1e-6 || abs(norm(cross(M, axis)) - radius) > 1e-6
+        error("Invalid ellipse parameters")
+    end
+
+    geo_c = model.geo.addPoint(c[1], c[2], c[3], mesh_size)
+    geo_m = model.geo.addPoint(c[1] + m[1], c[2] + m[2], c[3] + m[3], mesh_size)
+    geo_M = model.geo.addPoint(c[1] + M[1], c[2] + M[2], c[3] + M[3], mesh_size)
+
+    return Ellipse(c, geo_c, M, geo_M, m, geo_m)
+end
+
+function cylinder_ellipses(model, mesh_size, vertices, adj_list, inter_ells, radius)
+    all_ellipses = []
+    for (i, adjs) in enumerate(adj_list)
+        n = length(adjs)
+        vertex = vertices[i]
+        ellipses = []
+        for j in 1:n
+            axsis = normalize(vertices[adjs[j]] .- vertex)
+            M1 = inter_ells[i][j].major .+ vertex
+            M2 = inter_ells[i][mod1(j - 1, n)].major .+ vertex
+            push!(ellipses, find_ellipse_from_points(model, mesh_size, vertex, axsis, M1, M2, radius))
+        end
+        push!(all_ellipses, ellipses)
+    end
+    return all_ellipses
+end
+
+function edge_wires(model, mesh_size, vertices, geo_vertices, edges, adj_list, inter_ells, cyl_ells)
+    for (e1, e2) in edges
+        n1 = length(adj_list[e1])
+        n2 = length(adj_list[e2])
+        adj_idx1 = findfirst(x -> x == e2, adj_list[e1])
+        adj_idx2 = findfirst(x -> x == e1, adj_list[e2])
+
+        #make circle arcs on the exterior of intersections
+        geo_vertex1 = geo_vertices[e1]
+        geo_minor1_p1 = inter_ells[e1][adj_idx1].geo_minor
+        geo_minor1_p2 = inter_ells[e1][mod1(adj_idx1 - 1, n1)].geo_minor
+        geo_cir1 = model.geo.addCircleArc(geo_minor1_p1, geo_vertex1, geo_minor1_p2)
+
+        geo_vertex2 = geo_vertices[e2]
+        geo_minor2_p1 = inter_ells[e2][adj_idx2].geo_minor
+        geo_minor2_p2 = inter_ells[e2][mod1(adj_idx2 - 1, n2)].geo_minor
+        geo_cir2 = model.geo.addCircleArc(geo_minor2_p1, geo_vertex2, geo_minor2_p2)
+
+        #make intersection ellipse arcs
+        geo_major1_p1 = inter_ells[e1][adj_idx1].geo_major
+        geo_inter1_ell1 = model.geo.addEllipseArc(geo_major1_p1, geo_vertex1, geo_major1_p1, geo_minor1_p1)
+
+        geo_major1_p2 = inter_ells[e1][mod1(adj_idx1 - 1, n1)].geo_major
+        geo_inter1_ell2 = model.geo.addEllipseArc(geo_major1_p2, geo_vertex1, geo_major1_p2, geo_minor1_p2)
+
+        geo_major2_p1 = inter_ells[e2][adj_idx2].geo_major
+        geo_inter2_ell1 = model.geo.addEllipseArc(geo_major2_p1, geo_vertex2, geo_major2_p1, geo_minor2_p1)
+
+        geo_major2_p2 = inter_ells[e2][mod1(adj_idx2 - 1, n2)].geo_major
+        geo_inter2_ell2 = model.geo.addEllipseArc(geo_major2_p2, geo_vertex2, geo_major2_p2, geo_minor2_p2)
+
+        #make connecting lines
+        line1 = model.geo.addLine(geo_major1_p1, geo_major2_p2)
+        line2 = model.geo.addLine(geo_major1_p2, geo_major2_p1)
+        line3 = model.geo.addLine(geo_minor1_p1, geo_minor2_p2)
+        line4 = model.geo.addLine(geo_minor1_p2, geo_minor2_p1)
+
+        #make interior cylinder ellipses
+        geo_cyl1_c = cyl_ells[e1][adj_idx1].geo_center
+        geo_cyl1_M = cyl_ells[e1][adj_idx1].geo_major
+        geo_cyl1_ell = model.geo.addEllipseArc(geo_major1_p1, geo_cyl1_c, geo_cyl1_M, geo_major1_p2)
+
+        geo_cyl2_c = cyl_ells[e2][adj_idx2].geo_center
+        geo_cyl2_M = cyl_ells[e2][adj_idx2].geo_major
+        geo_cyl2_ell = model.geo.addEllipseArc(geo_major2_p1, geo_cyl2_c, geo_cyl2_M, geo_major2_p2)
+    end
+end
+
+app_cnt = 42
 cathode_radius = 0.05
 anode_radius = 0.25
 wire_radius = 0.005
@@ -400,33 +394,37 @@ vertices = Vector{Vector{Float64}}(json_data["vertices"])
 face_centers = Vector{Vector{Float64}}(json_data["points"])
 abstract_edges, adj_list = conectivity_analysis(vertices, edges)
 abstract_faces = find_faces(vertices, face_centers, adj_list)
-edge_face_list = make_edge_face_list(abstract_edges, abstract_faces)
 
 scaled_anode_radius = anode_radius / cathode_radius
 scaled_wire_radius = wire_radius / cathode_radius
 
-display(vertices)
-display(abstract_edges)
-display(adj_list)
-display(abstract_faces)
-display(edge_face_list)
 
 try
     gmsh.initialize()
+    gmsh.option.setNumber("General.Terminal", 0)
     model = gmsh.model
     model.add("Fusion")
     mesh_size = scaled_wire_radius / 8
 
     geo_vertices = [model.geo.addPoint(x, y, z, mesh_size) for (x, y, z) in vertices]
-    geo_edges = [model.geo.addLine(geo_vertices[i], geo_vertices[j]) for (i, j) in abstract_edges]
-    geo_bisects, bisects = add_bisections(model, mesh_size, vertices, abstract_faces, scaled_wire_radius)
+    #geo_edges = [model.geo.addLine(geo_vertices[i], geo_vertices[j]) for (i, j) in abstract_edges]
+
+    inter_ells = intersection_ellipses(model, mesh_size, vertices, geo_vertices, adj_list, scaled_wire_radius)
+    cyl_ells = cylinder_ellipses(model, mesh_size, vertices, adj_list, inter_ells, scaled_wire_radius)
+    edge_wires(model, mesh_size, vertices, geo_vertices, abstract_edges, adj_list, inter_ells, cyl_ells)
 
     model.geo.synchronize()
     model.mesh.generate(1)
     gmsh.fltk.run()
 catch e
-    println("Error: ", e)
-    stacktrace()
+    @error "Error occurred" exception = e
+    println("Stack trace:")
+    for (i, frame) in enumerate(stacktrace())
+        file = frame.file
+        line = frame.line
+        func = frame.func
+        println("[$i] $func at $file:$line")
+    end
 finally
     gmsh.finalize()
 end
