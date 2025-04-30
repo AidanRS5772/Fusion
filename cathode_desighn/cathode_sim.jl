@@ -314,7 +314,7 @@ function make_ellipse_bisects(vertex, axis, radius, b1, b2)
 
     center = (dot(b0 .- vertex, normal) / dot(axis, normal)) .* axis .+ vertex
     minor = normalize(cross(normal, axis)) .* radius
-    major = normalize(cross(minor, normal)) ./ dot(normal, axis)
+    major = normalize(cross(minor, normal)) .* (radius / dot(normal, axis))
     return Ellipse(center, major, minor)
 end
 
