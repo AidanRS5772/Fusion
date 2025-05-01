@@ -4,7 +4,6 @@ using JSON3
 using Gmsh
 using LinearAlgebra
 using Combinatorics
-using Optim
 
 function conectivity_analysis(vertices, edges)
     abstract_edges = []
@@ -97,7 +96,8 @@ end
 function make_ellipse_from_points(model, mesh_size, vertex, axis, radius, p1, p2, geo_p1, geo_p2)
     t1 = dot(p1 .- vertex, axis)
     t2 = dot(p2 .- vertex, axis)
-    c = vertex .+ ((t1 + t2) / 2) .* axis
+    tm = ((t1 + t2) / 2)
+    c = vertex .+ tm .* axis
     mid = normalize(normalize(p1 .- c) .+ normalize(p2 .- c)) .* radius .+ c
     n = normalize(cross(p1 .- c, p2 .- c))
     m = normalize(cross(n, axis))
@@ -110,12 +110,18 @@ function make_ellipse_from_points(model, mesh_size, vertex, axis, radius, p1, p2
     ell1 = model.geo.addEllipseArc(geo_p1, geo_c, geo_M, geo_mid)
     ell2 = model.geo.addEllipseArc(geo_mid, geo_c, geo_M, geo_p2)
 
-    return (ell1, ell2)
+    return ell1, ell2, geo_mid
 end
 
 function make_line_or_ellipse(model, mesh_size, vertex, axis, radius, p1, p2, geo_p1, geo_p2, err=0.001)
     if norm(cross(normalize(p1 .- p2), axis)) < err
-        return Tuple(model.geo.addLine(geo_p1, geo_p2))
+        l = normalize(p1 .- p2)
+        p = (p1 .+ p2) ./ 2
+        mid = p .+ dot((vertex .- p), axis) .* l
+        geo_mid = model.geo.addPoint(mid[1], mid[2], mid[3], mesh_size)
+        line1 = model.geo.addLine(geo_p1, geo_mid)
+        line2 = model.geo.addLine(geo_mid, geo_p2)
+        return line2, line1, geo_mid
     else
         return make_ellipse_from_points(model, mesh_size, vertex, axis, radius, p1, p2, geo_p1, geo_p2)
     end
@@ -170,27 +176,27 @@ function edge_wires(model, mesh_size, vertices, geo_vertices, edges, adj_list, i
         axis = normalize(vertices[e1] .- vertices[e2])
         mid_vertex = (vertices[e1] .+ vertices[e2]) ./ 2
 
+        #need to make intermediat connections between mid points
         geo_con1 = make_line_or_ellipse(model, mesh_size, mid_vertex, axis, radius, minor1_p2, minor2_p1, geo_minor1_p2, geo_minor2_p1)
         geo_con2 = make_line_or_ellipse(model, mesh_size, mid_vertex, axis, radius, minor1_p1, minor2_p2, geo_minor1_p1, geo_minor2_p2)
         geo_con3 = make_line_or_ellipse(model, mesh_size, mid_vertex, axis, radius, major1_p2, major2_p1, geo_major1_p2, geo_major2_p1)
         geo_con4 = make_line_or_ellipse(model, mesh_size, mid_vertex, axis, radius, major1_p1, major2_p2, geo_major1_p1, geo_major2_p2)
 
-
         #make interior cylinder ellipses
         geo_cyl1 = make_ellipse_from_points(model, mesh_size, vertex1, axis, radius, major1_p1, major1_p2, geo_major1_p1, geo_major1_p2)
         geo_cyl2 = make_ellipse_from_points(model, mesh_size, vertex2, axis, radius, major2_p1, major2_p2, geo_major2_p1, geo_major2_p2)
 
-        #make top pannel
-        top_curve = model.geo.addCurveLoop([geo_cir1, geo_con1..., geo_cir2, reverse_orientation(geo_con2)...])
-        top_panel = model.geo.addSurfaceFilling([top_curve])
+        # #make top pannel
+        # top_curve = model.geo.addCurveLoop([geo_cir1, geo_con1..., geo_cir2, reverse_orientation(geo_con2)...])
+        # top_panel = model.geo.addSurfaceFilling([top_curve])
 
-        #make bottom pannel
-        bottom_curve = model.geo.addCurveLoop([geo_cyl1..., geo_con3..., geo_cyl2..., reverse_orientation(geo_con4)...])
-        bottom_panel = model.geo.addSurfaceFilling([bottom_curve])
+        # #make bottom pannel
+        # bottom_curve = model.geo.addCurveLoop([geo_cyl1..., geo_con3..., geo_cyl2..., reverse_orientation(geo_con4)...])
+        # bottom_panel = model.geo.addSurfaceFilling([bottom_curve])
     end
 end
 
-app_cnt = 6
+app_cnt = 10
 cathode_radius = 0.05
 anode_radius = 0.25
 wire_radius = 0.005
@@ -207,7 +213,7 @@ scaled_wire_radius = wire_radius / cathode_radius
 try
     gmsh.initialize()
     gmsh.option.setNumber("General.Terminal", 0)
-    gmsh.option.setNumber("Geometry.Points", 0)
+    #gmsh.option.setNumber("Geometry.Points", 0)
     model = gmsh.model
     model.add("Fusion")
     mesh_size = scaled_wire_radius / 8
