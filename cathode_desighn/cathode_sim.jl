@@ -113,14 +113,16 @@ function make_ellipse_from_points(model, mesh_size, vertex, axis, radius, p1, p2
     return (ell1, ell2)
 end
 
-function make_line_or_ellipse(model, mesh_size, vertex, axis, radius, p1, p2, geo_p1, geo_p2, err=0.1)
-    θ = norm(cross(normalize(p1 .- p2), axis))
-    println("angle for line: ", θ)
-    if θ < err
-        return (model.geo.addLine(geo_p1, geo_p2))
+function make_line_or_ellipse(model, mesh_size, vertex, axis, radius, p1, p2, geo_p1, geo_p2, err=0.001)
+    if norm(cross(normalize(p1 .- p2), axis)) < err
+        return Tuple(model.geo.addLine(geo_p1, geo_p2))
     else
         return make_ellipse_from_points(model, mesh_size, vertex, axis, radius, p1, p2, geo_p1, geo_p2)
     end
+end
+
+function reverse_orientation(tags)
+    return Tuple(collect(tags) .* -1)
 end
 
 function edge_wires(model, mesh_size, vertices, geo_vertices, edges, adj_list, inter_ells, radius)
@@ -131,34 +133,36 @@ function edge_wires(model, mesh_size, vertices, geo_vertices, edges, adj_list, i
         adj_idx2 = findfirst(x -> x == e1, adj_list[e2])
 
         #make circle arcs on the exterior of intersections
+        vertex1 = vertices[e1]
         geo_vertex1 = geo_vertices[e1]
-        minor1_p1 = inter_ells[e1][adj_idx1].minor
+        minor1_p1 = inter_ells[e1][adj_idx1].minor .+ vertex1
         geo_minor1_p1 = inter_ells[e1][adj_idx1].geo_minor
-        minor1_p2 = inter_ells[e1][mod1(adj_idx1 - 1, n1)].minor
+        minor1_p2 = inter_ells[e1][mod1(adj_idx1 - 1, n1)].minor .+ vertex1
         geo_minor1_p2 = inter_ells[e1][mod1(adj_idx1 - 1, n1)].geo_minor
         geo_cir1 = model.geo.addCircleArc(geo_minor1_p1, geo_vertex1, geo_minor1_p2)
 
+        vertex2 = vertices[e2]
         geo_vertex2 = geo_vertices[e2]
-        minor2_p1 = inter_ells[e2][adj_idx2].minor
+        minor2_p1 = inter_ells[e2][adj_idx2].minor .+ vertex2
         geo_minor2_p1 = inter_ells[e2][adj_idx2].geo_minor
-        minor2_p2 = inter_ells[e2][mod1(adj_idx2 - 1, n2)].minor
+        minor2_p2 = inter_ells[e2][mod1(adj_idx2 - 1, n2)].minor .+ vertex2
         geo_minor2_p2 = inter_ells[e2][mod1(adj_idx2 - 1, n2)].geo_minor
         geo_cir2 = model.geo.addCircleArc(geo_minor2_p1, geo_vertex2, geo_minor2_p2)
 
         #make intersection ellipse arcs
-        major1_p1 = inter_ells[e1][adj_idx1].major
+        major1_p1 = inter_ells[e1][adj_idx1].major .+ vertex1
         geo_major1_p1 = inter_ells[e1][adj_idx1].geo_major
         geo_inter1_ell1 = model.geo.addEllipseArc(geo_major1_p1, geo_vertex1, geo_major1_p1, geo_minor1_p1)
 
-        major1_p2 = inter_ells[e1][mod1(adj_idx1 - 1, n1)].major
+        major1_p2 = inter_ells[e1][mod1(adj_idx1 - 1, n1)].major .+ vertex1
         geo_major1_p2 = inter_ells[e1][mod1(adj_idx1 - 1, n1)].geo_major
         geo_inter1_ell2 = model.geo.addEllipseArc(geo_major1_p2, geo_vertex1, geo_major1_p2, geo_minor1_p2)
 
-        major2_p1 = inter_ells[e2][adj_idx2].major
+        major2_p1 = inter_ells[e2][adj_idx2].major .+ vertex2
         geo_major2_p1 = inter_ells[e2][adj_idx2].geo_major
         geo_inter2_ell1 = model.geo.addEllipseArc(geo_major2_p1, geo_vertex2, geo_major2_p1, geo_minor2_p1)
 
-        major2_p2 = inter_ells[e2][mod1(adj_idx2 - 1, n2)].major
+        major2_p2 = inter_ells[e2][mod1(adj_idx2 - 1, n2)].major .+ vertex2
         geo_major2_p2 = inter_ells[e2][mod1(adj_idx2 - 1, n2)].geo_major
         geo_inter2_ell2 = model.geo.addEllipseArc(geo_major2_p2, geo_vertex2, geo_major2_p2, geo_minor2_p2)
 
@@ -166,25 +170,27 @@ function edge_wires(model, mesh_size, vertices, geo_vertices, edges, adj_list, i
         axis = normalize(vertices[e1] .- vertices[e2])
         mid_vertex = (vertices[e1] .+ vertices[e2]) ./ 2
 
-        # side1 = model.geo.addLine(geo_major1_p1, geo_major2_p2)
-        # side2 = model.geo.addLine(geo_major1_p2, geo_major2_p1)
-        # side3 = model.geo.addLine(geo_minor1_p1, geo_minor2_p2)
-        # side4 = model.geo.addLine(geo_minor1_p2, geo_minor2_p1)
+        geo_con1 = make_line_or_ellipse(model, mesh_size, mid_vertex, axis, radius, minor1_p2, minor2_p1, geo_minor1_p2, geo_minor2_p1)
+        geo_con2 = make_line_or_ellipse(model, mesh_size, mid_vertex, axis, radius, minor1_p1, minor2_p2, geo_minor1_p1, geo_minor2_p2)
+        geo_con3 = make_line_or_ellipse(model, mesh_size, mid_vertex, axis, radius, major1_p2, major2_p1, geo_major1_p2, geo_major2_p1)
+        geo_con4 = make_line_or_ellipse(model, mesh_size, mid_vertex, axis, radius, major1_p1, major2_p2, geo_major1_p1, geo_major2_p2)
 
-        side1 = make_line_or_ellipse(model, mesh_size, mid_vertex, axis, radius, major1_p1, major2_p2, geo_major1_p1, geo_major2_p2)
-        side2 = make_line_or_ellipse(model, mesh_size, mid_vertex, axis, radius, major1_p2, major2_p1, geo_major1_p2, geo_major2_p1)
-        side3 = make_line_or_ellipse(model, mesh_size, mid_vertex, axis, radius, minor1_p1, minor2_p2, geo_minor1_p1, geo_minor2_p2)
-        side4 = make_line_or_ellipse(model, mesh_size, mid_vertex, axis, radius, minor1_p2, minor2_p1, geo_minor1_p2, geo_minor2_p1)
 
         #make interior cylinder ellipses
-        vertex1 = vertices[e1]
-        cyl1_ell = make_ellipse_from_points(model, mesh_size, vertex1, axis, radius, major1_p1 .+ vertex1, major1_p2 .+ vertex1, geo_major1_p1, geo_major1_p2)
-        vertex2 = vertices[e2]
-        cyl2_ell = make_ellipse_from_points(model, mesh_size, vertex2, axis, radius, major2_p1 .+ vertex2, major2_p2 .+ vertex2, geo_major2_p1, geo_major2_p2)
+        geo_cyl1 = make_ellipse_from_points(model, mesh_size, vertex1, axis, radius, major1_p1, major1_p2, geo_major1_p1, geo_major1_p2)
+        geo_cyl2 = make_ellipse_from_points(model, mesh_size, vertex2, axis, radius, major2_p1, major2_p2, geo_major2_p1, geo_major2_p2)
+
+        #make top pannel
+        top_curve = model.geo.addCurveLoop([geo_cir1, geo_con1..., geo_cir2, reverse_orientation(geo_con2)...])
+        top_panel = model.geo.addSurfaceFilling([top_curve])
+
+        #make bottom pannel
+        bottom_curve = model.geo.addCurveLoop([geo_cyl1..., geo_con3..., geo_cyl2..., reverse_orientation(geo_con4)...])
+        bottom_panel = model.geo.addSurfaceFilling([bottom_curve])
     end
 end
 
-app_cnt = 10
+app_cnt = 6
 cathode_radius = 0.05
 anode_radius = 0.25
 wire_radius = 0.005
@@ -201,6 +207,7 @@ scaled_wire_radius = wire_radius / cathode_radius
 try
     gmsh.initialize()
     gmsh.option.setNumber("General.Terminal", 0)
+    gmsh.option.setNumber("Geometry.Points", 0)
     model = gmsh.model
     model.add("Fusion")
     mesh_size = scaled_wire_radius / 8
@@ -212,7 +219,7 @@ try
     edge_wires(model, mesh_size, vertices, geo_vertices, abstract_edges, adj_list, inter_ells, scaled_wire_radius)
 
     model.geo.synchronize()
-    model.mesh.generate(1)
+    model.mesh.generate(2)
     gmsh.fltk.run()
 finally
     gmsh.finalize()
