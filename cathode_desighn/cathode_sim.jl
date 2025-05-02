@@ -96,32 +96,43 @@ end
 function make_ellipse_from_points(model, mesh_size, vertex, axis, radius, p1, p2, geo_p1, geo_p2)
     t1 = dot(p1 .- vertex, axis)
     t2 = dot(p2 .- vertex, axis)
-    tm = ((t1 + t2) / 2)
+    tm = (t1 + t2) / 2
     c = vertex .+ tm .* axis
-    mid = normalize(normalize(p1 .- c) .+ normalize(p2 .- c)) .* radius .+ c
     n = normalize(cross(p1 .- c, p2 .- c))
-    m = normalize(cross(n, axis))
-    M = normalize(cross(m, axis)) .+ c
+    m = normalize(cross(n, axis)) .* radius
+    M = normalize(cross(m, n)) .* (radius / dot(n, axis))
+
+    mid = Nothing
+    k = -tm / dot(M, axis)
+    if abs(k) < 1
+        mid = c .+ M .* k .+ m .* sqrt(1 - k^2)
+        if dot(mid .- c, p1 .- c) < 0 && dot(mid .- c, p2 .- c) < 0
+            mid .-= 2 .* m .* sqrt(1 - k^2)
+        end
+    else
+        mid = normalize(normalize(p1 .- c) .+ normalize(p2 .- c)) .* radius .+ c
+    end
 
     geo_c = model.geo.addPoint(c[1], c[2], c[3], mesh_size)
     geo_mid = model.geo.addPoint(mid[1], mid[2], mid[3], mesh_size)
-    geo_M = model.geo.addPoint(M[1], M[2], M[3], mesh_size)
+    Mp = c .+ normalize(M)
+    geo_M = model.geo.addPoint(Mp[1], Mp[2], Mp[3], mesh_size)
 
     ell1 = model.geo.addEllipseArc(geo_p1, geo_c, geo_M, geo_mid)
     ell2 = model.geo.addEllipseArc(geo_mid, geo_c, geo_M, geo_p2)
 
-    return ell1, ell2, geo_mid
+    return ell1, ell2, geo_mid, mid
 end
 
 function make_line_or_ellipse(model, mesh_size, vertex, axis, radius, p1, p2, geo_p1, geo_p2, err=0.001)
     if norm(cross(normalize(p1 .- p2), axis)) < err
         l = normalize(p1 .- p2)
         p = (p1 .+ p2) ./ 2
-        mid = p .+ dot((vertex .- p), axis) .* l
+        mid = p .+ (dot(vertex .- p, axis) / dot(l, axis)) .* l
         geo_mid = model.geo.addPoint(mid[1], mid[2], mid[3], mesh_size)
         line1 = model.geo.addLine(geo_p1, geo_mid)
         line2 = model.geo.addLine(geo_mid, geo_p2)
-        return line2, line1, geo_mid
+        return line1, line2, geo_mid, mid
     else
         return make_ellipse_from_points(model, mesh_size, vertex, axis, radius, p1, p2, geo_p1, geo_p2)
     end
@@ -145,7 +156,7 @@ function edge_wires(model, mesh_size, vertices, geo_vertices, edges, adj_list, i
         geo_minor1_p1 = inter_ells[e1][adj_idx1].geo_minor
         minor1_p2 = inter_ells[e1][mod1(adj_idx1 - 1, n1)].minor .+ vertex1
         geo_minor1_p2 = inter_ells[e1][mod1(adj_idx1 - 1, n1)].geo_minor
-        geo_cir1 = model.geo.addCircleArc(geo_minor1_p1, geo_vertex1, geo_minor1_p2)
+        geo_end_cir1 = model.geo.addCircleArc(geo_minor1_p1, geo_vertex1, geo_minor1_p2)
 
         vertex2 = vertices[e2]
         geo_vertex2 = geo_vertices[e2]
@@ -153,7 +164,7 @@ function edge_wires(model, mesh_size, vertices, geo_vertices, edges, adj_list, i
         geo_minor2_p1 = inter_ells[e2][adj_idx2].geo_minor
         minor2_p2 = inter_ells[e2][mod1(adj_idx2 - 1, n2)].minor .+ vertex2
         geo_minor2_p2 = inter_ells[e2][mod1(adj_idx2 - 1, n2)].geo_minor
-        geo_cir2 = model.geo.addCircleArc(geo_minor2_p1, geo_vertex2, geo_minor2_p2)
+        geo_end_cir2 = model.geo.addCircleArc(geo_minor2_p1, geo_vertex2, geo_minor2_p2)
 
         #make intersection ellipse arcs
         major1_p1 = inter_ells[e1][adj_idx1].major .+ vertex1
@@ -172,27 +183,37 @@ function edge_wires(model, mesh_size, vertices, geo_vertices, edges, adj_list, i
         geo_major2_p2 = inter_ells[e2][mod1(adj_idx2 - 1, n2)].geo_major
         geo_inter2_ell2 = model.geo.addEllipseArc(geo_major2_p2, geo_vertex2, geo_major2_p2, geo_minor2_p2)
 
-        #make cross ellipse connections
         axis = normalize(vertices[e1] .- vertices[e2])
         mid_vertex = (vertices[e1] .+ vertices[e2]) ./ 2
-
-        #need to make intermediat connections between mid points
-        geo_con1 = make_line_or_ellipse(model, mesh_size, mid_vertex, axis, radius, minor1_p2, minor2_p1, geo_minor1_p2, geo_minor2_p1)
-        geo_con2 = make_line_or_ellipse(model, mesh_size, mid_vertex, axis, radius, minor1_p1, minor2_p2, geo_minor1_p1, geo_minor2_p2)
-        geo_con3 = make_line_or_ellipse(model, mesh_size, mid_vertex, axis, radius, major1_p2, major2_p1, geo_major1_p2, geo_major2_p1)
-        geo_con4 = make_line_or_ellipse(model, mesh_size, mid_vertex, axis, radius, major1_p1, major2_p2, geo_major1_p1, geo_major2_p2)
+        geo_mid_vertex = model.geo.addPoint(mid_vertex[1], mid_vertex[2], mid_vertex[3], mesh_size)
 
         #make interior cylinder ellipses
-        geo_cyl1 = make_ellipse_from_points(model, mesh_size, vertex1, axis, radius, major1_p1, major1_p2, geo_major1_p1, geo_major1_p2)
-        geo_cyl2 = make_ellipse_from_points(model, mesh_size, vertex2, axis, radius, major2_p1, major2_p2, geo_major2_p1, geo_major2_p2)
+        geo_cyl1_ell1, geo_cyl1_ell2, geo_cyl1_mid, cyl1_mid = make_ellipse_from_points(model, mesh_size, vertex1, axis, radius, major1_p1, major1_p2, geo_major1_p1, geo_major1_p2)
+        geo_cyl2_ell1, geo_cyl2_ell2, geo_cyl2_mid, cyl2_mid = make_ellipse_from_points(model, mesh_size, vertex2, axis, radius, major2_p1, major2_p2, geo_major2_p1, geo_major2_p2)
 
-        # #make top pannel
-        # top_curve = model.geo.addCurveLoop([geo_cir1, geo_con1..., geo_cir2, reverse_orientation(geo_con2)...])
-        # top_panel = model.geo.addSurfaceFilling([top_curve])
+        #make cross ellipse connection
+        geo_con1_l1, geo_con1_l2, geo_con1_mid, con1_mid = make_line_or_ellipse(model, mesh_size, mid_vertex, axis, radius, minor1_p2, minor2_p1, geo_minor1_p2, geo_minor2_p1)
+        geo_con2_l1, geo_con2_l2, geo_con2_mid, con2_mid = make_line_or_ellipse(model, mesh_size, mid_vertex, axis, radius, minor1_p1, minor2_p2, geo_minor1_p1, geo_minor2_p2)
+        geo_con3_l1, geo_con3_l2, geo_con3_mid, con3_mid = make_line_or_ellipse(model, mesh_size, mid_vertex, axis, radius, major1_p2, major2_p1, geo_major1_p2, geo_major2_p1)
+        geo_con4_l1, geo_con4_l2, geo_con4_mid, con4_mid = make_line_or_ellipse(model, mesh_size, mid_vertex, axis, radius, major1_p1, major2_p2, geo_major1_p1, geo_major2_p2)
+        geo_con5_l1, geo_con5_l2, geo_con5_mid, con5_mid = make_line_or_ellipse(model, mesh_size, mid_vertex, axis, radius, cyl1_mid, cyl2_mid, geo_cyl1_mid, geo_cyl2_mid)
 
-        # #make bottom pannel
-        # bottom_curve = model.geo.addCurveLoop([geo_cyl1..., geo_con3..., geo_cyl2..., reverse_orientation(geo_con4)...])
-        # bottom_panel = model.geo.addSurfaceFilling([bottom_curve])
+        #make middle circle arcs
+        geo_mid_cir1 = model.geo.addCircleArc(geo_con1_mid, geo_mid_vertex, geo_con2_mid)
+        geo_mid_cir2 = model.geo.addCircleArc(geo_con5_mid, geo_mid_vertex, geo_con3_mid)
+        geo_mid_cir3 = model.geo.addCircleArc(geo_con5_mid, geo_mid_vertex, geo_con4_mid)
+        geo_mid_cir4 = model.geo.addCircleArc(geo_con2_mid, geo_mid_vertex, geo_con3_mid)
+        geo_mid_cir5 = model.geo.addCircleArc(geo_con1_mid, geo_mid_vertex, geo_con4_mid)
+
+        #make top pannel
+        top_curve1 = model.geo.addCurveLoop([geo_end_cir1, geo_con1_l1, geo_mid_cir1, geo_con2_l1], -1, true)
+        top_panel1 = model.geo.addSurfaceFilling([top_curve1])
+        top_curve2 = model.geo.addCurveLoop([geo_end_cir2, geo_con1_l2, geo_mid_cir1, geo_con2_l2], -1, true)
+        top_panel2 = model.geo.addSurfaceFilling([top_curve2])
+
+        #make bottom pannel
+        bottom1_curv1 = model.geo.addCurveLoop([geo_cyl1_ell1, geo_con5_l1, geo_mid_cir2, geo_con3_l1], -1, true)
+        # bottom1_pannel1 = model.geo.addSurfaceFilling([bottom1_curv1])
     end
 end
 
