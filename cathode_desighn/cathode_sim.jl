@@ -1,9 +1,11 @@
-using JSON3: Error
-using Core: OptimizedGenerics
 using JSON3
 using Gmsh
 using LinearAlgebra
-using Combinatorics
+using Ferrite
+using FerriteGmsh
+using ProgressMeter
+using DifferentialEquations
+
 
 function circular_sort(axis, v0, vecs)
     b1 = cross(axis, [0, 0, 1])
@@ -351,48 +353,203 @@ function flatten_tags(item)
     return result
 end
 
+function make_anode(model, mesh_size, radius)
+    o = model.geo.addPoint(0, 0, 0, mesh_size)
+    z1 = model.geo.addPoint(0, 0, radius, mesh_size)
+    z2 = model.geo.addPoint(0, 0, -radius, mesh_size)
+    y1 = model.geo.addPoint(0, radius, 0, mesh_size)
+    y2 = model.geo.addPoint(0, -radius, 0, mesh_size)
+    x1 = model.geo.addPoint(radius, 0, 0, mesh_size)
+    x2 = model.geo.addPoint(-radius, 0, 0, mesh_size)
+
+    z1y1 = model.geo.addCircleArc(z1, o, y1)
+    z1y2 = model.geo.addCircleArc(z1, o, y2)
+    z1x1 = model.geo.addCircleArc(z1, o, x1)
+    z1x2 = model.geo.addCircleArc(z1, o, x2)
+
+    z2y1 = model.geo.addCircleArc(z2, o, y1)
+    z2y2 = model.geo.addCircleArc(z2, o, y2)
+    z2x1 = model.geo.addCircleArc(z2, o, x1)
+    z2x2 = model.geo.addCircleArc(z2, o, x2)
+
+    y1x1 = model.geo.addCircleArc(y1, o, x1)
+    y1x2 = model.geo.addCircleArc(y1, o, x2)
+    y2x1 = model.geo.addCircleArc(y2, o, x1)
+    y2x2 = model.geo.addCircleArc(y2, o, x2)
+
+    c1 = model.geo.addCurveLoop([z1y1, y1x1, z1x1], -1, true)
+    s1 = model.geo.addSurfaceFilling([c1])
+
+    c2 = model.geo.addCurveLoop([z1y2, y2x1, z1x1], -1, true)
+    s2 = model.geo.addSurfaceFilling([c2])
+
+    c3 = model.geo.addCurveLoop([z1x2, y1x2, z1y1], -1, true)
+    s3 = model.geo.addSurfaceFilling([c3])
+
+    c4 = model.geo.addCurveLoop([z1y2, y2x2, z1x2], -1, true)
+    s4 = model.geo.addSurfaceFilling([c4])
+
+    c5 = model.geo.addCurveLoop([z2y1, y1x1, z2x1], -1, true)
+    s5 = model.geo.addSurfaceFilling([c5])
+
+    c6 = model.geo.addCurveLoop([z2y2, y2x1, z2x1], -1, true)
+    s6 = model.geo.addSurfaceFilling([c6])
+
+    c7 = model.geo.addCurveLoop([z2x2, y1x2, z2y1], -1, true)
+    s7 = model.geo.addSurfaceFilling([c7])
+
+    c8 = model.geo.addCurveLoop([z2y2, y2x2, z2x2], -1, true)
+    s8 = model.geo.addSurfaceFilling([c8])
+
+    anode_surfaces = [s1, s2, s3, s4, s5, s6, s7, s8]
+
+    return model.geo.addSurfaceLoop(anode_surfaces), anode_surfaces
+end
+
+function make_mesh(app_cnt, cathode_radius, cathode_resolution, anode_radius, anode_resolution, wire_radius)
+    println("Making Mesh ...")
+    json_data = JSON3.read("cathode_data/appratures_$(app_cnt).json")
+    edges = Vector{Vector{Vector{Float64}}}(json_data["edges"])
+    vertices = Vector{Vector{Float64}}(json_data["vertices"])
+    face_centers = Vector{Vector{Float64}}(json_data["points"])
+    abstract_edges, adj_list = conectivity_analysis(vertices, edges)
+
+    scaled_anode_radius = anode_radius / cathode_radius
+    scaled_wire_radius = wire_radius / cathode_radius
+
+    try
+        gmsh.initialize()
+        gmsh.option.setNumber("General.Verbosity", 1)
+        model = gmsh.model
+        model.add("Fusion")
+        cathode_mesh_size = scaled_wire_radius * (2 * π / cathode_resolution)
+        anode_mesh_size = scaled_anode_radius * (2 * π / anode_resolution)
+
+        geo_vertices = [model.geo.addPoint(x, y, z, cathode_mesh_size) for (x, y, z) in vertices]
+        #geo_edges = [model.geo.addLine(geo_vertices[i], geo_vertices[j]) for (i, j) in abstract_edges]
+
+        inter_ells = make_intersection_ellipses(model, cathode_mesh_size, vertices, geo_vertices, adj_list, scaled_wire_radius)
+        cathode_surfaces, outer_curves, inner_curves = make_edge_wires(model, cathode_mesh_size, vertices, geo_vertices, abstract_edges, adj_list, inter_ells, scaled_wire_radius)
+        model.geo.synchronize()
+
+        outer_surfaces = make_outer_surfaces(model, cathode_mesh_size, vertices, geo_vertices, outer_curves, scaled_wire_radius)
+        inner_surfaces = make_inner_surfaces(model, cathode_mesh_size, vertices, inner_curves)
+        model.geo.synchronize()
+
+        all_cathode_surfaces = Int32[]
+        append!(all_cathode_surfaces, flatten_tags(cathode_surfaces))
+        append!(all_cathode_surfaces, flatten_tags(outer_surfaces))
+        append!(all_cathode_surfaces, flatten_tags(inner_surfaces))
+
+        cathode = model.geo.addSurfaceLoop(all_cathode_surfaces)
+        model.geo.synchronize()
+
+        anode, anode_surfaces = make_anode(model, anode_mesh_size, scaled_anode_radius)
+        model.geo.synchronize()
+
+        chamber = model.geo.addVolume([anode, -cathode])
+        model.geo.synchronize()
+
+        cathode_physical = model.addPhysicalGroup(2, all_cathode_surfaces, 1)
+        model.setPhysicalName(2, cathode_physical, "cathode")
+
+        anode_physical = model.addPhysicalGroup(2, anode_surfaces, 2)
+        model.setPhysicalName(2, anode_physical, "anode")
+
+        chamber_physical = model.addPhysicalGroup(3, [chamber], 3)
+        model.setPhysicalName(3, chamber_physical, "chamber")
+
+        model.mesh.generate(3)
+        gmsh.write("chamber_mesh.msh")
+        println("Mesh written to: chamber_mesh.msh")
+    finally
+        gmsh.finalize()
+    end
+end
+
+function solve_potential(ΔV, scale)
+    ferrite_grid = FerriteGmsh.togrid("chamber_mesh.msh")
+
+    interpolation = Lagrange{RefTetrahedron,1}()
+    quadrature = QuadratureRule{RefTetrahedron}(2)
+    cellvalues = CellValues(quadrature, interpolation)
+
+    dh = DofHandler(ferrite_grid)
+    add!(dh, :ϕ, interpolation)
+    close!(dh)
+    println("Number of DOFs: ", ndofs(dh))
+
+    ch = ConstraintHandler(dh)
+    add!(ch, Dirichlet(:ϕ, getfacetset(ferrite_grid, "cathode"), x -> -ΔV))
+    add!(ch, Dirichlet(:ϕ, getfacetset(ferrite_grid, "anode"), x -> 0.0))
+    close!(ch)
+    println("Number of constrained DOFs: ", length(ch.prescribed_dofs))
+
+    K = allocate_matrix(dh)
+    f = zeros(ndofs(dh))
+    assembler = start_assemble(K, f)
+
+    # Assemble the system
+    n_cells = length(CellIterator(dh))
+    p = Progress(n_cells; desc="Assembling", showspeed=true)
+    for cell in CellIterator(dh)
+        reinit!(cellvalues, cell)
+        ke = zeros(ndofs_per_cell(dh), ndofs_per_cell(dh))
+        for q_point in 1:getnquadpoints(cellvalues)
+            dΩ = getdetJdV(cellvalues, q_point)
+            for i in 1:getnbasefunctions(cellvalues)
+                ∇ϕi = shape_gradient(cellvalues, q_point, i)
+                for j in 1:getnbasefunctions(cellvalues)
+                    ∇ϕj = shape_gradient(cellvalues, q_point, j)
+                    ke[i, j] += (∇ϕi ⋅ ∇ϕj) * dΩ
+                end
+            end
+        end
+        assemble!(assembler, celldofs(cell), ke)
+        next!(p)
+    end
+
+    K, f = finish_assemble(assembler)  # This returns both K and f
+    apply!(K, f, ch)
+
+    println("Starting to Solve...")
+    ϕ = K \ f
+    println("Finished Solve")
+
+    grid_and_solution = (grid=ferrite_grid, dh=dh, solution=ϕ)
+
+    return function (points)
+        try
+            ferrite_points = [Vec(Tuple(p ./ scale)) for p in points]
+            ph = PointEvalHandler(grid_and_solution.grid, ferrite_points, warn=false)
+            result = evaluate_at_points(ph, grid_and_solution.dh, grid_and_solution.solution, :ϕ)
+            return result
+        catch
+            return fill(NaN, length(points))
+        end
+    end
+end
+
+function general_H(p, q, params, potential)
+    m, e = params
+    return norm(p)^2 / (2 * m) + e * potential([q])
+end
+
+function initial(N, T, r, R)
+
+end
+
 app_cnt = 42
 cathode_radius = 0.05
+cathode_resolution = 8
 anode_radius = 0.25
+anode_resolution = 48
 wire_radius = 0.0025
+ΔV = 4e5
+T = 293.15
+md = 3.343e-27
+e = 1.602e-16
 
-json_data = JSON3.read("cathode_data/appratures_$(app_cnt).json")
-edges = Vector{Vector{Vector{Float64}}}(json_data["edges"])
-vertices = Vector{Vector{Float64}}(json_data["vertices"])
-face_centers = Vector{Vector{Float64}}(json_data["points"])
-abstract_edges, adj_list = conectivity_analysis(vertices, edges)
-
-scaled_anode_radius = anode_radius / cathode_radius
-scaled_wire_radius = wire_radius / cathode_radius
-
-try
-    gmsh.initialize()
-    gmsh.option.setNumber("General.Terminal", 1)
-    #gmsh.option.setNumber("Geometry.Points", 0)
-    model = gmsh.model
-    model.add("Fusion")
-    mesh_size = scaled_wire_radius / 4
-
-    geo_vertices = [model.geo.addPoint(x, y, z, mesh_size) for (x, y, z) in vertices]
-    #geo_edges = [model.geo.addLine(geo_vertices[i], geo_vertices[j]) for (i, j) in abstract_edges]
-
-    inter_ells = make_intersection_ellipses(model, mesh_size, vertices, geo_vertices, adj_list, scaled_wire_radius)
-    surfaces, outer_curves, inner_curves = make_edge_wires(model, mesh_size, vertices, geo_vertices, abstract_edges, adj_list, inter_ells, scaled_wire_radius)
-    model.geo.synchronize()
-
-    outer_surfaces = make_outer_surfaces(model, mesh_size, vertices, geo_vertices, outer_curves, scaled_wire_radius)
-    inner_surfaces = make_inner_surfaces(model, mesh_size, vertices, inner_curves)
-    model.geo.synchronize()
-
-    all_surface_tags = Int32[]
-    append!(all_surface_tags, flatten_tags(surfaces))
-    append!(all_surface_tags, flatten_tags(outer_surfaces))
-    append!(all_surface_tags, flatten_tags(inner_surfaces))
-    cathode = model.geo.addSurfaceLoop(all_surface_tags)
-    model.geo.synchronize()
-
-    model.mesh.generate(2)
-    gmsh.fltk.run()
-finally
-    gmsh.finalize()
-end
+make_mesh(app_cnt, cathode_radius, cathode_resolution, anode_radius, anode_resolution, wire_radius)
+potential = solve_potential(ΔV, cathode_radius)
+H(p, q, params) = general_H(p, q, params, potential)
