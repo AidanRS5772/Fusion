@@ -1,11 +1,11 @@
+using LinearAlgebra
 using JSON3
 using Gmsh
-using LinearAlgebra
-using Ferrite
-using FerriteGmsh
-using ProgressMeter
-using DifferentialEquations
-
+using PlotlyJS
+import Ferrite as F
+import FerriteGmsh as FG
+import DifferentialEquations as DE
+import DiffEqPhysics as DP
 
 function circular_sort(axis, v0, vecs)
     b1 = cross(axis, [0, 0, 1])
@@ -289,7 +289,7 @@ function find_loop(model, arcs1, arcs2, arc3)
     end
 end
 
-function make_inner_surfaces(model, mesh_size, verticies, all_inner_curves)
+function make_inner_surfaces(model, mesh_size, vertices, all_inner_curves)
     inner_surfaces = []
     for (i, curve_info) in enumerate(all_inner_curves)
         surfaces = []
@@ -406,6 +406,15 @@ function make_anode(model, mesh_size, radius)
     return model.geo.addSurfaceLoop(anode_surfaces), anode_surfaces
 end
 
+struct Plot_Mesh
+    X::Vector{Float64}
+    Y::Vector{Float64}
+    Z::Vector{Float64}
+    I::Vector{Int}
+    J::Vector{Int}
+    K::Vector{Int}
+end
+
 function make_mesh(app_cnt, cathode_radius, cathode_resolution, anode_radius, anode_resolution, wire_radius)
     println("Making Mesh ...")
     json_data = JSON3.read("cathode_data/appratures_$(app_cnt).json")
@@ -416,6 +425,7 @@ function make_mesh(app_cnt, cathode_radius, cathode_resolution, anode_radius, an
 
     scaled_anode_radius = anode_radius / cathode_radius
     scaled_wire_radius = wire_radius / cathode_radius
+    X, Y, Z, I, J, K = Nothing, Nothing, Nothing, Int[], Int[], Int[]
 
     try
         gmsh.initialize()
@@ -462,81 +472,219 @@ function make_mesh(app_cnt, cathode_radius, cathode_resolution, anode_radius, an
         model.mesh.generate(3)
         gmsh.write("chamber_mesh.msh")
         println("Mesh written to: chamber_mesh.msh")
+
+        cathode_entities = gmsh.model.getEntitiesForPhysicalGroup(2, 1)
+        all_triangle_nodes = Int[]
+        for entity in cathode_entities
+            _, _, elem_node_tags = gmsh.model.mesh.getElements(2, entity)
+            if !isempty(elem_node_tags)
+                append!(all_triangle_nodes, elem_node_tags[1])
+            end
+        end
+        unique_node_tags = unique(all_triangle_nodes)
+        all_nodes_tags, all_nodes_coords, _ = gmsh.model.mesh.getNodes(-1, -1)
+        all_nodes_dict = Dict{Int,Vector{Float64}}()
+        for (tag, coords) in zip(all_nodes_tags,
+            Iterators.partition(all_nodes_coords, 3))
+            all_nodes_dict[tag] = collect(coords)
+        end
+
+        node_dict = Dict{Int,Vector{Float64}}()
+        for tag in unique_node_tags
+            if haskey(all_nodes_dict, tag)
+                node_dict[tag] = all_nodes_dict[tag]
+            end
+        end
+
+        node_tags = collect(keys(node_dict))
+        node_idx = Dict(tag => i - 1 for (i, tag) in enumerate(node_tags))
+        X = [node_dict[tag][1] for tag in node_tags] .* cathode_radius
+        Y = [node_dict[tag][2] for tag in node_tags] .* cathode_radius
+        Z = [node_dict[tag][3] for tag in node_tags] .* cathode_radius
+        for entity in cathode_entities
+            _, _, elem_node_tags = gmsh.model.mesh.getElements(2, entity)
+            if !isempty(elem_node_tags)
+                for (i, j, k) in Iterators.partition(elem_node_tags[1], 3)
+                    # All nodes should exist now since we got them specifically
+                    push!(I, node_idx[i])
+                    push!(J, node_idx[j])
+                    push!(K, node_idx[k])
+                end
+            end
+        end
     finally
         gmsh.finalize()
     end
+
+    return Plot_Mesh(X, Y, Z, I, J, K)
 end
 
-function solve_potential(ΔV, scale)
-    ferrite_grid = FerriteGmsh.togrid("chamber_mesh.msh")
+function solve_electric_feild(ΔV, scale)
+    ferrite_grid = FG.togrid("chamber_mesh.msh")
 
-    interpolation = Lagrange{RefTetrahedron,1}()
-    quadrature = QuadratureRule{RefTetrahedron}(2)
-    cellvalues = CellValues(quadrature, interpolation)
+    interpolation = F.Lagrange{F.RefTetrahedron,1}()
+    quadrature = F.QuadratureRule{F.RefTetrahedron}(2)
+    cellvalues = F.CellValues(quadrature, interpolation)
 
-    dh = DofHandler(ferrite_grid)
-    add!(dh, :ϕ, interpolation)
-    close!(dh)
-    println("Number of DOFs: ", ndofs(dh))
+    dh = F.DofHandler(ferrite_grid)
+    F.add!(dh, :ϕ, interpolation)
+    F.close!(dh)
+    println("Number of DOFs for potential: ", F.ndofs(dh))
 
-    ch = ConstraintHandler(dh)
-    add!(ch, Dirichlet(:ϕ, getfacetset(ferrite_grid, "cathode"), x -> -ΔV))
-    add!(ch, Dirichlet(:ϕ, getfacetset(ferrite_grid, "anode"), x -> 0.0))
-    close!(ch)
-    println("Number of constrained DOFs: ", length(ch.prescribed_dofs))
+    ch = F.ConstraintHandler(dh)
+    F.add!(ch, F.Dirichlet(:ϕ, F.getfacetset(ferrite_grid, "cathode"), x -> -ΔV))
+    F.add!(ch, F.Dirichlet(:ϕ, F.getfacetset(ferrite_grid, "anode"), x -> 0.0))
+    F.close!(ch)
+    println("Number of constrained DOFs for potential: ", length(ch.prescribed_dofs))
 
-    K = allocate_matrix(dh)
-    f = zeros(ndofs(dh))
-    assembler = start_assemble(K, f)
+    K = F.allocate_matrix(dh)
+    f = zeros(F.ndofs(dh))
+    assembler = F.start_assemble(K, f)
 
     # Assemble the system
-    n_cells = length(CellIterator(dh))
-    p = Progress(n_cells; desc="Assembling", showspeed=true)
-    for cell in CellIterator(dh)
-        reinit!(cellvalues, cell)
-        ke = zeros(ndofs_per_cell(dh), ndofs_per_cell(dh))
-        for q_point in 1:getnquadpoints(cellvalues)
-            dΩ = getdetJdV(cellvalues, q_point)
-            for i in 1:getnbasefunctions(cellvalues)
-                ∇ϕi = shape_gradient(cellvalues, q_point, i)
-                for j in 1:getnbasefunctions(cellvalues)
-                    ∇ϕj = shape_gradient(cellvalues, q_point, j)
+    println("Assembling potential system...")
+    for cell in F.CellIterator(dh)
+        F.reinit!(cellvalues, cell)
+        ke = zeros(F.ndofs_per_cell(dh), F.ndofs_per_cell(dh))
+        for q_point in 1:F.getnquadpoints(cellvalues)
+            dΩ = F.getdetJdV(cellvalues, q_point)
+            for i in 1:F.getnbasefunctions(cellvalues)
+                ∇ϕi = F.shape_gradient(cellvalues, q_point, i)
+                for j in 1:F.getnbasefunctions(cellvalues)
+                    ∇ϕj = F.shape_gradient(cellvalues, q_point, j)
                     ke[i, j] += (∇ϕi ⋅ ∇ϕj) * dΩ
                 end
             end
         end
-        assemble!(assembler, celldofs(cell), ke)
-        next!(p)
+        F.assemble!(assembler, F.celldofs(cell), ke)
     end
 
-    K, f = finish_assemble(assembler)  # This returns both K and f
-    apply!(K, f, ch)
+    K, f = F.finish_assemble(assembler)  # This returns both K and f
+    F.apply!(K, f, ch)
 
-    println("Starting to Solve...")
+    println("Starting to Solve for potential...")
     ϕ = K \ f
-    println("Finished Solve")
+    println("Finished Solve for potential")
 
-    grid_and_solution = (grid=ferrite_grid, dh=dh, solution=ϕ)
+    dh_E = F.DofHandler(ferrite_grid)
 
-    return function (points)
+    # Add three scalar fields for the x, y, and z components of the electric field
+    F.add!(dh_E, :Ex, interpolation)  # Same interpolation as potential
+    F.add!(dh_E, :Ey, interpolation)
+    F.add!(dh_E, :Ez, interpolation)
+    F.close!(dh_E)
+    println("Number of DOFs for electric field: ", F.ndofs(dh_E))
+
+    # Initialize vectors for each component of the electric field
+    Ex = zeros(F.ndofs(dh_E))
+    Ey = zeros(F.ndofs(dh_E))
+    Ez = zeros(F.ndofs(dh_E))
+
+    # Mass matrix and right-hand side vectors for the projection
+    M = F.allocate_matrix(dh_E)
+    fx = zeros(F.ndofs(dh_E))
+    fy = zeros(F.ndofs(dh_E))
+    fz = zeros(F.ndofs(dh_E))
+
+    # Start assemblers for each component
+    assembler_x = F.start_assemble(M, fx)
+    assembler_y = F.start_assemble(copy(M), fy)
+    assembler_z = F.start_assemble(copy(M), fz)
+
+    println("Assembling electric field ...")
+
+    # Loop over cells to construct and solve the projection
+    for cell in F.CellIterator(dh_E)
+        # Reinitialize cell values for this cell
+        F.reinit!(cellvalues, cell)
+
+        # Get the potential values for this cell
+        cell_id = F.cellid(cell)
+        potential_dofs = F.celldofs(dh, cell_id)
+        cell_potential = ϕ[potential_dofs]
+
+        # Get the dofs for this cell in the electric field space
+        field_dofs = F.celldofs(cell)
+        n_dofs = length(field_dofs)
+
+        # Initialize local matrices and vectors
+        me = zeros(n_dofs, n_dofs)  # Mass matrix (same for all components)
+        fe_x = zeros(n_dofs)        # Force vector for Ex
+        fe_y = zeros(n_dofs)        # Force vector for Ey
+        fe_z = zeros(n_dofs)        # Force vector for Ez
+
+        # Loop over quadrature points
+        for q_point in 1:F.getnquadpoints(cellvalues)
+            # Integration weight
+            dΩ = F.getdetJdV(cellvalues, q_point)
+
+            # Compute the potential gradient at this quadrature point
+            ∇ϕ_qp = F.Vec((0.0, 0.0, 0.0))
+            for i in 1:F.getnbasefunctions(cellvalues)
+                ∇ϕ_i = F.shape_gradient(cellvalues, q_point, i)
+                ∇ϕ_qp += cell_potential[i] * ∇ϕ_i
+            end
+
+            # Electric field is negative gradient
+            E_qp = -∇ϕ_qp
+
+            # Assemble mass matrix and right-hand side
+            for i in 1:F.getnbasefunctions(cellvalues)
+                Ni = F.shape_value(cellvalues, q_point, i)
+
+                # Right-hand side vectors
+                fe_x[i] += Ni * E_qp[1] * dΩ
+                fe_y[i] += Ni * E_qp[2] * dΩ
+                fe_z[i] += Ni * E_qp[3] * dΩ
+
+                # Mass matrix (same for all components)
+                for j in 1:F.getnbasefunctions(cellvalues)
+                    Nj = F.shape_value(cellvalues, q_point, j)
+                    me[i, j] += Ni * Nj * dΩ
+                end
+            end
+        end
+
+        # Assemble local matrices into global systems
+        F.assemble!(assembler_x, field_dofs, me, fe_x)
+        F.assemble!(assembler_y, field_dofs, me, fe_y)
+        F.assemble!(assembler_z, field_dofs, me, fe_z)
+    end
+
+    # Finalize assembly
+    M_x, fx = F.finish_assemble(assembler_x)
+    M_y, fy = F.finish_assemble(assembler_y)
+    M_z, fz = F.finish_assemble(assembler_z)
+
+    # Solve the projection systems
+    println("Solving for electric field components...")
+    λ = 1e-10
+    Ex = (M_x + λ * I) \ fx
+    Ey = (M_y + λ * I) \ fy
+    Ez = (M_z + λ * I) \ fz
+    println("Electric field computation complete.")
+
+    grid_and_fields = (
+        grid=ferrite_grid,
+        dh_E=dh_E,
+        Ex=Ex,
+        Ey=Ey,
+        Ez=Ez
+    )
+
+    return function (point)
         try
-            ferrite_points = [Vec(Tuple(p ./ scale)) for p in points]
-            ph = PointEvalHandler(grid_and_solution.grid, ferrite_points, warn=false)
-            result = evaluate_at_points(ph, grid_and_solution.dh, grid_and_solution.solution, :ϕ)
-            return result
+            ferrite_point = [F.Vec(Tuple(point ./ scale))]
+            handler = F.PointEvalHandler(grid_and_fields.grid, ferrite_point, warn=false)
+            return [
+                F.evaluate_at_points(handler, grid_and_fields.dh_E, grid_and_fields.Ex, :Ex),
+                F.evaluate_at_points(handler, grid_and_fields.dh_E, grid_and_fields.Ey, :Ey),
+                F.evaluate_at_points(handler, grid_and_fields.dh_E, grid_and_fields.Ez, :Ez)
+            ]
         catch
-            return fill(NaN, length(points))
+            return [NaN, NaN, NaN]
         end
     end
-end
-
-function general_H(p, q, params, potential)
-    m, e = params
-    return norm(p)^2 / (2 * m) + e * potential([q])
-end
-
-function initial(N, T, r, R)
-
 end
 
 app_cnt = 42
@@ -549,7 +697,16 @@ wire_radius = 0.0025
 T = 293.15
 md = 3.343e-27
 e = 1.602e-16
+kb = 1.380649e-23
 
-make_mesh(app_cnt, cathode_radius, cathode_resolution, anode_radius, anode_resolution, wire_radius)
-potential = solve_potential(ΔV, cathode_radius)
-H(p, q, params) = general_H(p, q, params, potential)
+plot_mesh_info = make_mesh(app_cnt, cathode_radius, cathode_resolution, anode_radius, anode_resolution, wire_radius)
+#E = solve_electric_feild(ΔV, cathode_radius)
+
+plot(
+    mesh3d(
+        x=plot_mesh_info.X, y=plot_mesh_info.Y, z=plot_mesh_info.Z,
+        i=plot_mesh_info.I, j=plot_mesh_info.J, k=plot_mesh_info.K,
+        opacity=0.5,
+        colorscale="Viridis"
+    )
+)
