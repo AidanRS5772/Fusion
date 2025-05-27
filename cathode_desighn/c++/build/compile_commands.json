@@ -1,8 +1,0 @@
-[
-{
-  "directory": "/Users/aidansgarlato/Programing/Julia/Fusion/cathode_desighn/c++/build",
-  "command": "/usr/bin/c++  -isystem /opt/homebrew/include -isystem /opt/homebrew/include/eigen3 -std=gnu++20 -arch arm64 -o CMakeFiles/Fusion.dir/main.cpp.o -c /Users/aidansgarlato/Programing/Julia/Fusion/cathode_desighn/c++/main.cpp",
-  "file": "/Users/aidansgarlato/Programing/Julia/Fusion/cathode_desighn/c++/main.cpp",
-  "output": "CMakeFiles/Fusion.dir/main.cpp.o"
-}
-]

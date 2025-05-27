@@ -1,0 +1,8 @@
+[
+{
+  "directory": "/Users/aidansgarlato/Programing/Julia/Fusion/cathode_desighn/build",
+  "command": "/usr/bin/c++ -DDEBUG -isystem /opt/homebrew/include -isystem /Users/aidansgarlato/dealii-candi/deal.II-v9.6.1/include -isystem /Users/aidansgarlato/dealii-candi/deal.II-v9.6.1/include/deal.II/bundled -isystem /opt/homebrew/include/opencascade -isystem /opt/homebrew/include/eigen3 -g -g -Wall -Wextra -Wpedantic -std=gnu++20 -arch arm64 -pedantic -Wall -Wextra -Wmissing-braces -Woverloaded-virtual -Wpointer-arith -Wsign-compare -Wsuggest-override -Wswitch -Wsynth -Wwrite-strings -Wno-deprecated-declarations -Wno-psabi -Wfloat-conversion -Qunused-arguments -Wno-unsupported-friend -Wno-pass-failed -Wno-unused-local-typedefs -Wno-parentheses -openmp-simd -ftemplate-depth=1024 -ffp-exception-behavior=strict -Og -ggdb -Wa,--compress-debug-sections -o CMakeFiles/Fusion.dir/main.cpp.o -c /Users/aidansgarlato/Programing/Julia/Fusion/cathode_desighn/main.cpp",
+  "file": "/Users/aidansgarlato/Programing/Julia/Fusion/cathode_desighn/main.cpp",
+  "output": "CMakeFiles/Fusion.dir/main.cpp.o"
+}
+]
