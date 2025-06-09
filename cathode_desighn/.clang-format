@@ -1,6 +1,42 @@
 ---
+# Basic settings
 IndentWidth: 4
 TabWidth: 4
 UseTab: Never
-ColumnLimit: 110
+ColumnLimit: 120
+
+# Function arguments/parameters formatting
+BinPackArguments: false
+BinPackParameters: false
+AlignAfterOpenBracket: AlwaysBreak
+AllowAllArgumentsOnNextLine: false
+AllowAllParametersOfDeclarationOnNextLine: false
+
+# Penalty settings - these control line breaking decisions
+PenaltyBreakAssignment: 100      # High penalty for breaking after =
+PenaltyBreakBeforeFirstCallParameter: 1  # Low penalty for breaking before first parameter
+PenaltyReturnTypeOnItsOwnLine: 1000  # Avoid putting return type on own line
+
+# Brace style
+BreakBeforeBraces: Attach
+
+# Additional formatting options
+AlignOperands: true
+AlignTrailingComments: true
+AllowShortFunctionsOnASingleLine: None
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+AllowShortLambdasOnASingleLine: false  # Force lambdas to break if needed
+BreakConstructorInitializers: BeforeColon
+ConstructorInitializerIndentWidth: 4
+ContinuationIndentWidth: 4
+Cpp11BracedListStyle: true
+DerivePointerAlignment: false
+PointerAlignment: Right
+SpaceAfterCStyleCast: false
+SpaceBeforeParens: ControlStatements
+SpacesInAngles: false
+SpacesInParentheses: false
+SpacesInSquareBrackets: false
+Standard: c++20
 ---

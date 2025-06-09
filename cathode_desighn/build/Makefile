@@ -117,41 +117,122 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named Fusion
+# Target rules for targets named Fusion_Debug
 
 # Build rule for target.
-Fusion: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 Fusion
-.PHONY : Fusion
+Fusion_Debug: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 Fusion_Debug
+.PHONY : Fusion_Debug
 
 # fast build rule for target.
-Fusion/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Fusion.dir/build.make CMakeFiles/Fusion.dir/build
-.PHONY : Fusion/fast
+Fusion_Debug/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Fusion_Debug.dir/build.make CMakeFiles/Fusion_Debug.dir/build
+.PHONY : Fusion_Debug/fast
 
-main.o: main.cpp.o
-.PHONY : main.o
+#=============================================================================
+# Target rules for targets named Fusion_Release
+
+# Build rule for target.
+Fusion_Release: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 Fusion_Release
+.PHONY : Fusion_Release
+
+# fast build rule for target.
+Fusion_Release/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Fusion_Release.dir/build.make CMakeFiles/Fusion_Release.dir/build
+.PHONY : Fusion_Release/fast
+
+#=============================================================================
+# Target rules for targets named all_builds
+
+# Build rule for target.
+all_builds: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all_builds
+.PHONY : all_builds
+
+# fast build rule for target.
+all_builds/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/all_builds.dir/build.make CMakeFiles/all_builds.dir/build
+.PHONY : all_builds/fast
+
+#=============================================================================
+# Target rules for targets named debug
+
+# Build rule for target.
+debug: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 debug
+.PHONY : debug
+
+# fast build rule for target.
+debug/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/debug.dir/build.make CMakeFiles/debug.dir/build
+.PHONY : debug/fast
+
+#=============================================================================
+# Target rules for targets named release
+
+# Build rule for target.
+release: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 release
+.PHONY : release
+
+# fast build rule for target.
+release/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/release.dir/build.make CMakeFiles/release.dir/build
+.PHONY : release/fast
+
+#=============================================================================
+# Target rules for targets named fusion
+
+# Build rule for target.
+fusion: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 fusion
+.PHONY : fusion
+
+# fast build rule for target.
+fusion/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/fusion.dir/build.make CMakeFiles/fusion.dir/build
+.PHONY : fusion/fast
+
+#=============================================================================
+# Target rules for targets named default
+
+# Build rule for target.
+default: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 default
+.PHONY : default
+
+# fast build rule for target.
+default/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/default.dir/build.make CMakeFiles/default.dir/build
+.PHONY : default/fast
+
+src/main.o: src/main.cpp.o
+.PHONY : src/main.o
 
 # target to build an object file
-main.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Fusion.dir/build.make CMakeFiles/Fusion.dir/main.cpp.o
-.PHONY : main.cpp.o
+src/main.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Fusion_Debug.dir/build.make CMakeFiles/Fusion_Debug.dir/src/main.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Fusion_Release.dir/build.make CMakeFiles/Fusion_Release.dir/src/main.cpp.o
+.PHONY : src/main.cpp.o
 
-main.i: main.cpp.i
-.PHONY : main.i
+src/main.i: src/main.cpp.i
+.PHONY : src/main.i
 
 # target to preprocess a source file
-main.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Fusion.dir/build.make CMakeFiles/Fusion.dir/main.cpp.i
-.PHONY : main.cpp.i
+src/main.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Fusion_Debug.dir/build.make CMakeFiles/Fusion_Debug.dir/src/main.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Fusion_Release.dir/build.make CMakeFiles/Fusion_Release.dir/src/main.cpp.i
+.PHONY : src/main.cpp.i
 
-main.s: main.cpp.s
-.PHONY : main.s
+src/main.s: src/main.cpp.s
+.PHONY : src/main.s
 
 # target to generate assembly for a file
-main.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Fusion.dir/build.make CMakeFiles/Fusion.dir/main.cpp.s
-.PHONY : main.cpp.s
+src/main.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Fusion_Debug.dir/build.make CMakeFiles/Fusion_Debug.dir/src/main.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Fusion_Release.dir/build.make CMakeFiles/Fusion_Release.dir/src/main.cpp.s
+.PHONY : src/main.cpp.s
 
 # Help Target
 help:
@@ -161,10 +242,16 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
-	@echo "... Fusion"
-	@echo "... main.o"
-	@echo "... main.i"
-	@echo "... main.s"
+	@echo "... all_builds"
+	@echo "... debug"
+	@echo "... default"
+	@echo "... fusion"
+	@echo "... release"
+	@echo "... Fusion_Debug"
+	@echo "... Fusion_Release"
+	@echo "... src/main.o"
+	@echo "... src/main.i"
+	@echo "... src/main.s"
 .PHONY : help
 
 

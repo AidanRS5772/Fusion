@@ -1,2 +1,2 @@
 # CMAKE generated file: DO NOT EDIT!
-# Timestamp file for compiler generated dependencies management for Fusion.
+# Timestamp file for custom commands dependencies management for fusion.
