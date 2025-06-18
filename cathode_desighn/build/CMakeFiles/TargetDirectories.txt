@@ -1,9 +1,0 @@
-/Users/aidansgarlato/Programing/Julia/Fusion/cathode_desighn/build/CMakeFiles/Fusion_Debug.dir
-/Users/aidansgarlato/Programing/Julia/Fusion/cathode_desighn/build/CMakeFiles/Fusion_Release.dir
-/Users/aidansgarlato/Programing/Julia/Fusion/cathode_desighn/build/CMakeFiles/all_builds.dir
-/Users/aidansgarlato/Programing/Julia/Fusion/cathode_desighn/build/CMakeFiles/debug.dir
-/Users/aidansgarlato/Programing/Julia/Fusion/cathode_desighn/build/CMakeFiles/release.dir
-/Users/aidansgarlato/Programing/Julia/Fusion/cathode_desighn/build/CMakeFiles/fusion.dir
-/Users/aidansgarlato/Programing/Julia/Fusion/cathode_desighn/build/CMakeFiles/default.dir
-/Users/aidansgarlato/Programing/Julia/Fusion/cathode_desighn/build/CMakeFiles/edit_cache.dir
-/Users/aidansgarlato/Programing/Julia/Fusion/cathode_desighn/build/CMakeFiles/rebuild_cache.dir

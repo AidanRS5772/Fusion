@@ -19,7 +19,8 @@ class OctoTree {
             max = Vector3d::Constant(-std::numeric_limits<double>::max());
         }
 
-        AABB(Vector3d min_, Vector3d max_) : min(std::move(min_)), max(std::move(max_)) {}
+        AABB(Vector3d min_, Vector3d max_) : min(std::move(min_)), max(std::move(max_)) {
+        }
 
         bool contains(const Vector3d &p) {
             return (p.array() >= min.array()).all() && (p.array() <= max.array()).all();
@@ -41,6 +42,19 @@ class OctoTree {
             }
             return children;
         }
+
+        bool intersects_sphere(const Vector3d &p, double radius) const {
+            double dist_sq = 0.0;
+
+            for (int i = 0; i < 3; ++i) {
+                if (p[i] < min[i])
+                    dist_sq += (min[i] - p[i]) * (min[i] - p[i]);
+                else if (p[i] > max[i])
+                    dist_sq += (p[i] - max[i]) * (p[i] - max[i]);
+            }
+
+            return dist_sq <= radius * radius;
+        }
     };
 
     struct Node {
@@ -50,7 +64,8 @@ class OctoTree {
 
         Node() = default;
         Node(const AABB &bounds_, const std::vector<std::array<size_t, 3>> &triangles_)
-            : bounds(bounds_), triangles(triangles_) {}
+            : bounds(bounds_), triangles(triangles_) {
+        }
 
         bool terminal() {
             for (const auto &child : children) {
@@ -99,8 +114,8 @@ class OctoTree {
         node->triangles.shrink_to_fit();
     }
 
-    void queryNode(const std::unique_ptr<Node> &node, const Vector3d &point,
-                   std::vector<std::array<size_t, 3>> &result) const {
+    void queryNode(const std::unique_ptr<Node> &node, const Vector3d &point, std::vector<std::array<size_t, 3>> &result)
+        const {
         if (node->terminal()) {
             result.insert(result.end(), node->triangles.begin(), node->triangles.end());
         } else {
@@ -114,11 +129,33 @@ class OctoTree {
         }
     }
 
+    void queryNode_w_radius(
+        const std::unique_ptr<Node> &node,
+        const Vector3d &point,
+        const double radius,
+        std::vector<std::array<size_t, 3>> &result) const {
+        if (node->terminal()) {
+            result.insert(result.end(), node->triangles.begin(), node->triangles.end());
+        } else {
+            for (const auto &child : node->children) {
+                if (child) {
+                    if (!child->bounds.intersects_sphere(point, radius)) {
+                        queryNode_w_radius(child, point, radius, result);
+                    }
+                }
+            }
+        }
+    }
+
   public:
     const std::vector<Vector3d> points;
 
-    OctoTree(const std::vector<Vector3d> &points_, const std::vector<std::array<size_t, 3>> &triangles, const double R,
-             size_t min_size_ = 16, size_t max_depth_ = 10)
+    OctoTree(
+        const std::vector<Vector3d> &points_,
+        const std::vector<std::array<size_t, 3>> &triangles,
+        const double R,
+        size_t min_size_ = 8,
+        size_t max_depth_ = 10)
         : min_size(min_size_), max_depth(max_depth_), points(points_) {
         AABB root_bounds(1.1 * Vector3d::Constant(-R), 1.1 * Vector3d::Constant(R));
         root = std::make_unique<Node>(root_bounds, triangles);
@@ -129,6 +166,15 @@ class OctoTree {
         if (root->bounds.contains(point)) {
             std::vector<std::array<size_t, 3>> result;
             queryNode(root, point, result);
+            return result;
+        }
+        return std::nullopt;
+    }
+
+    std::optional<std::vector<std::array<size_t, 3>>> query_w_radius(const Vector3d &point, const double radius) const {
+        if (root->bounds.contains(point)) {
+            std::vector<std::array<size_t, 3>> result;
+            queryNode_w_radius(root, point, radius, result);
             return result;
         }
         return std::nullopt;

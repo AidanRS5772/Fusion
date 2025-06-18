@@ -3,14 +3,22 @@ const path = require("path");
 const open = require("open");
 
 const type = process.argv[2];
+const projectRoot = process.argv[3]; // Pass PROJECT_ROOT as 3rd argument
+const hash = process.argv[4]; // Hash becomes 4th argument when needed
+
+// Define all paths relative to project root
+const PATHS = {
+  meshMetaData: path.join(projectRoot, "mesh_meta_data.json"),
+  plotData: path.join(projectRoot, "src/plots/plot_data.json"),
+  outputHtml: path.join(projectRoot, "src/plots/plot.html"),
+};
 
 const traces = [];
 let layout = {};
-if (type === "0") {
-  const hash = process.argv[3];
 
+if (type === "0") {
   const all_mesh_data = JSON.parse(
-    fs.readFileSync("../mesh_meta_data.json", "utf-8"),
+    fs.readFileSync(PATHS.meshMetaData, "utf-8"),
   );
   const mesh_data = all_mesh_data[hash];
 
@@ -29,7 +37,7 @@ if (type === "0") {
 
   traces.push(mesh_trace);
   layout = {
-    title: `${mesh_data.app_cnt} Apprature Mesh`,
+    title: `${mesh_data.app_cnt} Aperture Mesh`,
     scene: {
       xaxis: {
         title: "X (cm)",
@@ -47,9 +55,8 @@ if (type === "0") {
     },
   };
 } else if (type === "1") {
-  const hash = process.argv[3];
   const all_mesh_data = JSON.parse(
-    fs.readFileSync("../mesh_meta_data.json", "utf-8"),
+    fs.readFileSync(PATHS.meshMetaData, "utf-8"),
   );
   const mesh_data = all_mesh_data[hash];
 
@@ -66,9 +73,7 @@ if (type === "0") {
     hoverinfo: "skip",
   };
 
-  const data = JSON.parse(
-    fs.readFileSync("../src/plots/plot_data.json", "utf-8"),
-  );
+  const data = JSON.parse(fs.readFileSync(PATHS.plotData, "utf-8"));
 
   const path_trace = {
     type: "scatter3d",
@@ -85,7 +90,7 @@ if (type === "0") {
   };
   traces.push(mesh_trace, path_trace);
   layout = {
-    title: `${mesh_data.app_cnt} Apprature Mesh and Trajectory`,
+    title: `${mesh_data.app_cnt} Aperture Mesh and Trajectory`,
     scene: {
       xaxis: {
         title: "X (cm)",
@@ -103,10 +108,8 @@ if (type === "0") {
     },
   };
 } else if (type === "2") {
-  const hash = process.argv[3];
-
   const all_mesh_data = JSON.parse(
-    fs.readFileSync("../mesh_meta_data.json", "utf-8"),
+    fs.readFileSync(PATHS.meshMetaData, "utf-8"),
   );
   const mesh_data = all_mesh_data[hash];
 
@@ -123,11 +126,9 @@ if (type === "0") {
     hoverinfo: "skip",
   };
 
-  const data = JSON.parse(
-    fs.readFileSync("../src/plots/plot_data.json", "utf-8"),
-  );
+  const data = JSON.parse(fs.readFileSync(PATHS.plotData, "utf-8"));
 
-  cone_trace = {
+  const cone_trace = {
     type: "cone",
     x: data.X,
     y: data.Y,
@@ -139,7 +140,7 @@ if (type === "0") {
     cmin: Math.min(...data.M),
     cmax: Math.max(...data.M),
     colorbar: {
-      title: "Electric Feild Magnitude",
+      title: "Electric Field Magnitude",
     },
     showscale: true,
     sizemode: "absolute",
@@ -148,12 +149,12 @@ if (type === "0") {
     customdata: data.M,
     hovertemplate:
       "X: %{x}<br>Y: %{y}<br>Z: %{z}<br>" +
-      "Electric Feild Magnatude: %{customdata:.2f}<extra></extra>",
+      "Electric Field Magnitude: %{customdata:.2f}<extra></extra>",
   };
 
   traces.push(mesh_trace, cone_trace);
   layout = {
-    title: `${mesh_data.app_cnt} Apprature Mesh and Electric Feild`,
+    title: `${mesh_data.app_cnt} Aperture Mesh and Electric Field`,
     scene: {
       xaxis: {
         title: "X (cm)",
@@ -171,21 +172,19 @@ if (type === "0") {
     },
   };
 } else if (type === "3") {
-  const data = JSON.parse(
-    fs.readFileSync("../src/plots/plot_data.json", "utf-8"),
-  );
+  const data = JSON.parse(fs.readFileSync(PATHS.plotData, "utf-8"));
 
-  ke_trace = {
+  const ke_trace = {
     type: "scatter",
     x: data.T,
     y: data.KE,
     mode: "lines",
-    name: "Kenetic",
+    name: "Kinetic",
     line: {
       color: "red",
     },
   };
-  pe_trace = {
+  const pe_trace = {
     type: "scatter",
     x: data.T,
     y: data.PE,
@@ -195,7 +194,7 @@ if (type === "0") {
       color: "blue",
     },
   };
-  tot_trace = {
+  const tot_trace = {
     type: "scatter",
     x: data.T,
     y: data.E,
@@ -232,6 +231,5 @@ const html = `
 </html>
 `;
 
-const outputFile = path.resolve(__dirname, "plot.html");
-fs.writeFileSync(outputFile, html);
-open(outputFile);
+fs.writeFileSync(PATHS.outputHtml, html);
+open(PATHS.outputHtml);

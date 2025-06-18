@@ -4,9 +4,10 @@
 #include "solve_path.h"
 #include "solve_pde.h"
 #include <Eigen/Dense>
+#include <chrono>
 #include <gperftools/profiler.h>
 
-constexpr int app_cnt = 6;
+constexpr int app_cnt = 100;
 constexpr double cathode_radius = 5; // [cm]
 constexpr double anode_radius = 25;  // [cm]
 constexpr double wire_radius = .2;   // [cm]
@@ -15,21 +16,24 @@ constexpr double mD = 2.08690083;    // [MeV][cm/ns]^-2 mass of a deuteron (m = 
 
 int main() {
     auto mesh = MakeMesh(app_cnt, anode_radius, cathode_radius, wire_radius, 4, 24);
-    auto pde_sol =
-        SolvePDE(mesh.file_name, voltage, cathode_radius, anode_radius, mesh.inner_radius, mesh.outer_radius);
+    auto pde_sol = SolvePDE(mesh.file_name, voltage, cathode_radius);
 
-    // Vector3d init_pos(0, 0, 17.5);
-    // Vector3d init_vel(0, 0, 0);
+    Vector3d init_pos(0, 0, 17.5);
+    Vector3d init_vel(0, 0, 0);
 
-    // ProfilerStart("path_profile.prof");
-    // auto start = std::chrono::high_resolution_clock::now();
-    // auto path_sol = SolvePath(mesh.mesh_tree, pde_sol, mD, init_pos,
-    // init_vel, 1e4); auto end = std::chrono::high_resolution_clock::now();
-    // ProfilerStop();
+    ProfilerStart("path_profile.prof");
 
-    // auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end
-    // - start); std::cout << "Orbit Cnt: " << path_sol.orbit_cnt << std::endl;
-    // std::cout << "duration: " << duration.count() << " ms" << std::endl;
+    auto start = std::chrono::high_resolution_clock::now();
+    auto path_sol = SolvePath(mesh.mesh_tree, pde_sol, mD, init_pos, init_vel, 1e4);
+    auto end = std::chrono::high_resolution_clock::now();
+
+    ProfilerStop();
+
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+    std::cout << "Orbit Cnt: " << path_sol.orbit_cnt << std::endl;
+    std::cout << "duration: " << duration.count() << " ms" << std::endl;
+
+    // plot_mesh_path(mesh.hash, path_sol.path_info.path);
 
     return 0;
 }

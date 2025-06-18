@@ -32,8 +32,6 @@ class MakeMesh {
     std::string file_name;
     size_t hash;
     std::unique_ptr<OctoTree> mesh_tree;
-    double inner_radius;
-    double outer_radius;
 
     MakeMesh(
         const int app_cnt_,
@@ -850,21 +848,11 @@ class MakeMesh {
         std::vector<double> X(nodes.size()), Y(nodes.size()), Z(nodes.size());
         std::vector<Vector3d> mesh_nodes;
 
-        inner_radius = anode_radius;
-        outer_radius = 0;
         for (size_t i = 0; i < nodes.size(); i++) {
             const Vector3d c(
                 cords[3 * i] * cathode_radius,
                 cords[3 * i + 1] * cathode_radius,
                 cords[3 * i + 2] * cathode_radius);
-            const double c_norm = c.norm();
-
-            if (c_norm < inner_radius) {
-                inner_radius = c_norm;
-            }
-            if (c_norm > outer_radius) {
-                outer_radius = c_norm;
-            }
 
             mesh_nodes.push_back(c);
             X[i] = c.x();
@@ -872,9 +860,6 @@ class MakeMesh {
             Z[i] = c.z();
             node_index[nodes[i]] = i;
         }
-
-        inner_radius -= wire_radius;
-        outer_radius += wire_radius;
 
         std::vector<int> cathode_entitites;
         gmsh::model::getEntitiesForPhysicalGroup(2, 1, cathode_entitites);

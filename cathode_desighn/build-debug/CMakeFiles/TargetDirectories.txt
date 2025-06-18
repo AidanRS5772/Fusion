@@ -1,0 +1,3 @@
+/Users/aidansgarlato/Programing/Julia/Fusion/cathode_desighn/build-debug/CMakeFiles/Fusion.dir
+/Users/aidansgarlato/Programing/Julia/Fusion/cathode_desighn/build-debug/CMakeFiles/edit_cache.dir
+/Users/aidansgarlato/Programing/Julia/Fusion/cathode_desighn/build-debug/CMakeFiles/rebuild_cache.dir
