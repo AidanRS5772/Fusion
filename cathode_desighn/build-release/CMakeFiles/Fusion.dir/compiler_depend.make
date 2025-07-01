@@ -595,10 +595,43 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__numeric/transform_inclusive_scan.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__numeric/transform_reduce.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__ostream/basic_ostream.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/bernoulli_distribution.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/binomial_distribution.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/cauchy_distribution.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/chi_squared_distribution.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/clamp_to_integral.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/default_random_engine.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/discard_block_engine.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/discrete_distribution.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/exponential_distribution.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/extreme_value_distribution.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/fisher_f_distribution.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/gamma_distribution.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/generate_canonical.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/geometric_distribution.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/independent_bits_engine.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/is_seed_sequence.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/is_valid.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/knuth_b.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/linear_congruential_engine.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/log2.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/lognormal_distribution.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/mersenne_twister_engine.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/negative_binomial_distribution.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/normal_distribution.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/piecewise_constant_distribution.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/piecewise_linear_distribution.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/poisson_distribution.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/random_device.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/ranlux.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/seed_seq.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/shuffle_order_engine.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/student_t_distribution.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/subtract_with_carry_engine.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/uniform_int_distribution.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/uniform_random_bit_generator.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/uniform_real_distribution.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/weibull_distribution.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__ranges/access.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__ranges/all.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__ranges/common_view.h \
@@ -889,6 +922,7 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/ostream \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/print \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/queue \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/random \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/ranges \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/ratio \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/semaphore \
@@ -1091,7 +1125,6 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
   /Library/Developer/CommandLineTools/usr/lib/clang/17/include/stdint.h \
   /Users/aidansgarlato/Programing/Julia/Fusion/cathode_desighn/src/make_mesh.h \
   /Users/aidansgarlato/Programing/Julia/Fusion/cathode_desighn/src/octo_tree.h \
-  /Users/aidansgarlato/Programing/Julia/Fusion/cathode_desighn/src/plot.h \
   /Users/aidansgarlato/Programing/Julia/Fusion/cathode_desighn/src/solve_path.h \
   /Users/aidansgarlato/Programing/Julia/Fusion/cathode_desighn/src/solve_pde.h \
   /Users/aidansgarlato/dealii-release-optimized/include/deal.II/base/aligned_vector.h \
@@ -4858,15 +4891,11 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/fe/mapping.h:
 
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/fe/fe_values_views.h:
-
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/fe/fe_values.h:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/fe/fe_update_flags.h:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/fe/fe_dgq.h:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/fe/fe_data.h:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/fe/fe.h:
 
@@ -5164,8 +5193,6 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/type_traits/has_logical_and.hpp:
 
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/type_traits/has_less_equal.hpp:
-
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/type_traits/has_less.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/type_traits/has_left_shift_assign.hpp:
@@ -5400,8 +5427,6 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/range/metafunctions.hpp:
 
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/range/iterator_range_io.hpp:
-
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/range/iterator_range_core.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/range/irange.hpp:
@@ -5421,8 +5446,6 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/range/detail/safe_bool.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/range/detail/msvc_has_iterator_workaround.hpp:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/range/detail/implementation_help.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/range/detail/has_member_size.hpp:
 
@@ -5748,8 +5771,6 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/parameter/keyword_fwd.hpp:
 
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/parameter/aux_/yesno.hpp:
-
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/parameter/aux_/use_default_tag.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/parameter/aux_/unwrap_cv_reference.hpp:
@@ -6004,9 +6025,11 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/numeric/conversion/detail/udt_builtin_mixture.hpp:
 
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/Kokkos_Core.hpp:
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/numeric/conversion/detail/sign_mixture.hpp:
 
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/numeric/conversion/detail/preprocessed/numeric_cast_traits_common.hpp:
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/numeric/conversion/detail/preprocessed/numeric_cast_traits_long_long.hpp:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/numeric/conversion/detail/numeric_cast_traits.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/numeric/conversion/detail/meta.hpp:
 
@@ -6014,37 +6037,41 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/numeric/conversion/detail/int_float_mixture.hpp:
 
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/math/special_functions/detail/lgamma_small.hpp:
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/numeric/conversion/detail/conversion_traits.hpp:
 
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/numeric/conversion/detail/converter.hpp:
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/numeric/conversion/converter_policies.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/numeric/conversion/converter.hpp:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/numeric/conversion/conversion_traits.hpp:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/numeric/conversion/cast.hpp:
 
 /opt/homebrew/include/eigen3/Eigen/src/Core/PermutationMatrix.h:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/numeric/conversion/bounds.hpp:
 
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/none.hpp:
+
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/noncopyable.hpp:
 
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/cinttypes:
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/next_prior.hpp:
 
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/multiprecision/traits/is_variable_precision.hpp:
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/multiprecision/traits/transcendental_reduction_type.hpp:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/multiprecision/traits/std_integer_traits.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/multiprecision/traits/is_complex.hpp:
 
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/archive/archive_exception.hpp:
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/visit_each.hpp:
 
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/move/detail/meta_utils_core.hpp:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/multiprecision/traits/is_byte_container.hpp:
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/multiprecision/traits/is_backend.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/multiprecision/rational_adaptor.hpp:
 
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/ranges_find_end.h:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/multiprecision/number.hpp:
-
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/multiprecision/integer.hpp:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/multiprecision/fwd.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/multiprecision/detail/ublas_interop.hpp:
 
@@ -6131,6 +6158,8 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/multi_index/member.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/multi_index/indexed_by.hpp:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/fisher_f_distribution.h:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/multi_index/identity.hpp:
 
@@ -6240,8 +6269,6 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/mpl/vector/aux_/vector0.hpp:
 
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/mpl/vector/aux_/preprocessed/typeof_based/vector30.hpp:
-
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/base/index_set.h:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/mpl/vector/aux_/preprocessed/typeof_based/vector20.hpp:
@@ -6270,23 +6297,11 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/mpl/tag.hpp:
 
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/is_floating_point.h:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/math/tools/complex.hpp:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/none_t.hpp:
-
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/utility/declval.hpp:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/is_function.h:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/mpl/size_fwd.hpp:
-
-/opt/homebrew/include/eigen3/Eigen/src/QR/CompleteOrthogonalDecomposition.h:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__iterator/ostreambuf_iterator.h:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/multiprecision/traits/max_digits10.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/mpl/single_view.hpp:
 
@@ -6311,8 +6326,6 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/multi_index/detail/access_specifier.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/mpl/set/aux_/at_impl.hpp:
-
-/Users/aidansgarlato/Programing/Julia/Fusion/cathode_desighn/src/plot.h:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/mpl/sequence_tag_fwd.hpp:
 
@@ -6391,8 +6404,6 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/mpl/list/aux_/O1_size.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/mpl/limits/list.hpp:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/numeric/conversion/detail/conversion_traits.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/mpl/limits/arity.hpp:
 
@@ -6610,6 +6621,8 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/mpl/aux_/nested_type_wknd.hpp:
 
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/default_random_engine.h:
+
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/mpl/aux_/preprocessed/gcc/reverse_iter_fold_impl.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/mpl/aux_/msvc_eti_base.hpp:
@@ -6734,8 +6747,6 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/mpl/aux_/adl_barrier.hpp:
 
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/numeric/conversion/cast.hpp:
-
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/mpl/assert.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/multi_array/collection_concept.hpp:
@@ -6759,12 +6770,6 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/machine/_mcontext.h:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/mpl/always.hpp:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/serialization/split_member.hpp:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/ranges_clamp.h:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/multiprecision/traits/explicit_conversion.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/mpl/advance.hpp:
 
@@ -6820,10 +6825,6 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/mp11/detail/mp_list.hpp:
 
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/mpl/vector/aux_/front.hpp:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/mp11/detail/mp_is_value_list.hpp:
-
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/mp11/detail/mp_is_list.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/desul/atomics/Lock_Array_Cuda.hpp:
@@ -6874,13 +6875,13 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/move/detail/reverse_iterator.hpp:
 
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/multiprecision/fwd.hpp:
-
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/move/detail/pointer_element.hpp:
 
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__compare/strong_order.h:
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/multiprecision/traits/is_byte_container.hpp:
 
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/move/detail/iterator_to_raw_pointer.hpp:
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/archive/archive_exception.hpp:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/move/detail/meta_utils_core.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/move/detail/fwd_macros.hpp:
 
@@ -6938,6 +6939,12 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/math/tools/config.hpp:
 
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/none_t.hpp:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/is_floating_point.h:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/math/tools/complex.hpp:
+
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/serialization/nvp.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/move/algo/detail/heap_sort.hpp:
@@ -6958,13 +6965,15 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/math/special_functions/log1p.hpp:
 
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/math/special_functions/lanczos.hpp:
-
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/math/special_functions/hypot.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/math/special_functions/fpclassify.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/math/special_functions/detail/t_distribution_inv.hpp:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/numeric/conversion/detail/converter.hpp:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/math/special_functions/detail/lgamma_small.hpp:
 
 /opt/homebrew/include/nlohmann/detail/hash.hpp:
 
@@ -7212,13 +7221,11 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/intrusive/detail/value_functors.hpp:
 
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__fwd/format.h:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/multiprecision/traits/is_restricted_conversion.hpp:
-
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/container/detail/value_functors.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/intrusive/detail/mpl.hpp:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/discard_block_engine.h:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/intrusive/detail/iterator.hpp:
 
@@ -7302,6 +7309,8 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/util/precise_math.hpp:
 
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/is_seed_sequence.h:
+
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/util/normalize_spheroidal_coordinates.hpp:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_types/_intmax_t.h:
@@ -7323,10 +7332,6 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/config/compiler/clang.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/strategy/spherical/envelope_boxes.hpp:
-
-/opt/homebrew/include/nlohmann/detail/string_concat.hpp:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/strategy/spherical/envelope_box.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/any/bad_any_cast.hpp:
 
@@ -7656,8 +7661,6 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/strategies/cartesian/point_in_point.hpp:
 
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/strategies/cartesian/point_in_box.hpp:
-
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/mpl/vector/vector20.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/strategies/cartesian/line_interpolate.hpp:
@@ -7699,14 +7702,6 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/algorithms/detail/centroid/translating_transformer.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/strategies/cartesian/buffer_join_round_by_divide.hpp:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/mp11/algorithm.hpp:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/include/all.hpp:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__iterator/projected.h:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/strategies/cartesian/buffer_join_round.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/strategies/cartesian/buffer_end_round.hpp:
 
@@ -7773,8 +7768,6 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 /opt/homebrew/include/eigen3/Eigen/src/Core/DiagonalProduct.h:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/policies/relate/direction.hpp:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/next_prior.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/algorithms/detail/point_on_border.hpp:
 
@@ -7954,8 +7947,6 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/index/detail/maxmin_heap.hpp:
 
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/multiprecision/traits/std_integer_traits.hpp:
-
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/signals2/signal.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/index/detail/is_indexable.hpp:
@@ -8020,9 +8011,9 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/geometries/polygon.hpp:
 
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/ranges_find_if_not.h:
-
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/sequence.hpp:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/ranges_find_if_not.h:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/geometries/pointing_segment.hpp:
 
@@ -8089,8 +8080,6 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/formulas/vertex_latitude.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/formulas/unit_spheroid.hpp:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/numeric/conversion/detail/sign_mixture.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/formulas/thomas_inverse.hpp:
 
@@ -8254,13 +8243,15 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/algorithms/detail/select_geometry_type.hpp:
 
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/strategies/index/services.hpp:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/cstdint:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__bit/popcount.h:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/algorithms/detail/relate/turns.hpp:
+
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/algorithms/detail/relate/topology_check.hpp:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/optional/detail/optional_aligned_storage.hpp:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/numeric/odeint/util/is_resizeable.hpp:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/algorithms/detail/relate/point_geometry.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/algorithms/detail/relate/multi_point_geometry.hpp:
 
@@ -8330,17 +8321,9 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/algorithms/detail/overlay/is_self_turn.hpp:
 
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/algorithms/detail/overlay/handle_self_turns.hpp:
-
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/algorithms/detail/overlay/get_turns.hpp:
 
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/visit_each.hpp:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/multiprecision/traits/is_backend.hpp:
-
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/algorithms/detail/overlay/get_turn_info_la.hpp:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/algorithms/detail/overlay/get_turn_info_for_endpoint.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/algorithms/detail/overlay/get_turn_info.hpp:
 
@@ -8492,9 +8475,9 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/algorithms/detail/overlay/append_no_duplicates.hpp:
 
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/iostreams/positioning.hpp:
-
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/mpl/push_back.hpp:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/iostreams/positioning.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/algorithms/detail/disjoint/multipoint_geometry.hpp:
 
@@ -8667,8 +8650,6 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/type_traits/has_trivial_move_assign.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/view/transform_view/detail/end_impl.hpp:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/view/transform_view/detail/distance_impl.hpp:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/initializer_list:
 
@@ -8982,21 +8963,17 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/sequence/comparison/greater_equal.hpp:
 
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/sequence/comparison/detail/equal_to.hpp:
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/view/iterator_range/detail/begin_impl.hpp:
 
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/index/detail/distance_predicates.hpp:
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/sequence/comparison/detail/less.hpp:
 
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/algorithms/detail/distance/is_comparable.hpp:
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/mpl/size.hpp:
 
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__iterator/indirectly_comparable.h:
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/mpl/vector/aux_/pop_front.hpp:
 
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/units/detail/dimension_list.hpp:
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/mpl/pop_front.hpp:
 
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/utility:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/algorithms/detail/overlay/enrichment_info.hpp:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/sequence/comparison.hpp:
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/mpl/pop_back.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/mpl/has_key.hpp:
 
@@ -9004,27 +8981,23 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/mpl/front.hpp:
 
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/adjacent_find.h:
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/algorithms/envelope.hpp:
 
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__ranges/container_compatible_range.h:
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/mpl/end.hpp:
 
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/mpl/erase_key.hpp:
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/mpl/aux_/arithmetic_op.hpp:
 
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__format/formatter_pointer.h:
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/mpl/remove_if.hpp:
 
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/move/detail/std_ns_end.hpp:
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/mpl.hpp:
 
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__format/format_string.h:
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/smart_ptr/detail/sp_counted_base_gcc_atomic.hpp:
 
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/Kokkos_MathematicalSpecialFunctions.hpp:
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/iterator/value_of_data.hpp:
 
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__iterator/counted_iterator.h:
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/traits/Kokkos_OccupancyControlTrait.hpp:
 
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/mpl/erase.hpp:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/mpl/begin.hpp:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__numeric/pstl.h:
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/iterator/value_of.hpp:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__concepts/convertible_to.h:
 
@@ -9046,11 +9019,11 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/iterator/next.hpp:
 
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__numeric/accumulate.h:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/iterator/mpl/convert_iterator.hpp:
-
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/iterator/mpl.hpp:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/view/filter_view/detail/next_impl.hpp:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/iterator/iterator_facade.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/numeric/odeint/stepper/modified_midpoint.hpp:
 
@@ -9123,16 +9096,6 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/impl/Kokkos_TaskPolicyData.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/include/front.hpp:
-
-/Library/Developer/CommandLineTools/usr/lib/clang/17/include/__stdarg_va_list.h:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__format/concepts.h:
-
-/opt/homebrew/include/eigen3/Eigen/src/LU/arch/InverseSize4.h:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/strategies/geographic/buffer_join_miter.hpp:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/mpl/insert.hpp:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__utility/is_valid_range.h:
 
@@ -9207,6 +9170,8 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/traits/Kokkos_ExecutionSpaceTrait.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/container/list/cons_fwd.hpp:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/exponential_distribution.h:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/mpl/aux_/na.hpp:
 
@@ -9338,6 +9303,8 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/algorithm/iteration/fold_fwd.hpp:
 
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/weibull_distribution.h:
+
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/units/units_fwd.hpp:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/qos.h:
@@ -9364,6 +9331,8 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/adapted/mpl/detail/has_key_impl.hpp:
 
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/ranlux.h:
+
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/adapted/mpl/mpl_iterator.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/adapted/mpl/detail/category_of_impl.hpp:
@@ -9383,8 +9352,6 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/unistd.h:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/functional/hash_fwd.hpp:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/none.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/function_types/parameter_types.hpp:
 
@@ -9441,10 +9408,6 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/_types/_rsize_t.h:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/function_types/detail/components_impl/arity10_0.hpp:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/archive/binary_oarchive_impl.hpp:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/detail/reference_content.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/algorithms/expand.hpp:
 
@@ -9646,10 +9609,6 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/container/detail/destroyers.hpp:
 
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/detail/call_traits.hpp:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/container/detail/copy_move_algo.hpp:
-
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/algorithms/detail/envelope/point.hpp:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__memory/noexcept_move_assign_container.h:
@@ -9718,8 +9677,6 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/config/detail/select_platform_config.hpp:
 
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/multiprecision/traits/transcendental_reduction_type.hpp:
-
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/config/detail/select_compiler_config.hpp:
 
 /opt/homebrew/include/eigen3/Eigen/src/Core/DenseBase.h:
@@ -9770,6 +9727,8 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__chrono/statically_widen.h:
 
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/uniform_real_distribution.h:
+
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/base/mpi_tags.h:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/concept/detail/general.hpp:
@@ -9801,6 +9760,10 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__atomic/memory_order.h:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/archive/detail/register_archive.hpp:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/archive/binary_oarchive_impl.hpp:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/detail/reference_content.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/Kokkos_NumericTraits.hpp:
 
@@ -9898,21 +9861,13 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/string.h:
 
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/adapted/mpl/detail/at_impl.hpp:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/algorithm/transformation/erase_key.hpp:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/archive/basic_streambuf_locale_saver.hpp:
-
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/optional:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/archive/basic_binary_oprimitive.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/archive/basic_binary_oarchive.hpp:
 
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/traits/Kokkos_OccupancyControlTrait.hpp:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/iterator/value_of.hpp:
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/sequence/comparison/detail/equal_to.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/core/empty_value.hpp:
 
@@ -9956,13 +9911,13 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/algorithms/detail/sections/section_functions.hpp:
 
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/in_fun_result.h:
-
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/index/detail/priority_dequeue.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/view/transform_view/detail/deref_impl.hpp:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/ranges_count.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/in_fun_result.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__memory/auto_ptr.h:
 
@@ -9983,6 +9938,18 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_bounds.h:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/Kokkos_MemoryPool.hpp:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__format/formatter_pointer.h:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/move/detail/std_ns_end.hpp:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__iterator/counted_iterator.h:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/mpl/erase.hpp:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__format/format_string.h:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/Kokkos_MathematicalSpecialFunctions.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/Kokkos_MasterLock.hpp:
 
@@ -10018,6 +9985,10 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/ranges_is_heap.h:
 
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/numeric/conversion/detail/preprocessed/numeric_cast_traits_common.hpp:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/Kokkos_Core.hpp:
+
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__format/range_default_formatter.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/conjunction.h:
@@ -10052,18 +10023,6 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/KokkosExp_MDRangePolicy.hpp:
 
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/parameter/aux_/pack/unmatched_argument.hpp:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/sort.h:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/lac/trilinos_tpetra_types.h:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/Kokkos_Timer.hpp:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/mp11/integral.hpp:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/KokkosCore_config.h:
-
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/math/special_functions/digamma.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/index/distance_predicates.hpp:
@@ -10082,11 +10041,11 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/boost_adaptors/point.h:
 
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/container/detail/variadic_templates_tools.hpp:
+
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/stdlib.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/remove_all_extents.h:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/container/detail/variadic_templates_tools.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/index/detail/algorithms/path_intersection.hpp:
 
@@ -10174,6 +10133,8 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/ranges_replace_copy_if.h:
 
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/negative_binomial_distribution.h:
+
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/math/special_functions/detail/polygamma.hpp:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/ranges_unique_copy.h:
@@ -10183,6 +10144,8 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/base/mpi_stub.h:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/base/mpi.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/linear_congruential_engine.h:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/base/memory_space_data.h:
 
@@ -10217,24 +10180,6 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/base/floating_point_comparator.h:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/base/exceptions.h:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/algorithms/detail/overlay/sort_by_side.hpp:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__fwd/ios.h:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/algorithms/detail/closest_feature/range_to_range.hpp:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/base/cuda_size.h:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/base/cuda.h:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/strategies/index/services.hpp:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/cstdint:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__bit/popcount.h:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/algorithms/detail/relate/turns.hpp:
 
 /Users/aidansgarlato/Programing/Julia/Fusion/cathode_desighn/src/make_mesh.h:
 
@@ -10310,14 +10255,6 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/algorithm/transformation/insert.hpp:
 
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/archive/detail/basic_serializer.hpp:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/core/closure.hpp:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/type_traits/has_dereference.hpp:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/xlocale/_stdlib.h:
-
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/strategy/cartesian/envelope_point.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/algorithms/intersects.hpp:
@@ -10331,12 +10268,6 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/numeric/odeint/stepper/runge_kutta_cash_karp54_classic.hpp:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/xlocale.h:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/mpl/empty_fwd.hpp:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/wctype.h:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/numeric/conversion/conversion_traits.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/iterator/deref_data.hpp:
 
@@ -10366,6 +10297,10 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__format/formatter_bool.h:
 
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/container/detail/copy_move_algo.hpp:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/detail/call_traits.hpp:
+
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/_types/_timespec.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__atomic/cxx_atomic_impl.h:
@@ -10392,9 +10327,9 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/_types/_useconds_t.h:
 
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__ranges/take_while_view.h:
-
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__math/roots.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__ranges/take_while_view.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/_types/_pid_t.h:
 
@@ -10550,14 +10485,6 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/_pthread/_pthread_key_t.h:
 
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/index/detail/algorithms/nth_element.hpp:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/container/deque/deque_fwd.hpp:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/parameter/config.hpp:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/_pthread/_pthread_cond_t.h:
-
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_types.h:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/strategy/spherical/envelope_point.hpp:
@@ -10579,10 +10506,6 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/numeric/odeint/algebra/norm_result_type.hpp:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/_endian.h:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/mpl/vector/aux_/pop_front.hpp:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/mpl/pop_front.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/algorithms/detail/overlay/traversal_switch_detector.hpp:
 
@@ -10628,11 +10551,11 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/float.h:
 
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/mpl/aux_/arithmetic_op.hpp:
-
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/lac/vector_memory.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__chrono/high_resolution_clock.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/independent_bits_engine.h:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/container/list/detail/begin_impl.hpp:
 
@@ -10657,6 +10580,8 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/ctype.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__utility/no_destroy.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/random:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/algorithms/detail/intersection/areal_areal.hpp:
 
@@ -10689,12 +10614,6 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/preprocessor/arithmetic/limits/dec_256.hpp:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/_types/_u_short.h:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/desul/atomics/Lock_Array.hpp:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/config/abi_suffix.hpp:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/syncstream:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/parameter/aux_/augment_predicate.hpp:
 
@@ -10807,6 +10726,8 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__compare/three_way_comparable.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__fwd/bit_reference.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/shuffle_order_engine.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/filesystem:
 
@@ -10946,6 +10867,12 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/climits:
 
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/extreme_value_distribution.h:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/multiprecision/traits/is_variable_precision.hpp:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/cinttypes:
+
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/type_traits/is_floating_point.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/preprocessor/facilities/expand.hpp:
@@ -10990,9 +10917,9 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/type_traits/is_object.hpp:
 
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/config/user.hpp:
-
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/strategies/cartesian/buffer_join_miter.hpp:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/config/user.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/iterator/reverse_iterator.hpp:
 
@@ -11060,7 +10987,21 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__utility/convert_to_integral.h:
 
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__utility/as_const.h:
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/serialization/detail/is_default_constructible.hpp:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/lexicographical_compare_three_way.h:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/preprocessor/repetition/repeat.hpp:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__undef_macros:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/dependent_type.h:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/algorithms/detail/envelope/implementation.hpp:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__format/extended_grapheme_cluster_table.h:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/base/init_finalize.h:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/container/vector/detail/deref_impl.hpp:
 
@@ -11076,43 +11017,85 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/sequence/intrinsic/detail/segmented_begin_impl.hpp:
 
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/call_traits.hpp:
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/impl/Kokkos_Combined_Reducer.hpp:
 
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__memory/unique_ptr.h:
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/is_nothrow_constructible.h:
 
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/strip_signature.h:
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/support/tag_of_fwd.hpp:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/archive/basic_binary_iarchive.hpp:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/is_bounded_array.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__iterator/mergeable.h:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/algorithm/query/none.hpp:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/config/no_tr1/memory.hpp:
+
+/opt/homebrew/include/eigen3/Eigen/src/plugins/ArrayCwiseBinaryOps.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/_types/_seek_set.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/log2.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/find_first_of.h:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/base/std_cxx20/iota_view.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/ranges_make_heap.h:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/core/detail/sp_thread_yield.hpp:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/result_of.h:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/range/sub_range.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/algorithms/detail/relate/relate_impl.hpp:
 
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__concepts/relation.h:
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/impl/Kokkos_TaskQueueCommon.hpp:
 
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/arm/endian.h:
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/ranges_fill_n.h:
 
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/geometries/concepts/concept_type.hpp:
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/charconv:
 
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/type_traits/declval.hpp:
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/remove_cv.h:
 
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/remove_const_ref.h:
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/type_traits/is_trivially_copyable.hpp:
 
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/partition.h:
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/core/noncopyable.hpp:
 
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/move_backward.h:
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/type_traits/same_traits.hpp:
 
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/numerics/matrix_tools.h:
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/mpl/aux_/config/operators.hpp:
 
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__math/special_functions.h:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/remove_const.h:
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/arm/signal.h:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/math/special_functions/zeta.hpp:
 
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/arm/signal.h:
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/formulas/andoyer_inverse.hpp:
+
+/Library/Developer/CommandLineTools/usr/lib/clang/17/include/__stddef_size_t.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__memory/addressof.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/promote.h:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/parameter/aux_/lambda_tag.hpp:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__chrono/month_weekday.h:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/mpl/aux_/has_begin.hpp:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/_pthread/_pthread_types.h:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/base/memory_space.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/nat.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__assert:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/mpl/insert_range.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/mpl/advance_fwd.hpp:
 
@@ -11150,6 +11133,12 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/is_reference_wrapper.h:
 
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/strategies/cartesian/buffer_join_round.hpp:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/include/all.hpp:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__iterator/projected.h:
+
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/dofs/dof_accessor.templates.h:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/mpl/at_fwd.hpp:
@@ -11160,25 +11149,19 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/is_pointer.h:
 
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__format/concepts.h:
+
+/Library/Developer/CommandLineTools/usr/lib/clang/17/include/__stdarg_va_list.h:
+
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/iostreams/stream_buffer.hpp:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__concepts/regular.h:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/smart_ptr/detail/sp_counted_base_gcc_atomic.hpp:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/iterator/value_of_data.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/strategies/azimuth/cartesian.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/strategies/agnostic/buffer_distance_symmetric.hpp:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/is_nothrow_destructible.h:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/impl/Kokkos_Combined_Reducer.hpp:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/support/tag_of_fwd.hpp:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/is_nothrow_constructible.h:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/mpl/pop_back.hpp:
 
@@ -11204,19 +11187,11 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/is_equality_comparable.h:
 
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__memory/allocator_arg_t.h:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/numeric/conversion/detail/bounds.hpp:
-
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/xlocale/_ctype.h:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/function_types/detail/components_impl/arity20_1.hpp:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/in_in_out_result.h:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__assert:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/mpl/insert_range.hpp:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/ranges_reverse_copy.h:
 
@@ -11224,23 +11199,21 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/algorithms/detail/relate/linear_linear.hpp:
 
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/qvm/mat_traits_array.hpp:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/mpl/back.hpp:
+
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/signals2/deconstruct.hpp:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__chrono/convert_to_tm.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/ranges_adjacent_find.h:
 
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/qvm/mat_traits_array.hpp:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/mpl/back.hpp:
-
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/is_execution_policy.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_locale.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/is_convertible.h:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/is_volatile.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__format/format_parse_context.h:
 
@@ -11262,6 +11235,12 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__functional/unary_negate.h:
 
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/core/closure.hpp:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/type_traits/has_dereference.hpp:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/xlocale/_stdlib.h:
+
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/is_always_bitcastable.h:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/multi_index/detail/unbounded.hpp:
@@ -11271,10 +11250,6 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__iterator/default_sentinel.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_wctype.h:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/base/init_finalize.h:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__format/extended_grapheme_cluster_table.h:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/algorithm/transformation/remove.hpp:
 
@@ -11286,13 +11261,7 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/ranges_min.h:
 
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/ranges_min_element.h:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/qvm/deduce_scalar.hpp:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/parameter/aux_/preprocessor/nullptr.hpp:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/support/void.hpp:
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/normal_distribution.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__math/min_max.h:
 
@@ -11323,10 +11292,6 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/generate.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/copy_cv.h:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/promote.h:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__memory/addressof.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/is_nothrow_convertible.h:
 
@@ -11386,9 +11351,15 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/geometries/concepts/ring_concept.hpp:
 
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/piecewise_constant_distribution.h:
+
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/types.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__tuple/sfinae_helpers.h:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/multiprecision/traits/is_restricted_conversion.hpp:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__fwd/format.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__tuple/find_index.h:
 
@@ -11436,8 +11407,6 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/is_enum.h:
 
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/iostreams/input_sequence.hpp:
-
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/iterator/advance.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/view/zip_view.hpp:
@@ -11447,6 +11416,8 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/type_traits/detail/has_binary_operator.hpp:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__iterator/reverse_access.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/chi_squared_distribution.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__stop_token/stop_state.h:
 
@@ -11514,12 +11485,6 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__ranges/take_view.h:
 
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/base/std_cxx20/iota_view.h:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/log2.h:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/find_first_of.h:
-
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/archive/codecvt_null.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/strategies/azimuth/services.hpp:
@@ -11531,18 +11496,6 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/mpl/key_type_fwd.hpp:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__ranges/subrange.h:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/type_traits/is_trivially_copyable.hpp:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/core/noncopyable.hpp:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/type_traits/same_traits.hpp:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/mpl/aux_/config/operators.hpp:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/formulas/andoyer_inverse.hpp:
-
-/Library/Developer/CommandLineTools/usr/lib/clang/17/include/__stddef_size_t.h:
 
 /opt/homebrew/include/eigen3/Eigen/src/SVD/BDCSVD.h:
 
@@ -11573,6 +11526,8 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/math/special_functions/cbrt.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/Kokkos_Vectorization.hpp:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/binomial_distribution.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/ranges_find_if.h:
 
@@ -11650,6 +11605,40 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__functional/identity.h:
 
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/view/transform_view/detail/distance_impl.hpp:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/range/iterator_range_io.hpp:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/lognormal_distribution.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/student_t_distribution.h:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/fe/fe_values_views.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/generate_canonical.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/discrete_distribution.h:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/base/cuda.h:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/optional/detail/optional_aligned_storage.hpp:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/numeric/odeint/util/is_resizeable.hpp:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/algorithms/detail/relate/point_geometry.hpp:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/range/detail/implementation_help.hpp:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/clamp_to_integral.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/latch:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/cauchy_distribution.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__concepts/relation.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/bernoulli_distribution.h:
+
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__tuple/tuple_size.h:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/multiprecision/detail/standalone_config.hpp:
@@ -11670,13 +11659,23 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/ranges_swap_ranges.h:
 
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/move/detail/iterator_to_raw_pointer.hpp:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__compare/strong_order.h:
+
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/utility/addressof.hpp:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__concepts/derived_from.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__numeric/reduce.h:
 
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__numeric/pstl.h:
+
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__numeric/partial_sum.h:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/mpl/empty_fwd.hpp:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/wctype.h:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/type_traits/has_trivial_destructor.hpp:
 
@@ -11736,8 +11735,6 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/algorithm/iteration/detail/preprocessed/fold.hpp:
 
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/latch:
-
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/algorithms/detail/distance/point_to_geometry.hpp:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__memory/ranges_construct_at.h:
@@ -11786,6 +11783,8 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__math/rounding_functions.h:
 
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/iostreams/input_sequence.hpp:
+
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/multi_array/subarray.hpp:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/stdio.h:
@@ -11797,24 +11796,6 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__locale:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__iterator/wrap_iter.h:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/Kokkos_MathematicalConstants.hpp:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/math/cstdfloat/cstdfloat_types.hpp:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/chrono:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/strategies/concepts/area_concept.hpp:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/view/transform_view/detail/advance_impl.hpp:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/multiprecision/detail/bitscan.hpp:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__node_handle:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/smart_ptr/detail/sp_typeinfo_.hpp:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/type_identity.h:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/Kokkos_ExecPolicy.hpp:
 
@@ -11848,6 +11829,12 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/intrusive/detail/workaround.hpp:
 
+/opt/homebrew/include/eigen3/Eigen/src/QR/CompleteOrthogonalDecomposition.h:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/multiprecision/traits/max_digits10.hpp:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__iterator/ostreambuf_iterator.h:
+
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__memory/allocator.h:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/mpl/vector/aux_/at.hpp:
@@ -11857,20 +11844,6 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__iterator/move_iterator.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/unique_copy.h:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/algorithm/query/none.hpp:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/archive/basic_binary_iarchive.hpp:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/is_bounded_array.h:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__iterator/mergeable.h:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/ranges_make_heap.h:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/core/detail/sp_thread_yield.hpp:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/result_of.h:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/config/auto_link.hpp:
 
@@ -11899,6 +11872,10 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/mpl/aux_/value_wknd.hpp:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__iterator/insert_iterator.h:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/math/special_functions/binomial.hpp:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/subtract_with_carry_engine.h:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/random/mersenne_twister.hpp:
 
@@ -11948,9 +11925,11 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/ranges_copy_n.h:
 
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/algorithms/envelope.hpp:
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__ranges/container_compatible_range.h:
 
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/mpl/end.hpp:
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/mpl/erase_key.hpp:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/adjacent_find.h:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/support/is_view.hpp:
 
@@ -12012,8 +11991,6 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__fwd/span.h:
 
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/mpl/pop_back.hpp:
-
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/container/list/detail/value_of_impl.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/function/function_fwd.hpp:
@@ -12037,14 +12014,6 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/is_null_pointer.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/_types/_u_int16_t.h:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/shift_right.h:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/algorithms/detail/touches/interface.hpp:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/serialization/smart_cast.hpp:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__atomic/atomic.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__iterator/unreachable_sentinel.h:
 
@@ -12128,10 +12097,6 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/algorithms/detail/has_self_intersections.hpp:
 
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/mpl/remove_if.hpp:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/mpl.hpp:
-
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__format/formatter_integral.h:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/algorithms/detail/overlay/approximately_equals.hpp:
@@ -12152,6 +12117,10 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/algorithms/detail/intersection/multi.hpp:
 
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__iterator/indirectly_comparable.h:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/algorithms/detail/distance/is_comparable.hpp:
+
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/impl/Kokkos_Profiling_Interface.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/utility/base_from_member.hpp:
@@ -12167,18 +12136,6 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__memory/swap_allocator.h:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/index/detail/rtree/node/node_elements.hpp:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/_types/_time_t.h:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/core/type_name.hpp:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__chrono/hh_mm_ss.h:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/is_primary_template.h:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__numeric/exclusive_scan.h:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__utility/cmp.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/exception:
 
@@ -12196,6 +12153,30 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/mpl/aux_/preprocessed/gcc/unpack_args.hpp:
 
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/parameter/aux_/pack/unmatched_argument.hpp:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/sort.h:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/lac/trilinos_tpetra_types.h:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/Kokkos_Timer.hpp:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/mp11/integral.hpp:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/KokkosCore_config.h:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/parameter/aux_/yesno.hpp:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/seed_seq.h:
+
+/opt/homebrew/include/eigen3/Eigen/src/LU/arch/InverseSize4.h:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/strategies/geographic/buffer_join_miter.hpp:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/geometric_distribution.h:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/mpl/insert.hpp:
+
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/is_aggregate.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/for_each_segment.h:
@@ -12211,6 +12192,10 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/ranges_max_element.h:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/multi_array/multi_array_ref.hpp:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__numeric/exclusive_scan.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/is_primary_template.h:
 
 /opt/homebrew/include/eigen3/Eigen/src/plugins/BlockMethods.h:
 
@@ -12230,6 +12215,14 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/ranges_copy.h:
 
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/move_backward.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/partition.h:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/core/type_name.hpp:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/_types/_time_t.h:
+
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/is_polymorphic.h:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/parameter/aux_/void.hpp:
@@ -12237,6 +12230,14 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/sstream:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/mpl/apply_wrap.hpp:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/units/detail/dimension_list.hpp:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/utility:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/sequence/comparison.hpp:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/algorithms/detail/overlay/enrichment_info.hpp:
 
 /opt/homebrew/include/eigen3/Eigen/src/Geometry/EulerAngles.h:
 
@@ -12356,6 +12357,8 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/iterator/mpl/fusion_iterator.hpp:
 
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/index/detail/distance_predicates.hpp:
+
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/iostreams/detail/select_by_size.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/strategies/centroid/services.hpp:
@@ -12379,6 +12382,8 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/ranges_partial_sort.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__utility/forward_like.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/is_volatile.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/_types/_ino_t.h:
 
@@ -12404,6 +12409,8 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/iostreams/detail/config/unreachable_return.hpp:
 
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__chrono/hh_mm_ss.h:
+
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__chrono/day.h:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/mpl/for_each.hpp:
@@ -12411,6 +12418,10 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/preprocessor/facilities/identity.hpp:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_types/_uint64_t.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__node_handle:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/multiprecision/detail/bitscan.hpp:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/search.h:
 
@@ -12427,6 +12438,14 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__format/format_args.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__charconv/to_chars_base_10.h:
+
+/opt/homebrew/include/nlohmann/detail/string_concat.hpp:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/strategy/spherical/envelope_box.hpp:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/xlocale/_stdio.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/gamma_distribution.h:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/algorithms/detail/multi_modify.hpp:
 
@@ -12450,10 +12469,6 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__compare/common_comparison_category.h:
 
-/opt/homebrew/include/eigen3/Eigen/src/plugins/ArrayCwiseBinaryOps.h:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/_types/_seek_set.h:
-
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__chrono/system_clock.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/libkern/_OSByteOrder.h:
@@ -12462,13 +12477,7 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__bit/invert_if.h:
 
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/serialization/detail/is_default_constructible.hpp:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/lexicographical_compare_three_way.h:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/preprocessor/repetition/repeat.hpp:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__undef_macros:
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/arm/endian.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/cstdio:
 
@@ -12518,16 +12527,6 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/arm/types.h:
 
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/strategy/cartesian/side_non_robust.hpp:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_abort.h:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/make_projected.h:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/ranges_remove_copy.h:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/remove_volatile.h:
-
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/mpl/list/list10.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/strategies/geographic/distance_karney.hpp:
@@ -12547,12 +12546,6 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__atomic/atomic_sync.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__atomic/atomic_ref.h:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/parameter/aux_/lambda_tag.hpp:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/mpl/aux_/has_begin.hpp:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__chrono/month_weekday.h:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/multi_index/detail/vartempl_support.hpp:
 
@@ -12586,11 +12579,15 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/Kokkos_Pair.hpp:
 
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/archive/detail/basic_serializer.hpp:
+
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/grid/tria_objects.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/execinfo.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/upper_bound.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__utility/as_const.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/transform.h:
 
@@ -12612,6 +12609,10 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/swap_ranges.h:
 
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/mp11/algorithm.hpp:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/knuth_b.h:
+
 /opt/homebrew/include/eigen3/Eigen/src/Core/products/SelfadjointMatrixVector_BLAS.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/stable_partition.h:
@@ -12626,9 +12627,19 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__ranges/owning_view.h:
 
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/strip_signature.h:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/call_traits.hpp:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__memory/unique_ptr.h:
+
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/concept/detail/concept_undef.hpp:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__tuple/tuple_like_ext.h:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/algorithms/detail/touches/interface.hpp:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/shift_right.h:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/view/filter_view/detail/key_of_impl.hpp:
 
@@ -12656,6 +12667,16 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/strategies/cartesian/centroid_average.hpp:
 
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/algorithms/detail/overlay/sort_by_side.hpp:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__fwd/ios.h:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/algorithms/detail/closest_feature/range_to_range.hpp:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/base/cuda_size.h:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/strategies/cartesian/point_in_box.hpp:
+
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__hash_table:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__cstddef/max_align_t.h:
@@ -12682,13 +12703,15 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__chrono/file_clock.h:
 
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/xlocale/_stdio.h:
-
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/remove_if.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sched.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__ranges/common_view.h:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/numeric/conversion/detail/bounds.hpp:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__memory/allocator_arg_t.h:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/archive/detail/abi_suffix.hpp:
 
@@ -12712,15 +12735,13 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__compare/partial_order.h:
 
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/config/no_tr1/memory.hpp:
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/algorithms/detail/overlay/handle_self_turns.hpp:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__format/formatter_output.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/AvailabilityVersions.h:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/iostreams/checked_operations.hpp:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/numeric/conversion/converter_policies.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/math/tools/rational.hpp:
 
@@ -12729,6 +12750,10 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/strategies/buffer/cartesian.hpp:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__bit/bit_floor.h:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/iterator/mpl/convert_iterator.hpp:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__numeric/accumulate.h:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/signals2/mutex.hpp:
 
@@ -12772,6 +12797,12 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/mpl/minus.hpp:
 
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/numerics/matrix_tools.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/remove_const.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__math/special_functions.h:
+
 /opt/homebrew/include/eigen3/Eigen/src/Core/CoreEvaluators.h:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/mpl/max_element.hpp:
@@ -12787,6 +12818,10 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__iterator/size.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__cstddef/size_t.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/cstddef:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/mpl/vector/aux_/preprocessed/typeof_based/vector30.hpp:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__functional/reference_wrapper.h:
 
@@ -12832,6 +12867,14 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__concepts/assignable.h:
 
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/type_traits/has_less_equal.hpp:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/mersenne_twister_engine.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/make_projected.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_abort.h:
+
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/type_traits/add_rvalue_reference.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/move/detail/meta_utils.hpp:
@@ -12852,6 +12895,10 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__memory/allocator_traits.h:
 
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/serialization/smart_cast.hpp:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__atomic/atomic.h:
+
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/lac/block_indices.h:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/mpl/aux_/iter_fold_impl.hpp:
@@ -12862,6 +12909,8 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__utility/private_constructor_tag.h:
 
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/ranges_min_element.h:
+
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/math/tools/user.hpp:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/set_difference.h:
@@ -12871,6 +12920,20 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/comp_ref_type.h:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/algorithms/detail/relate/follow_helpers.hpp:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/Kokkos_MathematicalConstants.hpp:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/smart_ptr/detail/sp_typeinfo_.hpp:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/type_identity.h:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/math/cstdfloat/cstdfloat_types.hpp:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/chrono:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/strategies/concepts/area_concept.hpp:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/view/transform_view/detail/advance_impl.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/lexical_cast/detail/widest_char.hpp:
 
@@ -12888,7 +12951,19 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/ranges_is_permutation.h:
 
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/mpl/size.hpp:
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/index/detail/algorithms/nth_element.hpp:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/container/deque/deque_fwd.hpp:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/parameter/config.hpp:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/_pthread/_pthread_cond_t.h:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/algorithms/detail/overlaps/interface.hpp:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__memory/allocation_guard.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/random_device.h:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/strategies/area/geographic.hpp:
 
@@ -12922,6 +12997,8 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/sample.h:
 
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/mpl/begin.hpp:
+
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/mpl/aux_/preprocessed/gcc/or.hpp:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/nth_element.h:
@@ -12952,14 +13029,6 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/base/config.h:
 
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/charconv:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/remove_cv.h:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/impl/Kokkos_TaskQueueCommon.hpp:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/ranges_fill_n.h:
-
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/uniform_random_bit_generator_adaptor.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__memory/destruct_n.h:
@@ -12970,9 +13039,9 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__debug_utils/sanitizers.h:
 
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/view/iterator_range/detail/begin_impl.hpp:
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/algorithm/transformation/erase_key.hpp:
 
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/sequence/comparison/detail/less.hpp:
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/adapted/mpl/detail/at_impl.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/variant/detail/enable_recursive_fwd.hpp:
 
@@ -12996,6 +13065,16 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/multiprecision/cpp_int/add_unsigned.hpp:
 
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/serialization/split_member.hpp:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/multiprecision/traits/explicit_conversion.hpp:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/ranges_clamp.h:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/mpl/vector/aux_/front.hpp:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/mp11/detail/mp_is_value_list.hpp:
+
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__concepts/common_reference_with.h:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/preprocessor/repetition/limits/for_256.hpp:
@@ -13012,10 +13091,6 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/is_abstract.h:
 
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/dependent_type.h:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/algorithms/detail/envelope/implementation.hpp:
-
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/geometries/concepts/box_concept.hpp:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/ranges_replace.h:
@@ -13026,9 +13101,19 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/base/function.h:
 
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/desul/atomics/Lock_Array.hpp:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/config/abi_suffix.hpp:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/syncstream:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/piecewise_linear_distribution.h:
+
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/_pthread/_pthread_attr_t.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__ranges/view_interface.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__utility/cmp.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/unique.h:
 
@@ -13043,10 +13128,6 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/partition_point.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/partition_copy.h:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/view/filter_view/detail/next_impl.hpp:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/iterator/iterator_facade.hpp:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/partial_sort_copy.h:
 
@@ -13094,8 +13175,6 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/base/kokkos.h:
 
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/numeric/conversion/detail/numeric_cast_traits.hpp:
-
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/iostreams/detail/adapter/output_iterator_adapter.hpp:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/ranges_lexicographical_compare.h:
@@ -13106,6 +13185,8 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/make_heap.h:
 
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/strategy/cartesian/side_non_robust.hpp:
+
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__filesystem/directory_iterator.h:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/qvm/mat_operations4.hpp:
@@ -13115,10 +13196,6 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/mpl/aux_/push_back_impl.hpp:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/malloc/_malloc.h:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/algorithms/detail/overlaps/interface.hpp:
-
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__memory/allocation_guard.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__iterator/iterator_with_data.h:
 
@@ -13136,9 +13213,17 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/_types/_ssize_t.h:
 
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/remove_volatile.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/ranges_remove_copy.h:
+
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/range/detail/range_return.hpp:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/_types/_id_t.h:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/archive/basic_streambuf_locale_saver.hpp:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/algorithms/detail/overlay/get_turn_info_for_endpoint.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/preprocessor/detail/check.hpp:
 
@@ -13204,6 +13289,10 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/base/array_view.h:
 
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/multiprecision/number.hpp:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/ranges_find_end.h:
+
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/includes.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__functional/binary_negate.h:
@@ -13252,8 +13341,6 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/container/vector/detail/equal_to_impl.hpp:
 
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/_pthread/_pthread_types.h:
-
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__math/modulo.h:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/mpl/aux_/config/use_preprocessed.hpp:
@@ -13261,8 +13348,6 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/iostreams/detail/double_object.hpp:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__bit/countr.h:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/math/special_functions/binomial.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/iostreams/detail/streambuf/direct_streambuf.hpp:
 
@@ -13298,6 +13383,12 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/none_of.h:
 
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/math/special_functions/lanczos.hpp:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/fe/fe_data.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__random/poisson_distribution.h:
+
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/multi_index/detail/ord_index_impl.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/mp11/detail/mp_count.hpp:
@@ -13311,6 +13402,12 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__tuple/tuple_like_no_subrange.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/cstdlib:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/geometry/geometries/concepts/concept_type.hpp:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/type_traits/declval.hpp:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__type_traits/remove_const_ref.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/vector:
 
@@ -13333,8 +13430,6 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__format/format_error.h:
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__ranges/istream_view.h:
-
-/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/numeric/conversion/detail/preprocessed/numeric_cast_traits_long_long.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/function_types/config/cc_names.hpp:
 
@@ -13370,7 +13465,11 @@ CMakeFiles/Fusion.dir/src/main.cpp.o: /Users/aidansgarlato/Programing/Julia/Fusi
 
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__atomic/fence.h:
 
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/cstddef:
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/qvm/deduce_scalar.hpp:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/parameter/aux_/preprocessor/nullptr.hpp:
+
+/Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/fusion/support/void.hpp:
 
 /Users/aidansgarlato/dealii-release-optimized/include/deal.II/bundled/boost/function_types/detail/pp_tags/cc_tag.hpp:
 

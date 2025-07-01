@@ -1,7 +1,6 @@
 #ifndef SOLVE_PDE_H
 #define SOLVE_PDE_H
 
-#include "octo_tree.h"
 #include <Eigen/Dense>
 #include <cstddef>
 #include <cstdlib>
@@ -42,12 +41,17 @@
 #include <map>
 #include <optional>
 #include <ostream>
+#include <span>
 #include <string>
+#include <unordered_map>
 
 using namespace dealii;
-using Vector3d = Eigen::Vector3d;
 
 class SolvePDE {
+    using Vector3d = Eigen::Vector3d;
+    using TriCell = typename Triangulation<3>::active_cell_iterator;
+    using DofCell = typename DoFHandler<3>::active_cell_iterator;
+
   public:
     SolvePDE(
         const std::string &file_name_,
@@ -58,8 +62,7 @@ class SolvePDE {
         const double solve_tol = 1e-15)
         : mesh_file_name(file_name_), voltage(voltage_), cathode_radius(cathode_radius_), finite_element(fem_order),
           mapping(finite_element), grid_cache(triangulation),
-          point_evaluator(mapping, finite_element, update_values | update_gradients),
-          cached_cell_sol(finite_element.n_dofs_per_cell()) {
+          point_evaluator(mapping, finite_element, update_values | update_gradients) {
         MultithreadInfo::set_thread_limit(1);
         std::cout << "Starting PDE Solve..." << std::endl;
         read_mesh();
@@ -68,48 +71,14 @@ class SolvePDE {
         solve(solve_max_iter, solve_tol);
     }
 
-    std::optional<double> V(const Vector3d &p) const {
-        Point<3> point(p.x() / cathode_radius, p.y() / cathode_radius, p.z() / cathode_radius);
-        auto cell_ref_opt = find_cell(point);
-        if (!cell_ref_opt.has_value())
+    std::optional<std::pair<double, Vector3d>> VE(const Vector3d &p, const size_t path_id) const {
+        const Point<3> point(p.x() / cathode_radius, p.y() / cathode_radius, p.z() / cathode_radius);
+        auto res_opt = find_cell(point, path_id);
+        if (!res_opt.has_value()) {
             return std::nullopt;
-        auto [cell, ref_point] = cell_ref_opt.value();
-
-        const auto dof_cell = cell->as_dof_handler_iterator(dof_handler);
-        get_cached_dof_values(dof_cell);
-        point_evaluator.reinit(dof_cell, ArrayView<const Point<3>>(&ref_point, 1));
-        point_evaluator.evaluate(cached_cell_sol, EvaluationFlags::values);
-
-        return point_evaluator.get_value(0);
-    }
-
-    std::optional<Vector3d> E(const Vector3d &p) const {
-        Point<3> point(p.x() / cathode_radius, p.y() / cathode_radius, p.z() / cathode_radius);
-        auto cell_ref_opt = find_cell(point);
-        if (!cell_ref_opt.has_value())
-            return std::nullopt;
-        const auto [cell, ref_point] = cell_ref_opt.value();
-
-        const auto dof_cell = cell->as_dof_handler_iterator(dof_handler);
-        get_cached_dof_values(dof_cell);
-        point_evaluator.reinit(dof_cell, ArrayView<const Point<3>>(&ref_point, 1));
-        point_evaluator.evaluate(cached_cell_sol, EvaluationFlags::gradients);
-
-        const auto g = point_evaluator.get_gradient(0);
-        return Vector3d(-g[0] / cathode_radius, -g[1] / cathode_radius, -g[2] / cathode_radius);
-    }
-
-    std::optional<std::pair<double, Vector3d>> VE(const Vector3d &p) const {
-        Point<3> point(p.x() / cathode_radius, p.y() / cathode_radius, p.z() / cathode_radius);
-        auto cell_ref_opt = find_cell(point);
-        if (!cell_ref_opt.has_value())
-            return std::nullopt;
-        const auto [cell, ref_point] = cell_ref_opt.value();
-
-        const auto dof_cell = cell->as_dof_handler_iterator(dof_handler);
-        get_cached_dof_values(dof_cell);
-        point_evaluator.reinit(dof_cell, ArrayView<const Point<3>>(&ref_point, 1));
-        point_evaluator.evaluate(cached_cell_sol, EvaluationFlags::gradients | EvaluationFlags::values);
+        }
+        point_evaluator.reinit(cell_idx_map[res_opt->first], ArrayView<const Point<3>>(&res_opt->second, 1));
+        point_evaluator.evaluate(cell_sol_map[res_opt->first], EvaluationFlags::values | EvaluationFlags::gradients);
 
         const auto g = point_evaluator.get_gradient(0);
         return std::pair{
@@ -117,12 +86,71 @@ class SolvePDE {
             Vector3d(-g[0] / cathode_radius, -g[1] / cathode_radius, -g[2] / cathode_radius)};
     }
 
-    void init_cache(const Vector3d &p) const {
-        Point<3> point(p.x() / cathode_radius, p.y() / cathode_radius, p.z() / cathode_radius);
-        auto [cell, ref_point] = GridTools::find_active_cell_around_point(grid_cache, point);
-        last_cell = cell;
-        cached_dof_cell = cell->as_dof_handler_iterator(dof_handler);
-        cached_dof_cell->get_dof_values(solution, cached_cell_sol.begin(), cached_cell_sol.end());
+    std::vector<std::optional<std::pair<double, Vector3d>>> multi_VE(
+        const std::vector<Vector3d> &points,
+        const std::vector<size_t> &path_ids) const {
+        cell_ref_map.clear();
+        for (size_t i = 0; i < points.size(); i++) {
+            const Point<3> point(
+                points[i].x() / cathode_radius,
+                points[i].y() / cathode_radius,
+                points[i].z() / cathode_radius);
+            auto res_opt = find_cell(point, path_ids[i]);
+            if (res_opt.has_value()) {
+                cell_ref_map[res_opt->first].first.push_back(i);
+                cell_ref_map[res_opt->first].second.push_back(res_opt->second);
+            }
+        }
+
+        std::vector<std::optional<std::pair<double, Vector3d>>> result(points.size());
+        for (const auto &[dof_idx, idx_ref] : cell_ref_map) {
+            point_evaluator.reinit(
+                cell_idx_map[dof_idx],
+                ArrayView<const Point<3>>(idx_ref.second.data(), idx_ref.second.size()));
+            point_evaluator.evaluate(cell_sol_map[dof_idx], EvaluationFlags::gradients | EvaluationFlags::values);
+            for (size_t i = 0; i < idx_ref.first.size(); i++) {
+                const auto g = point_evaluator.get_gradient(i);
+                result[idx_ref.first[i]] = std::pair{
+                    point_evaluator.get_value(i),
+                    Vector3d(-g[0] / cathode_radius, -g[1] / cathode_radius, -g[2] / cathode_radius)};
+            }
+        }
+
+        return result;
+    }
+
+    std::vector<std::optional<std::pair<double, Vector3d>>> init_cache(std::span<const Vector3d> points) const {
+        cell_cache.clear();
+        cell_ref_map.clear();
+        std::vector<std::optional<std::pair<double, Vector3d>>> valid_paths(points.size());
+        size_t cnt = 0;
+        for (size_t i = 0; i < points.size(); i++) {
+            Point<3> point(
+                points[i].x() / cathode_radius,
+                points[i].y() / cathode_radius,
+                points[i].z() / cathode_radius);
+            auto [cell, ref_point] = GridTools::find_active_cell_around_point(grid_cache, point);
+            if (cell != triangulation.end()) {
+                cell_cache[cnt++] = cell;
+                auto dof_cell = cell->as_dof_handler_iterator(dof_handler);
+                std::vector<double> cell_sol(finite_element.n_dofs_per_cell());
+                dof_cell->get_dof_values(solution, cell_sol.begin(), cell_sol.end());
+                size_t dof_idx = dof_cell->active_cell_index();
+                if (cell_sol_map.contains(dof_idx)) {
+                    cell_sol_map[dof_idx] = cell_sol;
+                }
+
+                point_evaluator.reinit(dof_cell, ArrayView<const Point<3>>(&ref_point, 1));
+                point_evaluator.evaluate(cell_sol, EvaluationFlags::values | EvaluationFlags::gradients);
+
+                const auto g = point_evaluator.get_gradient(0);
+                valid_paths[i] = std::make_pair(
+                    point_evaluator.get_value(0),
+                    Vector3d(-g[0] / cathode_radius, -g[1] / cathode_radius, -g[2] / cathode_radius));
+            }
+        }
+
+        return valid_paths;
     }
 
   private:
@@ -140,10 +168,11 @@ class SolvePDE {
     Vector<double> system_rhs;
 
     GridTools::Cache<3, 3> grid_cache;
-    mutable typename Triangulation<3>::active_cell_iterator last_cell;
     mutable FEPointEvaluation<1, 3> point_evaluator;
-    mutable typename DoFHandler<3>::active_cell_iterator cached_dof_cell;
-    mutable std::vector<double> cached_cell_sol;
+    mutable std::unordered_map<size_t, TriCell> cell_cache;
+    mutable std::unordered_map<size_t, std::pair<std::vector<size_t>, std::vector<Point<3>>>> cell_ref_map;
+    mutable std::unordered_map<size_t, DofCell> cell_idx_map;
+    mutable std::unordered_map<size_t, std::vector<double>> cell_sol_map;
 
     void read_mesh() {
         GridIn<3> grid_in;
@@ -239,24 +268,22 @@ class SolvePDE {
         std::cout << solver_control.last_step() << " CG iterations needed to obtain convergence." << std::endl;
     }
 
-    std::optional<std::pair<typename Triangulation<3>::active_cell_iterator, Point<3>>> find_cell(
-        const Point<3> &p) const {
-        auto result = GridTools::find_active_cell_around_point(grid_cache, p, last_cell);
+    std::optional<std::pair<size_t, Point<3>>> find_cell(const Point<3> &p, size_t id) const {
+        auto result = GridTools::find_active_cell_around_point(grid_cache, p, cell_cache[id]);
         if (result.first == triangulation.end()) {
-            Vector3d real_point(p[0], p[1], p[2]);
-            real_point *= cathode_radius;
-            std::cerr << "Could Not Find active cell around point" << real_point.transpose() << std::endl;
             return std::nullopt;
         }
-        last_cell = result.first;
-        return result;
-    }
 
-    void get_cached_dof_values(const typename DoFHandler<3>::active_cell_iterator &dof_cell) const {
-        if (dof_cell != cached_dof_cell) {
-            cached_dof_cell = dof_cell;
-            dof_cell->get_dof_values(solution, cached_cell_sol.begin(), cached_cell_sol.end());
+        cell_cache[id] = result.first;
+        auto dof_cell = result.first->as_dof_handler_iterator(dof_handler);
+        size_t dof_idx = dof_cell->active_cell_index();
+        cell_idx_map[dof_idx] = dof_cell;
+        if (!cell_sol_map.contains(dof_idx)) {
+            std::vector<double> cell_sol(finite_element.n_dofs_per_cell());
+            dof_cell->get_dof_values(solution, cell_sol.begin(), cell_sol.end());
+            cell_sol_map[dof_idx] = cell_sol;
         }
+        return std::pair{dof_idx, result.second};
     }
 };
 

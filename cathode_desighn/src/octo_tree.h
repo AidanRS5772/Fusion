@@ -7,9 +7,9 @@
 #include <optional>
 #include <utility>
 
-using Vector3d = Eigen::Vector3d;
-
 class OctoTree {
+    using Vector3d = Eigen::Vector3d;
+
   private:
     struct AABB {
         Vector3d min, max;
@@ -172,7 +172,7 @@ class OctoTree {
     }
 
     std::optional<std::vector<std::array<size_t, 3>>> query_w_radius(const Vector3d &point, const double radius) const {
-        if (root->bounds.contains(point)) {
+        if (root->bounds.contains(point) && radius < 1e-6) {
             std::vector<std::array<size_t, 3>> result;
             queryNode_w_radius(root, point, radius, result);
             return result;

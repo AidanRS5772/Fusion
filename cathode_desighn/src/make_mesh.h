@@ -22,12 +22,13 @@
 #include <utility>
 #include <vector>
 
-using json = nlohmann::json;
-using ordered_json = nlohmann::ordered_json;
-using Vector3d = Eigen::Vector3d;
 namespace geo = gmsh::model::geo;
 
 class MakeMesh {
+    using json = nlohmann::json;
+    using ordered_json = nlohmann::ordered_json;
+    using Vector3d = Eigen::Vector3d;
+
   public:
     std::string file_name;
     size_t hash;

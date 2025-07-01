@@ -5,88 +5,110 @@
 #include "solve_pde.h"
 #include <Eigen/Dense>
 #include <boost/numeric/odeint.hpp>
-#include <iostream>
+#include <cstddef>
+#include <cstdlib>
 #include <memory>
-#include <optional>
-#include <stdexcept>
+#include <unordered_set>
+#include <utility>
 
-namespace odeint = boost::numeric::odeint;
-using Vector3d = Eigen::Vector3d;
-using Vector6d = Eigen::Vector<double, 6>;
+template <size_t N> class SolveMultiPath {
+    using Vector3d = Eigen::Vector3d;
+    using Vector6d = Eigen::Vector<double, 6>;
+    using Stepper =
+        boost::numeric::odeint::controlled_runge_kutta<boost::numeric::odeint::runge_kutta_dopri5<Vector6d>>;
 
-class SolvePath {
-    struct Path {
-        std::vector<Vector6d> path{};
+  private:
+    struct PathInfo {
+        std::vector<Vector3d> positions{};
+        std::vector<Vector3d> velocities{};
         std::vector<double> times{};
         std::vector<std::pair<double, double>> energies{};
     };
 
-  public:
-    Path path_info;
-    size_t orbit_cnt = 0;
+    struct Path {
+        Stepper stepper;
+        Vector3d pos;
+        Vector3d vel;
+        double time = 0.0;
+        double dt = 0.001;
+        double V;
+        Vector3d E;
+        PathInfo path_info;
 
-    SolvePath(
-        const std::unique_ptr<OctoTree> &mesh_tree_,
-        const SolvePDE &PDE_,
-        double mass_,
-        const Vector3d &init_pos,
-        const Vector3d &init_vel,
-        const double max_t = 1e3,
-        const bool record_path_ = false)
-        : mesh_tree(*mesh_tree_), PDE(PDE_), mass(mass_), record_path(record_path_) {
-        PDE.init_cache(init_pos);
-        init_energy = (0.5 * mass) * init_vel.dot(init_vel) + PDE.V(init_pos).value();
-        find_path(init_pos, init_vel, max_t);
-    }
+        const size_t id;
+        const double init_energy;
+        const bool record_path;
+        size_t orbit_cnt = 0;
+        Vector3d prev_pos = pos;
+        double prev_prev_norm = pos.norm();
 
-    void operator()(const Vector6d &state, Vector6d &dstate, double _) {
-        auto E_val = PDE.E(state.head<3>());
-        if (!E_val.has_value()) {
-            std::cout << "Collision Found by Out Of Bounds Eval" << std::endl;
-            throw std::runtime_error("Particle hit boundary");
+        Path(
+            const Vector3d &init_pos,
+            const Vector3d &init_vel,
+            const double init_ke,
+            const double init_pe,
+            const Vector3d &init_E,
+            const size_t id_,
+            const bool record_path_,
+            const double abs_err = 1e-4,
+            const double rel_err = 1e-4)
+            : stepper(boost::numeric::odeint::make_controlled<boost::numeric::odeint::runge_kutta_dopri5<Vector6d>>(
+                  abs_err,
+                  rel_err)),
+              pos(init_pos), vel(init_vel), time(0.0), dt(0.001), V(init_pe), E(init_E), id(id_),
+              init_energy(init_ke + init_pe), record_path(record_path_) {
+            if (record_path) {
+                path_info.positions.reserve(1000);
+                path_info.velocities.reserve(1000);
+                path_info.times.reserve(1000);
+                path_info.energies.reserve(1000);
+                path_info.positions.push_back(init_pos);
+                path_info.velocities.push_back(init_vel);
+                path_info.times.push_back(0.0);
+                path_info.energies.push_back(std::make_pair(init_ke, init_pe));
+            }
         }
-        dstate.head<3>() = state.tail<3>();
-        dstate.tail<3>() = E_val.value() / mass;
-    }
 
-  private:
+        bool update(const double mass, const double max_t) {
+            Vector6d state;
+            state.head<3>() = pos;
+            state.tail<3>() = vel;
+            auto system = [&](const Vector6d &state, Vector6d &dstate, double _) {
+                dstate.head<3>() = state.tail<3>();
+                dstate.tail<3>() = E / mass;
+            };
+            stepper.try_step(system, state, time, dt);
+            dt = std::min(dt, max_t - time);
+            auto result = stepper.try_step(system, state, time, dt);
+            while (result == boost::numeric::odeint::controlled_step_result::fail) {
+                result = stepper.try_step(system, state, time, dt);
+            }
+            prev_prev_norm = prev_pos.norm();
+            prev_pos = pos;
+            pos = state.head<3>();
+            vel = state.tail<3>();
+            if (record_path) {
+                path_info.positions.push_back(pos);
+                path_info.velocities.push_back(vel);
+                path_info.times.push_back(time);
+                path_info.energies.push_back(std::make_pair(0.5 * mass * vel.squaredNorm(), V));
+            }
+            return time < max_t;
+        }
+
+        void print() {
+            std::cout << "Path: " << id << " (" << time << " s)" << std::endl;
+            std::cout << "  pos: " << pos.transpose() << " , vel: " << vel.transpose() << std::endl;
+            std::cout << "  V: " << V << " , E: " << E.transpose() << std::endl;
+        }
+    };
+
+    const SolvePDE &pde;
     const OctoTree &mesh_tree;
-    const SolvePDE &PDE;
     const double mass;
-    const bool record_path;
-    double init_energy;
-    std::optional<Vector3d> prev_pos1;
-    std::optional<Vector3d> prev_pos2;
-    double cur_time;
-
-    std::pair<double, double> adjust_energy(
-        Vector6d &state,
-        const size_t max_iter = 100,
-        const double rel_error = 1e-3) {
-        const double tol = rel_error * init_energy;
-        double KE, V;
-        for (size_t iter = 0; iter < max_iter; ++iter) {
-            const Vector3d pos = state.head<3>();
-            const Vector3d vel = state.tail<3>();
-
-            const auto [pot, E] = PDE.VE(pos).value();
-            V = pot;
-            KE = (mass / 2) * vel.squaredNorm();
-            const double current_energy = KE + V;
-            const double energy_error = current_energy - init_energy;
-
-            if (std::abs(energy_error) < tol)
-                return {KE, V};
-
-            const double grad_norm_sq = E.squaredNorm() + 2 * mass * KE;
-            const double scale = energy_error / grad_norm_sq;
-
-            state.head<3>() += scale * E;
-            state.tail<3>() -= scale * mass * vel;
-        }
-
-        return {KE, V};
-    }
+    const double max_time;
+    std::unordered_set<std::unique_ptr<Path>> paths;
+    size_t active_path_cnt;
 
     bool check_collision(
         const Vector3d &p1,
@@ -118,84 +140,136 @@ class SolvePath {
         return t >= 0.0 && t <= 1.0;
     }
 
-    void observer(Vector6d &state, double time) {
-        const Vector3d cur_pos = state.head<3>();
-        const Vector3d cur_vel = state.tail<3>();
-        double ke = (mass / 2) * state.tail<3>().squaredNorm();
-        double pe = PDE.V(state.head<3>()).value();
-        const double energy = ke + pe;
-        const double rel_err = std::abs(energy / init_energy - 1);
-        if (rel_err > 0.05) {
-            const auto res = adjust_energy(state);
-            ke = res.first;
-            pe = res.second;
-        }
+    void adjust_energies(
+        std::vector<bool> &adjust_energy_paths,
+        const size_t max_iter = 10,
+        const double rel_tol = 1e-5) {
+        for (size_t i = 0; i < max_iter; i++) {
+            std::vector<Vector3d> points;
+            points.reserve(active_path_cnt);
+            std::vector<size_t> path_ids;
+            path_ids.reserve(active_path_cnt);
+            for (size_t j = 0; j < active_path_cnt; j++) {
+                if (adjust_energy_paths[j]) {
+                    const double ke = (mass / 2) * paths[j]->vel.squaredNorm();
+                    const double scale = (ke + paths[j]->V - paths[j]->init_energy) /
+                                         (paths[j]->E.squaredNorm() + 2 * mass * ke);
+                    paths[j]->pos += scale * paths[j]->E;
+                    paths[j]->vel *= (1 - scale * mass);
 
-        if (prev_pos1.has_value()) {
-            const auto triangles = mesh_tree.query_w_radius(
-                (cur_pos + prev_pos1.value()) / 2,
-                (cur_pos - prev_pos1.value()).norm() / 2);
-            if (triangles.has_value()) {
-                for (const auto &tri : triangles.value()) {
-                    if (check_collision(
-                            cur_pos,
-                            prev_pos1.value(),
-                            mesh_tree.points[tri[0]],
-                            mesh_tree.points[tri[1]],
-                            mesh_tree.points[tri[2]])) {
-                        std::cout << "Collision Found by Octo-Tree" << std::endl;
-                        throw std::runtime_error("Particle hit boundary");
+                    points.push_back(paths[j]->pos);
+                    path_ids.push_back(paths[j]->id);
+                }
+            }
+
+            auto VE_vals = pde.multi_VE(points, path_ids);
+            for (size_t i = points.size() - 1; i > VE_vals.size(); i++) {
+                const double energy = (mass / 2) * paths[path_ids[i]]->vel.squaredNorm() + paths[path_ids[i]]->V;
+                if (std::abs(energy / paths[path_ids[i]]->init_energy - 1) < rel_tol) {
+                    adjust_energy_paths[path_ids[i]] = false;
+                }
+            }
+
+            bool flag = false;
+            for (size_t i = 0; i < active_path_cnt; i++) {
+                if (adjust_energy_paths[i]) {
+                    const double energy = (mass / 2) * paths[i]->vel.squaredNorm() + paths[i]->V;
+                    if (std::abs(energy / paths[i]->init_energy - 1) < rel_tol) {
+                        adjust_energy_paths[i] = false;
+                    }
+                    flag = true;
+                }
+            }
+            if (flag) {
+                break;
+            }
+        }
+    }
+
+    void integrate(const double energy_rel_tol = 0.05) {
+        while (active_path_cnt > 0) {
+            for (size_t i = 0; i < active_path_cnt; i++) {
+                if (!paths[i]->update(mass, max_time)) {
+                    std::swap(paths[i + 1], paths[--active_path_cnt]);
+                }
+            }
+
+            for (size_t i = 0; i < active_path_cnt; i++) {
+                const auto &p1 = paths[i]->pos;
+                const auto &p2 = paths[i]->prev_pos;
+                const auto triangles = mesh_tree.query_w_radius((p1 + p2) / 2, (p1 - p2).norm() / 2);
+                if (triangles.has_value()) {
+                    for (const auto &tri : triangles.value()) {
+                        if (check_collision(
+                                p1,
+                                p2,
+                                mesh_tree.points[tri[0]],
+                                mesh_tree.points[tri[1]],
+                                mesh_tree.points[tri[2]])) {
+                            std::swap(paths[i + 1], paths[--active_path_cnt]);
+                        }
                     }
                 }
             }
-            if (prev_pos2.has_value()) {
-                const double n0 = cur_pos.norm();
-                const double n1 = prev_pos1->norm();
-                const double n2 = prev_pos2->norm();
-                if (n0 < n1 && n2 < n1)
-                    orbit_cnt++;
+
+            std::vector<Vector3d> points(active_path_cnt);
+            std::vector<size_t> path_ids(active_path_cnt);
+            for (size_t i = 0; i < active_path_cnt; i++) {
+                points[i] = paths[i]->pos;
+                path_ids[i] = paths[i]->id;
             }
-        }
 
-        if (record_path) {
-            path_info.path.push_back(state);
-            path_info.times.push_back(time);
-            path_info.energies.emplace_back(ke, pe);
-        }
+            auto VE_vals = pde.multi_VE(points, path_ids);
+            for (int i = active_path_cnt - 1; i >= 0; i--) {
+                if (VE_vals[i].has_value()) {
+                    paths[i]->V = VE_vals[i]->first;
+                    paths[i]->E = VE_vals[i]->second;
+                } else {
+                    std::swap(paths[i], paths[--active_path_cnt]);
+                }
+            }
 
-        cur_time = time;
-        prev_pos2 = prev_pos1;
-        prev_pos1 = cur_pos;
+            std::vector<bool> adjust_energy_paths(active_path_cnt, false);
+            for (size_t i = 0; i < active_path_cnt; i++) {
+                const double energy = (mass / 2) * paths[i]->vel.squaredNorm() + paths[i]->V;
+                if (std::abs(energy / paths[i]->init_energy - 1) > energy_rel_tol) {
+                    adjust_energy_paths[i] = true;
+                }
+            }
+
+            adjust_energies(adjust_energy_paths);
+        }
     }
 
-    void find_path(
-        const Vector3d &init_pos,
-        const Vector3d &init_vel,
-        const double max_t,
-        const double init_dt = 1,
-        const double abs_tol = 1e-4,
-        const double rel_tol = 1e-4) {
-        Vector6d state;
-        state.head<3>() = init_pos;
-        state.tail<3>() = init_vel;
-
-        auto observer_wraper = [this](Vector6d &state, double time) {
-            observer(state, time);
-        };
-        auto stepper = odeint::make_controlled<odeint::runge_kutta_dopri5<Vector6d>>(abs_tol, rel_tol);
-
-        try {
-            odeint::integrate_adaptive(stepper, *this, state, 0.0, max_t, init_dt, observer_wraper);
-            std::cout << "No Collison" << std::endl;
-        } catch (const std::runtime_error &e) {
-            if (std::string(e.what()) == "Particle hit boundary") {
-                std::cout << "Collision Detected at " << cur_time << " ns" << std::endl;
-            } else {
-                std::cerr << "Integration failed: " << e.what() << std::endl;
+  public:
+    SolveMultiPath(
+        const OctoTree &mesh_tree_,
+        const SolvePDE &pde_,
+        const double mass_,
+        const std::array<Vector3d, N> &init_pos,
+        const std::array<Vector3d, N> &init_vel,
+        const double max_time_ = 1e4,
+        const size_t record_density = N)
+        : pde(pde_), mesh_tree(mesh_tree_), mass(mass_), max_time(max_time_) {
+        auto valid_paths = pde.init_cache(init_pos);
+        active_path_cnt = 0;
+        for (size_t i = 0; i < N; i++) {
+            if (valid_paths[i].has_value()) {
+                const auto &[V, E] = valid_paths[i].value();
+                const double ke = (mass / 2) * init_vel[i].squaredNorm();
+                paths[active_path_cnt] = std::make_unique<Path>(
+                    init_pos[i],
+                    init_vel[i],
+                    ke,
+                    V,
+                    E,
+                    active_path_cnt,
+                    active_path_cnt % record_density == 0);
+                active_path_cnt++;
             }
-        } catch (const std::exception &e) {
-            std::cerr << "Integration failed: " << e.what() << std::endl;
         }
+
+        integrate();
     }
 };
 
