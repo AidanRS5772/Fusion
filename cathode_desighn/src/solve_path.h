@@ -34,15 +34,15 @@ class SolvePath {
         const double max_t = 1e3,
         const bool record_path_ = false)
         : mesh_tree(*mesh_tree_), PDE(PDE_), mass(mass_), record_path(record_path_) {
-        PDE.init_cache(init_pos);
-        init_energy = (0.5 * mass) * init_vel.dot(init_vel) + PDE.V(init_pos).value();
-        find_path(init_pos, init_vel, max_t);
+        if (PDE.init_cache(init_pos)) {
+            init_energy = (0.5 * mass) * init_vel.dot(init_vel) + PDE.V(init_pos).value();
+            find_path(init_pos, init_vel, max_t);
+        }
     }
 
     void operator()(const Vector6d &state, Vector6d &dstate, double _) {
         auto E_val = PDE.E(state.head<3>());
         if (!E_val.has_value()) {
-            std::cout << "Collision Found by Out Of Bounds Eval" << std::endl;
             throw std::runtime_error("Particle hit boundary");
         }
         dstate.head<3>() = state.tail<3>();

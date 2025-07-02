@@ -8,13 +8,14 @@
 #include <gperftools/profiler.h>
 #include <random>
 
-constexpr int app_cnt = 6;
+constexpr int app_cnt = 362;
 constexpr double cathode_radius = 5; // [cm]
 constexpr double anode_radius = 25;  // [cm]
-constexpr double wire_radius = .2;   // [cm]
+constexpr double wire_radius = .1;   // [cm]
 constexpr double voltage = 1;        // [MV]
 constexpr double mD = 2.08690083;    // [MeV][cm/ns]^-2 mass of a deuteron (m = E/c^2)
 constexpr double temp = 28.5724675;  // [µeV][cm/ns]^-2 room temprature energy
+constexpr size_t N = 10'000;
 
 using namespace std;
 
@@ -41,18 +42,22 @@ int main() {
     auto mesh = MakeMesh(app_cnt, anode_radius, cathode_radius, wire_radius, 4, 24);
     auto pde_sol = SolvePDE(mesh.file_name, voltage, cathode_radius);
 
-    // Vector3d init_pos(0, 0, 17.5);
-    // Vector3d init_vel(0, 0, 0);
-    auto init_states = make_init_states(anode_radius, cathode_radius, 100);
+    Vector3d init_pos(0, 0, 17.5);
+    Vector3d init_vel(0, 0, 0);
+    auto init_states = make_init_states(anode_radius, cathode_radius, N);
 
     ProfilerStart("path_profile.prof");
 
     auto start = chrono::high_resolution_clock::now();
-    // auto path_sol = SolvePath(mesh.mesh_tree, pde_sol, mD, init_pos, init_vel, 1e4);
-    for (auto &state : init_states) {
-        auto path_sol = SolvePath(mesh.mesh_tree, pde_sol, mD, state.first, state.second, 1e4);
-        cout << "Orbit Cnt: " << path_sol.orbit_cnt << "\n";
-    }
+    auto path_sol = SolvePath(mesh.mesh_tree, pde_sol, mD, init_pos, init_vel, 1e4);
+    // size_t cnt = 0;
+    // for (auto &[pos, vel] : init_states) {
+    //     auto path_sol = SolvePath(mesh.mesh_tree, pde_sol, mD, vel, pos, 1e4);
+    //     cnt++;
+    //     if (cnt % 100 == 0) {
+    //         std::cout << "Progress: " << cnt << "/" << N << std::endl;
+    //     }
+    // }
     auto end = chrono::high_resolution_clock::now();
 
     ProfilerStop();

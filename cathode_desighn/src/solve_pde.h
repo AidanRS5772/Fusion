@@ -54,7 +54,7 @@ class SolvePDE {
         const double voltage_,
         const double cathode_radius_,
         const size_t fem_order = 3,
-        const size_t solve_max_iter = 1000,
+        const size_t solve_max_iter = 10000,
         const double solve_tol = 1e-15)
         : mesh_file_name(file_name_), voltage(voltage_), cathode_radius(cathode_radius_), finite_element(fem_order),
           mapping(finite_element), grid_cache(triangulation),
@@ -117,12 +117,16 @@ class SolvePDE {
             Vector3d(-g[0] / cathode_radius, -g[1] / cathode_radius, -g[2] / cathode_radius)};
     }
 
-    void init_cache(const Vector3d &p) const {
+    bool init_cache(const Vector3d &p) const {
         Point<3> point(p.x() / cathode_radius, p.y() / cathode_radius, p.z() / cathode_radius);
         auto [cell, ref_point] = GridTools::find_active_cell_around_point(grid_cache, point);
+        if (cell == triangulation.end()) {
+            return false;
+        }
         last_cell = cell;
         cached_dof_cell = cell->as_dof_handler_iterator(dof_handler);
         cached_dof_cell->get_dof_values(solution, cached_cell_sol.begin(), cached_cell_sol.end());
+        return true;
     }
 
   private:
@@ -243,9 +247,6 @@ class SolvePDE {
         const Point<3> &p) const {
         auto result = GridTools::find_active_cell_around_point(grid_cache, p, last_cell);
         if (result.first == triangulation.end()) {
-            Vector3d real_point(p[0], p[1], p[2]);
-            real_point *= cathode_radius;
-            std::cerr << "Could Not Find active cell around point" << real_point.transpose() << std::endl;
             return std::nullopt;
         }
         last_cell = result.first;
