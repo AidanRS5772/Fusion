@@ -14,30 +14,51 @@ constexpr double anode_radius = 25;  // [cm]
 constexpr double wire_radius = .2;   // [cm]
 constexpr double voltage = 1;        // [MV]
 constexpr double mD = 2.08690083;    // [MeV][cm/ns]^-2 mass of a deuteron (m = E/c^2)
-std::mt19937 gen(314);
-std::uniform_int_distribution<int> dis(1, 100);
+constexpr double temp = 28.5724675;  // [µeV][cm/ns]^-2 room temprature energy
 
-std::vector<std::pair<Vector3d, Vector3d>> make_init_states(const size_t n) {
+using namespace std;
+
+vector<pair<Vector3d, Vector3d>> make_init_states(const double a, const double b, const size_t size) {
+    mt19937 gen(314);
+    uniform_real_distribution<double> u;
+    normal_distribution<double> n(0, sqrt(temp / mD) * 1e-6);
+    const double a3 = a * a * a;
+    const double b3 = b * b * b;
+    vector<pair<Vector3d, Vector3d>> init_states(size);
+    for (size_t i = 0; i < size; ++i) {
+        const double r = cbrt((b3 - a3) * u(gen) + a3);
+        const double th = 2 * M_PI * u(gen);
+        const double sphi = 1 - 2 * u(gen);
+        const double cphi = sqrt(1 - sphi * sphi);
+        const Vector3d pos(r * cphi * sin(th), r * cphi * cos(th), r * sphi);
+        const Vector3d vel(n(gen), n(gen), n(gen));
+        init_states[i] = {pos, vel};
+    }
+    return init_states;
 }
 
 int main() {
     auto mesh = MakeMesh(app_cnt, anode_radius, cathode_radius, wire_radius, 4, 24);
     auto pde_sol = SolvePDE(mesh.file_name, voltage, cathode_radius);
 
-    Vector3d init_pos(0, 0, 17.5);
-    Vector3d init_vel(0, 0, 0);
+    // Vector3d init_pos(0, 0, 17.5);
+    // Vector3d init_vel(0, 0, 0);
+    auto init_states = make_init_states(anode_radius, cathode_radius, 100);
 
     ProfilerStart("path_profile.prof");
 
-    auto start = std::chrono::high_resolution_clock::now();
-    auto path_sol = SolvePath(mesh.mesh_tree, pde_sol, mD, init_pos, init_vel, 1e4);
-    auto end = std::chrono::high_resolution_clock::now();
+    auto start = chrono::high_resolution_clock::now();
+    // auto path_sol = SolvePath(mesh.mesh_tree, pde_sol, mD, init_pos, init_vel, 1e4);
+    for (auto &state : init_states) {
+        auto path_sol = SolvePath(mesh.mesh_tree, pde_sol, mD, state.first, state.second, 1e4);
+        cout << "Orbit Cnt: " << path_sol.orbit_cnt << "\n";
+    }
+    auto end = chrono::high_resolution_clock::now();
 
     ProfilerStop();
 
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-    std::cout << "Orbit Cnt: " << path_sol.orbit_cnt << std::endl;
-    std::cout << "duration: " << duration.count() << " ms" << std::endl;
+    auto duration = chrono::duration_cast<chrono::milliseconds>(end - start);
+    cout << "duration: " << duration.count() << " ms" << endl;
 
     // plot_mesh_path(mesh.hash, path_sol.path_info.path);
 
