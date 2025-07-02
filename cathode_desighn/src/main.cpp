@@ -6,13 +6,19 @@
 #include <Eigen/Dense>
 #include <chrono>
 #include <gperftools/profiler.h>
+#include <random>
 
-constexpr int app_cnt = 100;
+constexpr int app_cnt = 6;
 constexpr double cathode_radius = 5; // [cm]
 constexpr double anode_radius = 25;  // [cm]
 constexpr double wire_radius = .2;   // [cm]
 constexpr double voltage = 1;        // [MV]
 constexpr double mD = 2.08690083;    // [MeV][cm/ns]^-2 mass of a deuteron (m = E/c^2)
+std::mt19937 gen(314);
+std::uniform_int_distribution<int> dis(1, 100);
+
+std::vector<std::pair<Vector3d, Vector3d>> make_init_states(const size_t n) {
+}
 
 int main() {
     auto mesh = MakeMesh(app_cnt, anode_radius, cathode_radius, wire_radius, 4, 24);
