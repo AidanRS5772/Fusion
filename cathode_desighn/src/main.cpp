@@ -45,7 +45,7 @@ template <size_t N> std::pair<std::array<Eigen::Vector3d, N>, std::array<Eigen::
 
 int main() {
     auto mesh = MakeMesh(app_cnt, anode_radius, cathode_radius, wire_radius, 4, 24);
-    auto pde_sol = SolvePDE(mesh.file_name, voltage, cathode_radius);
+    auto pde_sol = SolvePDE<chunk>(mesh.file_name, voltage, cathode_radius);
 
     const auto [init_pos, init_vel] = make_samples<chunk>();
 

@@ -47,7 +47,7 @@
 
 using namespace dealii;
 
-class SolvePDE {
+template <size_t N> class SolvePDE {
     using Vector3d = Eigen::Vector3d;
     using TriCell = typename Triangulation<3>::active_cell_iterator;
     using DofCell = typename DoFHandler<3>::active_cell_iterator;
@@ -86,16 +86,20 @@ class SolvePDE {
             Vector3d(-g[0] / cathode_radius, -g[1] / cathode_radius, -g[2] / cathode_radius)};
     }
 
+    // returns: all V and E of the valid points given
+    // points: the position of all the points
+    // path_idx: the index of all the points
+    // side effect: updates caches
     std::vector<std::optional<std::pair<double, Vector3d>>> multi_VE(
         const std::vector<Vector3d> &points,
-        const std::vector<size_t> &path_ids) const {
+        const std::vector<size_t> &path_idxs) const {
         cell_ref_map.clear();
         for (size_t i = 0; i < points.size(); i++) {
             const Point<3> point(
                 points[i].x() / cathode_radius,
                 points[i].y() / cathode_radius,
                 points[i].z() / cathode_radius);
-            auto res_opt = find_cell(point, path_ids[i]);
+            auto res_opt = find_cell(point, path_idxs[i]);
             if (res_opt.has_value()) {
                 cell_ref_map[res_opt->first].first.push_back(i);
                 cell_ref_map[res_opt->first].second.push_back(res_opt->second);
@@ -119,11 +123,14 @@ class SolvePDE {
         return result;
     }
 
-    std::vector<std::optional<std::pair<double, Vector3d>>> init_cache(std::span<const Vector3d> points) const {
-        cell_cache.clear();
+    // returns: vector of all V and E if it is a valid starting position
+    // points: all starting positions
+    // side_effects: clears caches, updates caches with values
+    std::vector<std::optional<std::pair<double, Vector3d>>> init_cache(const std::array<Vector3d, N> &points) const {
         cell_ref_map.clear();
+        cell_sol_map.clear();
+        cell_idx_map.clear();
         std::vector<std::optional<std::pair<double, Vector3d>>> valid_paths(points.size());
-        size_t cnt = 0;
         for (size_t i = 0; i < points.size(); i++) {
             Point<3> point(
                 points[i].x() / cathode_radius,
@@ -131,22 +138,24 @@ class SolvePDE {
                 points[i].z() / cathode_radius);
             auto [cell, ref_point] = GridTools::find_active_cell_around_point(grid_cache, point);
             if (cell != triangulation.end()) {
-                cell_cache[cnt++] = cell;
+                cell_cache[i] = cell;
+
                 auto dof_cell = cell->as_dof_handler_iterator(dof_handler);
+                size_t dof_idx = dof_cell->active_cell_index();
+                cell_idx_map[dof_idx] = dof_cell;
+
                 std::vector<double> cell_sol(finite_element.n_dofs_per_cell());
                 dof_cell->get_dof_values(solution, cell_sol.begin(), cell_sol.end());
-                size_t dof_idx = dof_cell->active_cell_index();
-                if (cell_sol_map.contains(dof_idx)) {
-                    cell_sol_map[dof_idx] = cell_sol;
-                }
+                cell_sol_map[dof_idx] = cell_sol;
 
                 point_evaluator.reinit(dof_cell, ArrayView<const Point<3>>(&ref_point, 1));
                 point_evaluator.evaluate(cell_sol, EvaluationFlags::values | EvaluationFlags::gradients);
-
                 const auto g = point_evaluator.get_gradient(0);
                 valid_paths[i] = std::make_pair(
                     point_evaluator.get_value(0),
                     Vector3d(-g[0] / cathode_radius, -g[1] / cathode_radius, -g[2] / cathode_radius));
+            } else {
+                cell_cache[i] = triangulation.end();
             }
         }
 
@@ -169,7 +178,7 @@ class SolvePDE {
 
     GridTools::Cache<3, 3> grid_cache;
     mutable FEPointEvaluation<1, 3> point_evaluator;
-    mutable std::unordered_map<size_t, TriCell> cell_cache;
+    mutable std::array<TriCell, N> cell_cache;
     mutable std::unordered_map<size_t, std::pair<std::vector<size_t>, std::vector<Point<3>>>> cell_ref_map;
     mutable std::unordered_map<size_t, DofCell> cell_idx_map;
     mutable std::unordered_map<size_t, std::vector<double>> cell_sol_map;
@@ -268,13 +277,18 @@ class SolvePDE {
         std::cout << solver_control.last_step() << " CG iterations needed to obtain convergence." << std::endl;
     }
 
-    std::optional<std::pair<size_t, Point<3>>> find_cell(const Point<3> &p, size_t id) const {
-        auto result = GridTools::find_active_cell_around_point(grid_cache, p, cell_cache[id]);
+    // returns: dof index and reference point for the cell (if the point is found to be in a valid cell)
+    // p: real point for evaluation
+    // idx: index of the path being evaluated (used for determining which hint to use)
+    // side effect: updates cell_sol_cache if that cell has not been encoutered previously and updates cell_idx_map with
+    // the dof cell.
+    std::optional<std::pair<size_t, Point<3>>> find_cell(const Point<3> &p, const size_t idx) const {
+        auto result = GridTools::find_active_cell_around_point(grid_cache, p, cell_cache[idx]);
         if (result.first == triangulation.end()) {
             return std::nullopt;
         }
 
-        cell_cache[id] = result.first;
+        cell_cache[idx] = result.first;
         auto dof_cell = result.first->as_dof_handler_iterator(dof_handler);
         size_t dof_idx = dof_cell->active_cell_index();
         cell_idx_map[dof_idx] = dof_cell;
