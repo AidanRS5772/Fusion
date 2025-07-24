@@ -3,7 +3,7 @@
 IndentWidth: 4
 TabWidth: 4
 UseTab: Never
-ColumnLimit: 120
+ColumnLimit: 150
 
 # Function arguments/parameters formatting
 BinPackArguments: false

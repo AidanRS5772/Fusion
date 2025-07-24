@@ -24,6 +24,11 @@ class SolvePath {
   public:
     Path path_info;
     size_t orbit_cnt = 0;
+    bool eternal = false;
+    bool sucsessful = false;
+    double init_energy;
+    double init_KE;
+    double init_PE;
 
     SolvePath(
         const std::unique_ptr<OctoTree> &mesh_tree_,
@@ -35,7 +40,9 @@ class SolvePath {
         const bool record_path_ = false)
         : mesh_tree(*mesh_tree_), PDE(PDE_), mass(mass_), record_path(record_path_) {
         if (PDE.init_cache(init_pos)) {
-            init_energy = (0.5 * mass) * init_vel.dot(init_vel) + PDE.V(init_pos).value();
+            init_KE = (0.5 * mass) * init_vel.dot(init_vel);
+            init_PE = PDE.V(init_pos).value();
+            init_energy = init_KE + init_PE;
             find_path(init_pos, init_vel, max_t);
         }
     }
@@ -54,15 +61,10 @@ class SolvePath {
     const SolvePDE &PDE;
     const double mass;
     const bool record_path;
-    double init_energy;
     std::optional<Vector3d> prev_pos1;
     std::optional<Vector3d> prev_pos2;
-    double cur_time;
 
-    std::pair<double, double> adjust_energy(
-        Vector6d &state,
-        const size_t max_iter = 100,
-        const double rel_error = 1e-3) {
+    std::pair<double, double> adjust_energy(Vector6d &state, const size_t max_iter = 100, const double rel_error = 1e-3) {
         const double tol = rel_error * init_energy;
         double KE, V;
         for (size_t iter = 0; iter < max_iter; ++iter) {
@@ -132,18 +134,10 @@ class SolvePath {
         }
 
         if (prev_pos1.has_value()) {
-            const auto triangles = mesh_tree.query_w_radius(
-                (cur_pos + prev_pos1.value()) / 2,
-                (cur_pos - prev_pos1.value()).norm() / 2);
+            const auto triangles = mesh_tree.query_w_radius((cur_pos + prev_pos1.value()) / 2, (cur_pos - prev_pos1.value()).norm() / 2);
             if (triangles.has_value()) {
                 for (const auto &tri : triangles.value()) {
-                    if (check_collision(
-                            cur_pos,
-                            prev_pos1.value(),
-                            mesh_tree.points[tri[0]],
-                            mesh_tree.points[tri[1]],
-                            mesh_tree.points[tri[2]])) {
-                        std::cout << "Collision Found by Octo-Tree" << std::endl;
+                    if (check_collision(cur_pos, prev_pos1.value(), mesh_tree.points[tri[0]], mesh_tree.points[tri[1]], mesh_tree.points[tri[2]])) {
                         throw std::runtime_error("Particle hit boundary");
                     }
                 }
@@ -163,7 +157,6 @@ class SolvePath {
             path_info.energies.emplace_back(ke, pe);
         }
 
-        cur_time = time;
         prev_pos2 = prev_pos1;
         prev_pos1 = cur_pos;
     }
@@ -186,15 +179,17 @@ class SolvePath {
 
         try {
             odeint::integrate_adaptive(stepper, *this, state, 0.0, max_t, init_dt, observer_wraper);
-            std::cout << "No Collison" << std::endl;
+            sucsessful = true;
+            eternal = true;
         } catch (const std::runtime_error &e) {
             if (std::string(e.what()) == "Particle hit boundary") {
-                std::cout << "Collision Detected at " << cur_time << " ns" << std::endl;
+                sucsessful = true;
+                eternal = false;
             } else {
-                std::cerr << "Integration failed: " << e.what() << std::endl;
+                std::cerr << "\nIntegration failed: " << e.what() << std::endl;
             }
         } catch (const std::exception &e) {
-            std::cerr << "Integration failed: " << e.what() << std::endl;
+            std::cerr << "\nIntegration failed: " << e.what() << std::endl;
         }
     }
 };

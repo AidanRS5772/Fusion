@@ -210,6 +210,55 @@ if (type === "0") {
     title: "Energy Plot",
     showlegend: true,
   };
+} else if (type === "4") {
+  const data = JSON.parse(fs.readFileSync(PATHS.plotData, "utf-8"));
+
+  const maxVal = Math.ceil(Math.max(...data.FUSION_PROBS));
+  const hist = {
+    type: "histogram",
+    x: data.FUSION_PROBS,
+    histnorm: "probability density",
+    autobinx: false,
+    xbins: {
+      start: 0.0,
+      end: maxVal,
+      size: 0.5,
+    },
+    marker: {
+      color: "blue",
+    },
+    opacity: 0.6,
+    hovertemplate:
+      "<b>Fusion Probability:</b> %{x}<br>" +
+      "<b>Frequency:</b> %{y}<br>" +
+      "<extra></extra>",
+  };
+  const exp = {
+    type: "scatter",
+    x: data.X,
+    y: data.EXP,
+    mode: "lines",
+    name: "Exponential Distribution",
+    line: {
+      color: "green",
+    },
+  };
+  const gamma = {
+    type: "scatter",
+    x: data.X,
+    y: data.GAMMA,
+    mode: "lines",
+    name: "Gamma Distribution",
+    line: {
+      color: "blue",
+    },
+  };
+  traces.push(hist, exp, gamma);
+
+  layout = {
+    title: "Fusion Probability Distribution",
+    showlegend: true,
+  };
 }
 
 const html = `

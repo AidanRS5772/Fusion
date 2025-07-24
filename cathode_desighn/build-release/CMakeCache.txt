@@ -149,7 +149,7 @@ CMAKE_PROJECT_DESCRIPTION:STATIC=
 CMAKE_PROJECT_HOMEPAGE_URL:STATIC=
 
 //Value Computed by CMake
-CMAKE_PROJECT_NAME:STATIC=YourProjectName
+CMAKE_PROJECT_NAME:STATIC=Fusion
 
 //Value Computed by CMake
 CMAKE_PROJECT_VERSION:STATIC=1.0
@@ -234,20 +234,20 @@ CMAKE_VERBOSE_MAKEFILE:BOOL=FALSE
 //The directory containing a CMake configuration file for Eigen3.
 Eigen3_DIR:PATH=/opt/homebrew/share/eigen3/cmake
 
+//Value Computed by CMake
+Fusion_BINARY_DIR:STATIC=/Users/aidansgarlato/Programing/Julia/Fusion/cathode_desighn/build-release
+
+//Value Computed by CMake
+Fusion_IS_TOP_LEVEL:STATIC=ON
+
+//Value Computed by CMake
+Fusion_SOURCE_DIR:STATIC=/Users/aidansgarlato/Programing/Julia/Fusion/cathode_desighn
+
 //Path to a library.
 LAPACKE_LIB:FILEPATH=/opt/homebrew/opt/lapack/lib/liblapacke.dylib
 
 //Path to a library.
 PROFILER_LIB:FILEPATH=/opt/homebrew/lib/libprofiler.dylib
-
-//Value Computed by CMake
-YourProjectName_BINARY_DIR:STATIC=/Users/aidansgarlato/Programing/Julia/Fusion/cathode_desighn/build-release
-
-//Value Computed by CMake
-YourProjectName_IS_TOP_LEVEL:STATIC=ON
-
-//Value Computed by CMake
-YourProjectName_SOURCE_DIR:STATIC=/Users/aidansgarlato/Programing/Julia/Fusion/cathode_desighn
 
 //The directory containing a CMake configuration file for deal.II.
 deal.II_DIR:PATH=/Users/aidansgarlato/dealii-release-optimized/lib/cmake/deal.II
