@@ -66,7 +66,7 @@ class GammaDist {
         alpha = 1 / (2 * (log_mean - mean_log));
         double d = 1;
         size_t iter = 0;
-        while (std::abs(d) > 1e-8 && iter < 100) {
+        while (std::abs(d) > 1e-8 && iter < 10) {
             d = gs(alpha) / dgs(alpha);
             alpha -= d;
             iter++;

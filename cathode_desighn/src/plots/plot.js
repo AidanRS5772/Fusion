@@ -233,27 +233,27 @@ if (type === "0") {
       "<b>Frequency:</b> %{y}<br>" +
       "<extra></extra>",
   };
-  const exp = {
-    type: "scatter",
-    x: data.X,
-    y: data.EXP,
-    mode: "lines",
-    name: "Exponential Distribution",
-    line: {
-      color: "green",
-    },
-  };
-  const gamma = {
-    type: "scatter",
-    x: data.X,
-    y: data.GAMMA,
-    mode: "lines",
-    name: "Gamma Distribution",
-    line: {
-      color: "blue",
-    },
-  };
-  traces.push(hist, exp, gamma);
+  // const exp = {
+  //   type: "scatter",
+  //   x: data.X,
+  //   y: data.EXP,
+  //   mode: "lines",
+  //   name: "Exponential Distribution",
+  //   line: {
+  //     color: "green",
+  //   },
+  // };
+  // const gamma = {
+  //   type: "scatter",
+  //   x: data.X,
+  //   y: data.GAMMA,
+  //   mode: "lines",
+  //   name: "Gamma Distribution",
+  //   line: {
+  //     color: "blue",
+  //   },
+  // };
+  traces.push(hist);
 
   layout = {
     title: "Fusion Probability Distribution",

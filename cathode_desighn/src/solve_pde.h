@@ -56,9 +56,8 @@ class SolvePDE {
         const size_t fem_order = 3,
         const size_t solve_max_iter = 10000,
         const double solve_tol = 1e-15)
-        : mesh_file_name(file_name_), voltage(voltage_), cathode_radius(cathode_radius_), finite_element(fem_order),
-          mapping(finite_element), grid_cache(triangulation),
-          point_evaluator(mapping, finite_element, update_values | update_gradients),
+        : mesh_file_name(file_name_), voltage(voltage_), cathode_radius(cathode_radius_), finite_element(fem_order), mapping(finite_element),
+          grid_cache(triangulation), point_evaluator(mapping, finite_element, update_values | update_gradients),
           cached_cell_sol(finite_element.n_dofs_per_cell()) {
         MultithreadInfo::set_thread_limit(1);
         std::cout << "Starting PDE Solve..." << std::endl;
@@ -112,9 +111,7 @@ class SolvePDE {
         point_evaluator.evaluate(cached_cell_sol, EvaluationFlags::gradients | EvaluationFlags::values);
 
         const auto g = point_evaluator.get_gradient(0);
-        return std::pair{
-            point_evaluator.get_value(0),
-            Vector3d(-g[0] / cathode_radius, -g[1] / cathode_radius, -g[2] / cathode_radius)};
+        return std::pair{point_evaluator.get_value(0), Vector3d(-g[0] / cathode_radius, -g[1] / cathode_radius, -g[2] / cathode_radius)};
     }
 
     bool init_cache(const Vector3d &p) const {
@@ -187,11 +184,7 @@ class SolvePDE {
         std::cout << "Starting system assembly..." << std::flush;
 
         const QGaussSimplex<3> quadrature_formula(finite_element.degree + 1);
-        FEValues<3> fe_values(
-            mapping,
-            finite_element,
-            quadrature_formula,
-            update_values | update_gradients | update_JxW_values);
+        FEValues<3> fe_values(mapping, finite_element, quadrature_formula, update_values | update_gradients | update_JxW_values);
 
         const unsigned int dofs_per_cell = finite_element.n_dofs_per_cell();
         const unsigned int n_q_points = quadrature_formula.size();
@@ -207,8 +200,7 @@ class SolvePDE {
             for (unsigned int q_point = 0; q_point < n_q_points; ++q_point) {
                 for (unsigned int i = 0; i < dofs_per_cell; ++i) {
                     for (unsigned int j = 0; j < dofs_per_cell; ++j) {
-                        cell_matrix(i, j) += fe_values.shape_grad(i, q_point) * fe_values.shape_grad(j, q_point) *
-                                             fe_values.JxW(q_point);
+                        cell_matrix(i, j) += fe_values.shape_grad(i, q_point) * fe_values.shape_grad(j, q_point) * fe_values.JxW(q_point);
                     }
                 }
             }
@@ -220,16 +212,8 @@ class SolvePDE {
         }
 
         std::map<types::global_dof_index, double> boundary_values;
-        VectorTools::interpolate_boundary_values(
-            dof_handler,
-            types::boundary_id(1),
-            Functions::ConstantFunction<3>(-voltage),
-            boundary_values);
-        VectorTools::interpolate_boundary_values(
-            dof_handler,
-            types::boundary_id(2),
-            Functions::ZeroFunction<3>(),
-            boundary_values);
+        VectorTools::interpolate_boundary_values(dof_handler, types::boundary_id(1), Functions::ConstantFunction<3>(-voltage), boundary_values);
+        VectorTools::interpolate_boundary_values(dof_handler, types::boundary_id(2), Functions::ZeroFunction<3>(), boundary_values);
         MatrixTools::apply_boundary_values(boundary_values, system_matrix, solution, system_rhs);
 
         std::cout << " assembly finished." << std::endl;
@@ -243,8 +227,7 @@ class SolvePDE {
         std::cout << solver_control.last_step() << " CG iterations needed to obtain convergence." << std::endl;
     }
 
-    std::optional<std::pair<typename Triangulation<3>::active_cell_iterator, Point<3>>> find_cell(
-        const Point<3> &p) const {
+    std::optional<std::pair<typename Triangulation<3>::active_cell_iterator, Point<3>>> find_cell(const Point<3> &p) const {
         auto result = GridTools::find_active_cell_around_point(grid_cache, p, last_cell);
         if (result.first == triangulation.end()) {
             return std::nullopt;

@@ -2,7 +2,7 @@
 #define PLOT_H
 
 #include <Eigen/Dense>
-#include <algorithm>
+// #include <algorithm>
 #include <cstdlib>
 #include <fstream>
 #include <nlohmann/json.hpp>
@@ -102,21 +102,22 @@ inline void plot_energy(std::vector<double> &times, std::vector<std::pair<double
 }
 
 inline void plot_orbits(
-    std::vector<double> &fusion_probs,
-    std::function<double(double)> exp,
-    std::function<double(double)> gamma,
-    const size_t N = 500) {
-    std::vector<double> exp_vals, gamma_vals, X;
-    exp_vals.reserve(N);
-    gamma_vals.reserve(N);
-    X.reserve(N);
-    auto eigenX = Eigen::VectorXd::LinSpaced(N, 0, *std::max_element(fusion_probs.begin(), fusion_probs.end()));
-    for (const double x : eigenX) {
-        exp_vals.push_back(exp(x));
-        gamma_vals.push_back(gamma(x));
-        X.push_back(x);
-    }
-    json data = {{"FUSION_PROBS", fusion_probs}, {"EXP", exp_vals}, {"GAMMA", gamma_vals}, {"X", X}};
+    std::vector<double> &fusion_probs
+    // std::function<double(double)> exp,
+    // std::function<double(double)> gamma,
+    // const size_t N = 500
+) {
+    // std::vector<double> exp_vals, gamma_vals, X;
+    // exp_vals.reserve(N);
+    // gamma_vals.reserve(N);
+    // X.reserve(N);
+    // auto eigenX = Eigen::VectorXd::LinSpaced(N, 0, *std::max_element(fusion_probs.begin(), fusion_probs.end()));
+    // for (const double x : eigenX) {
+    //     exp_vals.push_back(exp(x));
+    //     gamma_vals.push_back(gamma(x));
+    //     X.push_back(x);
+    // }
+    json data = {{"FUSION_PROBS", fusion_probs}};
     std::ofstream plot_data(std::string(PROJECT_ROOT) + "/src/plots/plot_data.json");
     plot_data << data.dump();
     plot_data.close();
