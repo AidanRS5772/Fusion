@@ -1,7 +1,6 @@
 #ifndef MAKE_MESH_H
 #define MAKE_MESH_H
 
-#include "octo_tree.h"
 #include <Eigen/Dense>
 #include <algorithm>
 #include <cmath>
@@ -12,7 +11,6 @@
 #include <gmsh.h>
 #include <iomanip>
 #include <iostream>
-#include <memory>
 #include <nlohmann/json.hpp>
 #include <optional>
 #include <ostream>
@@ -31,7 +29,6 @@ class MakeMesh {
   public:
     std::string file_name;
     size_t hash;
-    std::unique_ptr<OctoTree> mesh_tree;
 
     MakeMesh(
         const int app_cnt_,
@@ -106,8 +103,7 @@ class MakeMesh {
             auto end = std::chrono::high_resolution_clock::now();
             auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
 
-            std::cout << "Mesh construction finished in " << static_cast<double>(duration.count()) / 1000 << " s"
-                      << std::endl;
+            std::cout << "Mesh construction finished in " << static_cast<double>(duration.count()) / 1000 << " s" << std::endl;
             std::cout << "Mesh Saved too: mesh_cache/" << file_name << std::endl;
         }
 
@@ -131,8 +127,8 @@ class MakeMesh {
         int geo_ellipse;
 
         Ellipse()
-            : start(Vector3d::Zero()), geo_start(-1), end(Vector3d::Zero()), geo_end(-1), center(Vector3d::Zero()),
-              geo_center(-1), major(Vector3d::Zero()), geo_major(-1), minor(Vector3d::Zero()), geo_ellipse(-1) {
+            : start(Vector3d::Zero()), geo_start(-1), end(Vector3d::Zero()), geo_end(-1), center(Vector3d::Zero()), geo_center(-1),
+              major(Vector3d::Zero()), geo_major(-1), minor(Vector3d::Zero()), geo_ellipse(-1) {
         }
 
         Ellipse(
@@ -146,8 +142,7 @@ class MakeMesh {
             std::optional<int> geo_end_ = std::nullopt,
             std::optional<int> geo_center_ = std::nullopt,
             std::optional<int> geo_major_ = std::nullopt)
-            : start(std::move(start_)), end(std::move(end_)), center(std::move(center_)), major(std::move(major_)),
-              minor(std::move(minor_)) {
+            : start(std::move(start_)), end(std::move(end_)), center(std::move(center_)), major(std::move(major_)), minor(std::move(minor_)) {
             if (geo_start_.has_value()) {
                 geo_start = geo_start_.value();
             } else {
@@ -224,19 +219,16 @@ class MakeMesh {
             const Vector3d major_vec = center + major * mesh_size;
             const int geo_M = geo::addPoint(major_vec.x(), major_vec.y(), major_vec.z(), mesh_size);
 
-            const Vector3d mid = ((p1 - center).normalized() + (p2 - center).normalized()).normalized() * radius +
-                                 center;
+            const Vector3d mid = ((p1 - center).normalized() + (p2 - center).normalized()).normalized() * radius + center;
             const int geo_mid = geo::addPoint(mid.x(), mid.y(), mid.z(), mesh_size);
 
             points[1] = inter1.end;
             geo_points[1] = inter1.geo_end;
-            curves[2] =
-                geo::addEllipseArc(inter1.geo_end, geo_c, geo_M, geo_mid, -1, normal.x(), normal.y(), normal.z());
+            curves[2] = geo::addEllipseArc(inter1.geo_end, geo_c, geo_M, geo_mid, -1, normal.x(), normal.y(), normal.z());
 
             points[2] = mid;
             geo_points[2] = geo_mid;
-            curves[3] =
-                geo::addEllipseArc(geo_mid, geo_c, geo_M, inter2.geo_end, -1, normal.x(), normal.y(), normal.z());
+            curves[3] = geo::addEllipseArc(geo_mid, geo_c, geo_M, inter2.geo_end, -1, normal.x(), normal.y(), normal.z());
 
             points[3] = inter2.end;
             geo_points[3] = inter2.geo_end;
@@ -264,13 +256,7 @@ class MakeMesh {
             std::array<std::pair<int, int>, 5> cons;
             std::array<int, 5> mids;
             for (size_t i = 0; i < 5; i++) {
-                auto [c1, c2, mid] = find_line_or_ellipse(
-                    mesh_size,
-                    radius,
-                    v1.points[i],
-                    v1.geo_points[i],
-                    v2.points[4 - i],
-                    v2.geo_points[4 - i]);
+                auto [c1, c2, mid] = find_line_or_ellipse(mesh_size, radius, v1.points[i], v1.geo_points[i], v2.points[4 - i], v2.geo_points[4 - i]);
                 cons[i] = std::pair<int, int>(c1, c2);
                 mids[i] = mid;
             }
@@ -281,10 +267,8 @@ class MakeMesh {
             }
 
             for (size_t i = 0; i < 5; i++) {
-                loops[2 * i] = geo::addCurveLoop(
-                    {v1.curves[i], cons[i].first, -mid_circs[i], -cons[(i + 4) % 5].first});
-                loops[2 * i + 1] = geo::addCurveLoop(
-                    {mid_circs[i], cons[i].second, v2.curves[(5 - i) % 5], -cons[(i + 4) % 5].second});
+                loops[2 * i] = geo::addCurveLoop({v1.curves[i], cons[i].first, -mid_circs[i], -cons[(i + 4) % 5].first});
+                loops[2 * i + 1] = geo::addCurveLoop({mid_circs[i], cons[i].second, v2.curves[(5 - i) % 5], -cons[(i + 4) % 5].second});
             }
         }
 
@@ -331,10 +315,8 @@ class MakeMesh {
                     "mid is not a radius away from the vertex");
                 const int geo_mid = geo::addPoint(mid.x(), mid.y(), mid.z(), mesh_size);
 
-                const int ell1 =
-                    geo::addEllipseArc(geo_p1, geo_c, geo_M, geo_mid, -1, normal.x(), normal.y(), normal.z());
-                const int ell2 =
-                    geo::addEllipseArc(geo_mid, geo_c, geo_M, geo_p2, -1, normal.x(), normal.y(), normal.z());
+                const int ell1 = geo::addEllipseArc(geo_p1, geo_c, geo_M, geo_mid, -1, normal.x(), normal.y(), normal.z());
+                const int ell2 = geo::addEllipseArc(geo_mid, geo_c, geo_M, geo_p2, -1, normal.x(), normal.y(), normal.z());
 
                 return {ell1, ell2, geo_mid};
             }
@@ -577,8 +559,7 @@ class MakeMesh {
                 }
 
                 for (size_t i = 0; i < n; i++) {
-                    const int loop =
-                        geo::addCurveLoop({v_curves[i].curves[0], cons[i], cons[(i + n - 1) % n]}, -1, true);
+                    const int loop = geo::addCurveLoop({v_curves[i].curves[0], cons[i], cons[(i + n - 1) % n]}, -1, true);
                     cathode_surfaces.push_back(geo::addSurfaceFilling({loop}));
                 }
             }
@@ -594,8 +575,7 @@ class MakeMesh {
             }
 
             for (size_t i = 0; i < n; i++) {
-                const int loop =
-                    geo::addCurveLoop({lines[i], v_curves[i].curves[2], v_curves[(i + 1) % n].curves[3]}, -1, true);
+                const int loop = geo::addCurveLoop({lines[i], v_curves[i].curves[2], v_curves[(i + 1) % n].curves[3]}, -1, true);
                 cathode_surfaces.push_back(geo::addSurfaceFilling({loop}));
             }
 
@@ -810,18 +790,17 @@ class MakeMesh {
         std::cout << "\n=== Mesh Statistics ===" << std::endl;
         std::cout << "\n--- Nodes ---" << std::endl;
         std::cout << "Total nodes: " << numNodes << std::endl;
-        std::cout << "Surface nodes: " << surfaceNodes.size() << " (" << std::fixed << std::setprecision(1)
-                  << nodeSurfaceProportion << "%)" << std::endl;
+        std::cout << "Surface nodes: " << surfaceNodes.size() << " (" << std::fixed << std::setprecision(1) << nodeSurfaceProportion << "%)"
+                  << std::endl;
 
         std::cout << "\n--- Edges ---" << std::endl;
         std::cout << "Total edges: " << allEdges.size() << std::endl;
-        std::cout << "Surface edges: " << surfaceEdges.size() << " (" << std::fixed << std::setprecision(1)
-                  << edgeSurfaceProportion << "%)" << std::endl;
+        std::cout << "Surface edges: " << surfaceEdges.size() << " (" << std::fixed << std::setprecision(1) << edgeSurfaceProportion << "%)"
+                  << std::endl;
 
         std::cout << "\n--- Elements ---" << std::endl;
         std::cout << "Tetrahedra: " << numTets << std::endl;
-        std::cout << "Triangles: " << numTriangles << " (" << std::fixed << std::setprecision(1)
-                  << cellSurfaceProportion << "%)" << std::endl;
+        std::cout << "Triangles: " << numTriangles << " (" << std::fixed << std::setprecision(1) << cellSurfaceProportion << "%)" << std::endl;
 
         std::cout << std::resetiosflags(std::ios::fixed) << std::setprecision(16);
 
@@ -833,8 +812,7 @@ class MakeMesh {
             gmsh::model::getPhysicalName(dim, tag, name);
             std::vector<int> entities;
             gmsh::model::getEntitiesForPhysicalGroup(dim, tag, entities);
-            std::cout << "Physical group '" << name << "' (dim=" << dim << ", tag=" << tag << "): " << entities.size()
-                      << " entities" << std::endl;
+            std::cout << "Physical group '" << name << "' (dim=" << dim << ", tag=" << tag << "): " << entities.size() << " entities" << std::endl;
         }
         std::cout << "======================\n" << std::endl;
     }
@@ -849,10 +827,7 @@ class MakeMesh {
         std::vector<Vector3d> mesh_nodes;
 
         for (size_t i = 0; i < nodes.size(); i++) {
-            const Vector3d c(
-                cords[3 * i] * cathode_radius,
-                cords[3 * i + 1] * cathode_radius,
-                cords[3 * i + 2] * cathode_radius);
+            const Vector3d c(cords[3 * i] * cathode_radius, cords[3 * i + 1] * cathode_radius, cords[3 * i + 2] * cathode_radius);
 
             mesh_nodes.push_back(c);
             X[i] = c.x();
@@ -864,23 +839,15 @@ class MakeMesh {
         std::vector<int> cathode_entitites;
         gmsh::model::getEntitiesForPhysicalGroup(2, 1, cathode_entitites);
         std::vector<size_t> I, J, K;
-        std::vector<std::array<size_t, 3>> mesh_triangles;
         for (const auto &entity : cathode_entitites) {
             std::vector<size_t> elements, e_nodes;
             gmsh::model::mesh::getElementsByType(2, elements, e_nodes, entity);
             for (size_t i = 0; i < elements.size(); i++) {
-                std::array<size_t, 3> tri = {
-                    node_index[e_nodes[3 * i]],
-                    node_index[e_nodes[3 * i + 1]],
-                    node_index[e_nodes[3 * i + 2]]};
-                mesh_triangles.push_back(tri);
-                I.push_back(tri[0]);
-                J.push_back(tri[1]);
-                K.push_back(tri[2]);
+                I.push_back(node_index[e_nodes[3 * i]]);
+                J.push_back(node_index[e_nodes[3 * i + 1]]);
+                K.push_back(node_index[e_nodes[3 * i + 2]]);
             }
         }
-
-        mesh_tree = std::make_unique<OctoTree>(mesh_nodes, mesh_triangles, cathode_radius);
 
         std::ifstream meta_in(std::string(PROJECT_ROOT) + "/mesh_meta_data.json");
         ordered_json meta_data = ordered_json::parse(meta_in);

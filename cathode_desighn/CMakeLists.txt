@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.26)
 project(Fusion VERSION 1.0)
-set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -29,29 +29,9 @@ endif()
 find_package(Eigen3 3.3 REQUIRED)
 find_package(nlohmann_json 3.10.5 REQUIRED)
 
-# SELECT CORRECT DEAL.II BASED ON BUILD TYPE
-if(NOT CMAKE_BUILD_TYPE)
-    message(FATAL_ERROR "CMAKE_BUILD_TYPE must be set to Debug or Release")
-endif()
 
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    set(DEAL_II_DIR "/Users/aidansgarlato/dealii-debug")
-    message(STATUS "Using Debug build of deal.II from ${DEAL_II_DIR}")
-elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
-    set(DEAL_II_DIR "/Users/aidansgarlato/dealii-release-optimized")
-    message(STATUS "Using Release build of deal.II from ${DEAL_II_DIR}")
-else()
-    message(FATAL_ERROR "CMAKE_BUILD_TYPE must be Debug or Release, not ${CMAKE_BUILD_TYPE}")
-endif()
-
-# Find deal.II - only once!
-find_package(deal.II 9.5.0 REQUIRED HINTS ${DEAL_II_DIR} NO_DEFAULT_PATH)
-
-# Verify we got the expected build type
-if(NOT DEAL_II_BUILD_TYPE STREQUAL CMAKE_BUILD_TYPE)
-    message(WARNING "Expected ${CMAKE_BUILD_TYPE} deal.II but found ${DEAL_II_BUILD_TYPE}")
-endif()
-
+set(CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/candi/dealii" ${CMAKE_PREFIX_PATH})
+find_package(deal.II 9.7.0 REQUIRED)
 DEAL_II_INITIALIZE_CACHED_VARIABLES()
 
 # GMSH configuration
@@ -135,7 +115,6 @@ endif()
 message(STATUS "")
 message(STATUS "Build configuration:")
 message(STATUS "  Build type: ${CMAKE_BUILD_TYPE}")
-message(STATUS "  deal.II type: ${DEAL_II_BUILD_TYPE}")
 message(STATUS "  Output: ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}/")
 message(STATUS "")
 message(STATUS "To build different configurations:")

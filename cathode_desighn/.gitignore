@@ -1,3 +1,6 @@
 build-debug/
 build-release/
-mesh_cache/
+mesh_cache/*
+.clang-format
+.clangd
+candi/

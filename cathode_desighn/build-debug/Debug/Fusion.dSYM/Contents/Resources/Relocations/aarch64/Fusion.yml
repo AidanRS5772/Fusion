@@ -1,5 +1,0 @@
----
-triple:          'arm64-apple-darwin'
-binary-path:     '/Users/aidansgarlato/Programing/Julia/Fusion/cathode_desighn/build-debug/Debug/Fusion'
-relocations:     []
-...

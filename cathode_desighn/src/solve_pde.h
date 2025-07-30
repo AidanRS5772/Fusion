@@ -1,7 +1,6 @@
 #ifndef SOLVE_PDE_H
 #define SOLVE_PDE_H
 
-#include "octo_tree.h"
 #include <Eigen/Dense>
 #include <cstddef>
 #include <cstdlib>
