@@ -1,7 +1,7 @@
-build-debug/
-build-release/
-mesh_cache/*
-.clang-format
-.clangd
-candi/
+cathode_desighn/build-debug/
+cathode_desighn/build-release/
+cathode_desighn/mesh_cache/*
+cathode_desighn/.clang-format
+cathode_desighn/.clangd
+cathode_desighn/candi/
 .DS_Store
