@@ -4,3 +4,4 @@ mesh_cache/*
 .clang-format
 .clangd
 candi/
+.DS_Store
