@@ -2,34 +2,35 @@
 #define PLOT_H
 
 #include <Eigen/Dense>
-// #include <algorithm>
 #include <cstdlib>
 #include <fstream>
 #include <nlohmann/json.hpp>
 #include <string>
 
-using Vector6d = Eigen::Vector<double, 6>;
 using Vector3d = Eigen::Vector3d;
 using json = nlohmann::json;
 using V_func = std::function<std::optional<double>(const Vector3d &)>;
 using E_func = std::function<std::optional<Vector3d>(const Vector3d &)>;
 
 inline void plot_mesh(const size_t hash) {
-    std::string cmd = "node " + std::string(PROJECT_ROOT) + "/src/plots/plot.js 0 " + std::string(PROJECT_ROOT) + " " + std::to_string(hash);
+    std::string cmd = "node " + std::string(PROJECT_ROOT) + "/src/plots/plot.js 0 "
+                      + std::string(PROJECT_ROOT) + " " + std::to_string(hash);
     std::system(cmd.c_str());
 }
 
-inline void plot_mesh_path(const size_t hash, const std::vector<Vector6d> &path) {
+inline void plot_mesh_path(const size_t hash,
+                           const std::vector<std::pair<Vector3d, Vector3d>> &states,
+                           const double mass) {
     std::vector<double> X, Y, Z, S;
-    X.reserve(path.size());
-    Y.reserve(path.size());
-    Z.reserve(path.size());
-    S.reserve(path.size());
-    for (const auto &p : path) {
-        X.push_back(p[0]);
-        Y.push_back(p[1]);
-        Z.push_back(p[2]);
-        S.push_back(p.tail<3>().norm());
+    X.reserve(states.size());
+    Y.reserve(states.size());
+    Z.reserve(states.size());
+    S.reserve(states.size());
+    for (const auto &[q, p] : states) {
+        X.push_back(q[0]);
+        Y.push_back(q[1]);
+        Z.push_back(q[2]);
+        S.push_back(p.norm() / (2 * mass));
     }
 
     json data = {{"X", X}, {"Y", Y}, {"Z", Z}, {"S", S}};
@@ -37,11 +38,15 @@ inline void plot_mesh_path(const size_t hash, const std::vector<Vector6d> &path)
     plot_data << data.dump();
     plot_data.close();
 
-    std::string cmd = "node " + std::string(PROJECT_ROOT) + "/src/plots/plot.js 1 " + std::string(PROJECT_ROOT) + " " + std::to_string(hash);
+    std::string cmd = "node " + std::string(PROJECT_ROOT) + "/src/plots/plot.js 1 "
+                      + std::string(PROJECT_ROOT) + " " + std::to_string(hash);
     std::system(cmd.c_str());
 }
 
-inline void plot_mesh_electric_feild(const size_t hash, E_func E_feild, const double L, const size_t N = 20) {
+inline void plot_mesh_electric_feild(const size_t hash,
+                                     E_func E_feild,
+                                     const double L,
+                                     const size_t N = 20) {
     std::vector<double> X, Y, Z, U, V, W, M;
     X.reserve(N * N * N / 2);
     Y.reserve(N * N * N / 2);
@@ -77,11 +82,13 @@ inline void plot_mesh_electric_feild(const size_t hash, E_func E_feild, const do
     plot_data << data.dump();
     plot_data.close();
 
-    std::string cmd = "node " + std::string(PROJECT_ROOT) + "/src/plots/plot.js 2 " + std::string(PROJECT_ROOT) + " " + std::to_string(hash);
+    std::string cmd = "node " + std::string(PROJECT_ROOT) + "/src/plots/plot.js 2 "
+                      + std::string(PROJECT_ROOT) + " " + std::to_string(hash);
     std::system(cmd.c_str());
 }
 
-inline void plot_energy(std::vector<double> &times, std::vector<std::pair<double, double>> &energies) {
+inline void plot_energy(std::vector<double> &times,
+                        std::vector<std::pair<double, double>> &energies) {
     std::vector<double> KE, PE, E;
     KE.reserve(energies.size());
     PE.reserve(energies.size());
@@ -97,22 +104,22 @@ inline void plot_energy(std::vector<double> &times, std::vector<std::pair<double
     plot_data << data.dump();
     plot_data.close();
 
-    std::string cmd = "node " + std::string(PROJECT_ROOT) + "/src/plots/plot.js 3 " + std::string(PROJECT_ROOT);
+    std::string cmd =
+        "node " + std::string(PROJECT_ROOT) + "/src/plots/plot.js 3 " + std::string(PROJECT_ROOT);
     std::system(cmd.c_str());
 }
 
-inline void plot_orbits(
-    std::vector<double> &fusion_probs
-    // std::function<double(double)> exp,
-    // std::function<double(double)> gamma,
-    // const size_t N = 500
+inline void plot_orbits(std::vector<double> &fusion_probs
+                        // std::function<double(double)> exp,
+                        // std::function<double(double)> gamma,
+                        // const size_t N = 500
 ) {
     // std::vector<double> exp_vals, gamma_vals, X;
     // exp_vals.reserve(N);
     // gamma_vals.reserve(N);
     // X.reserve(N);
-    // auto eigenX = Eigen::VectorXd::LinSpaced(N, 0, *std::max_element(fusion_probs.begin(), fusion_probs.end()));
-    // for (const double x : eigenX) {
+    // auto eigenX = Eigen::VectorXd::LinSpaced(N, 0, *std::max_element(fusion_probs.begin(),
+    // fusion_probs.end())); for (const double x : eigenX) {
     //     exp_vals.push_back(exp(x));
     //     gamma_vals.push_back(gamma(x));
     //     X.push_back(x);
@@ -121,7 +128,8 @@ inline void plot_orbits(
     std::ofstream plot_data(std::string(PROJECT_ROOT) + "/src/plots/plot_data.json");
     plot_data << data.dump();
     plot_data.close();
-    std::string cmd = "node " + std::string(PROJECT_ROOT) + "/src/plots/plot.js 4 " + std::string(PROJECT_ROOT);
+    std::string cmd =
+        "node " + std::string(PROJECT_ROOT) + "/src/plots/plot.js 4 " + std::string(PROJECT_ROOT);
     std::system(cmd.c_str());
 }
 
