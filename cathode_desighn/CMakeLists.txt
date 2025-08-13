@@ -28,7 +28,7 @@ endif()
 # Find packages
 find_package(Eigen3 3.3 REQUIRED)
 find_package(nlohmann_json 3.10.5 REQUIRED)
-
+find_package(dlib REQUIRED)
 
 set(CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/candi/dealii" ${CMAKE_PREFIX_PATH})
 find_package(deal.II 9.7.0 REQUIRED)
@@ -64,7 +64,6 @@ else()
         EIGEN_NO_DEBUG
         EIGEN_FAST_MATH=1
         EIGEN_USE_BLAS
-        EIGEN_USE_LAPACKE
         PROJECT_ROOT="${CMAKE_SOURCE_DIR}"
     )
     set_property(TARGET Fusion PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
@@ -94,6 +93,7 @@ target_link_libraries(Fusion
     ${LAPACKE_LIB}
     Eigen3::Eigen
     nlohmann_json::nlohmann_json
+    dlib::dlib
 )
 
 # Link with Accelerate framework on macOS
