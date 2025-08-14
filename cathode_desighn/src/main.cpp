@@ -5,6 +5,7 @@
 #include <Eigen/Dense>
 #include <algorithm>
 #include <boost/math/quadrature/exp_sinh.hpp>
+#include <chrono>
 #include <cmath>
 #include <deal.II/lac/lapack_support.h>
 #include <dlib/optimization.h>
@@ -18,6 +19,7 @@
 #include <numeric>
 #include <ostream>
 #include <random>
+#include <ratio>
 #include <stdexcept>
 #include <string>
 
@@ -27,7 +29,7 @@ constexpr double wire_radius = .1;		// [cm]
 constexpr double voltage = 1;			// [MV]
 constexpr double mD = 2.08690083;		// [MeV][cm/ns]^-2 mass of a deuteron (m = E/c^2)
 constexpr double temp = 86.17333262;	// [µeV] room temprature energy
-constexpr size_t mc_sample_size = 100; // number of monte carlo samples
+constexpr size_t mc_sample_size = 1000; // number of monte carlo samples
 
 constexpr double K_exp(const double r, const double R) {
 	return voltage * (1 / r - 1.5 * (r + R) / (r * r + r * R + R * R)) / (1 / r - 1 / R) + 1.5 * temp * 1e-6;
@@ -164,7 +166,7 @@ pareto_params fit_pareto(const std::vector<double> &X) {
 				sum += std::log(1 + z);
 			}
 		}
-		return (1 + 1 / p(1)) * sum; 
+		return (1 + 1 / p(1)) * sum - std::log(p(0)) * X.size();
 	};
 	double _ = dlib::find_min_box_constrained(dlib::bfgs_search_strategy(), dlib::objective_delta_stop_strategy(), mle,
 											  dlib::derivative(mle), params, lower, upper);
@@ -337,6 +339,26 @@ class JSONWriter {
 	}
 };
 
+std::string format_duration(double seconds) {
+	std::ostringstream oss;
+	oss << std::fixed << std::setprecision(1);
+
+	if (seconds < 60) {
+		oss << seconds << " s";
+	} else if (seconds < 3600) {
+		int mins = static_cast<int>(seconds / 60);
+		double secs = seconds - mins * 60;
+		oss << mins << " m " << secs << " s";
+	} else {
+		int hours = static_cast<int>(seconds / 3600);
+		int mins = static_cast<int>((seconds - hours * 3600) / 60);
+		double secs = seconds - hours * 3600 - mins * 60;
+		oss << hours << " h " << mins << " min " << secs << " s";
+	}
+
+	return oss.str();
+}
+
 void collect_data(const size_t app_cnt, const std::function<double(double)> fprob) {
 	auto mesh = MakeMesh(app_cnt, anode_radius, cathode_radius, wire_radius, 4, 24);
 	auto pde_sol = SolvePDE(mesh.file_name, voltage, cathode_radius);
@@ -347,12 +369,17 @@ void collect_data(const size_t app_cnt, const std::function<double(double)> fpro
 	std::vector<double> fusion_probs;
 	std::vector<size_t> orbit_cnts;
 	fusion_probs.reserve(mc_sample_size);
-	std::vector<std::pair<Vector3d, Vector3d>> eternal_states;
 	size_t zero_orbit_cnt = 0;
 
 	size_t completed = 0;
-	const size_t update_interval = std::max(1UL, mc_sample_size / 1000);
+	const size_t update_interval = std::max(1UL, mc_sample_size / 100);
+
+	const auto start_time = std::chrono::high_resolution_clock::now();
 	std::cout << std::endl;
+	std::cout << "\n\n";		 // reserve two lines for the HUD
+	std::cout << "\033[2A\0337"; // save cursor
+	std::cout << std::flush;
+
 	for (auto const &[q, p] : init_states) {
 		const auto path_sol = SolvePath(pde_sol, mD, q, p);
 		if (path_sol.sucsessful) {
@@ -368,9 +395,17 @@ void collect_data(const size_t app_cnt, const std::function<double(double)> fpro
 
 		completed++;
 		if (completed % update_interval == 0) {
-			double percent = 100.0 * completed / mc_sample_size;
-			std::cout << "\rProgress: " << completed << "/" << mc_sample_size << " (" << std::fixed
-					  << std::setprecision(1) << percent << "%)" << std::flush;
+			const auto cur_time = std::chrono::high_resolution_clock::now();
+			const auto duration = std::chrono::duration_cast<std::chrono::microseconds>(cur_time - start_time);
+			const double avg_ms = static_cast<double>(duration.count()) / (1000 * completed);
+			const double percent = 100.0 * completed / mc_sample_size;
+			const double eta = (mc_sample_size - completed) * avg_ms / 1000;
+			std::cout << "\0338"
+					  << "Progress: " << completed << "/" << mc_sample_size << " (" << std::fixed
+					  << std::setprecision(1) << percent << "%)\n"
+					  << "\x1b[2K\r"
+					  << "Average Execution: " << std::fixed << std::setprecision(1) << avg_ms << " ms "
+					  << "(ETA: " << format_duration(eta) << ")" << std::flush;
 		}
 	}
 
@@ -504,8 +539,41 @@ template <size_t T> void Monte_Carlo_Simulation(const size_t max_app_cnt) {
 }
 
 int main() {
-	//	Monte_Carlo_Simulation<4>(362);
-	const auto fp = make_fusion_probability();
-	collect_data(6, fp);
+	constexpr size_t app_cnt = 6;
+	constexpr size_t N = 250;
+	constexpr size_t warm_up = 5;
+	auto mesh = MakeMesh(app_cnt, anode_radius, cathode_radius, wire_radius);
+	auto pde_sol = SolvePDE(mesh.file_name, voltage, cathode_radius);
+	auto init_states = make_init_states<N + warm_up>(5772);
+
+	double max_dt = 0.5;
+	for (size_t i = 0; i < 6; i++) {
+		double sum = 0;
+		double sqr_sum = 0;
+		size_t cnt = 0;
+		std::cout << "\nmax_dt = " << max_dt << std::endl;
+		for (const auto &[q, p] : init_states) {
+			const auto start = std::chrono::steady_clock::now();
+
+			const auto _ = SolvePath(pde_sol, mD, q, p, max_dt);
+
+			const auto end = std::chrono::steady_clock::now();
+			const auto dur = std::chrono::duration<double, std::milli>(end - start).count();
+
+			cnt++;
+			if (cnt > warm_up) {
+				sum += dur;
+				sqr_sum += dur * dur;
+				std::cout << "\rProgress: " << cnt - warm_up << "/" << N << std::flush;
+			} else {
+				std::cout << "\rWarm Up" << std::flush;
+			}
+		}
+
+		std::cout << "\33[2K\rAverage: " << sum / N << " ms" << std::endl;
+		std::cout << "Std Dev: " << std::sqrt((sqr_sum - sum * sum / N) / (N - 1)) << " ms" << std::endl;
+		max_dt /= 2;
+	}
+
 	return 0;
 }

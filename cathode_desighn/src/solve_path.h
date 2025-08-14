@@ -6,6 +6,7 @@
 #include <boost/numeric/odeint.hpp>
 #include <boost/numeric/odeint/stepper/symplectic_euler.hpp>
 #include <boost/numeric/odeint/stepper/symplectic_rkn_sb3a_m4_mclachlan.hpp>
+#include <deal.II/lac/vector.h>
 #include <optional>
 #include <stdexcept>
 #include <utility>
@@ -48,7 +49,7 @@ class SolvePath {
 				KE.push_back(ke.value());
 				PE.push_back(KE.back() + PE.back() - ke.value());
 			} else if (!ke.has_value() && pe.has_value()) {
-				KE.push_back(KE.back() + PE.back() - ke.value());
+				KE.push_back(KE.back() + PE.back() - pe.value());
 				PE.push_back(pe.value());
 			} else {
 				KE.push_back(KE.back());
@@ -66,20 +67,11 @@ class SolvePath {
 	std::optional<double> prev_prev_norm;
 	std::optional<double> prev_norm;
 
-	double H(const Vector3d &q, const Vector3d &p) {
-		auto opt_V = PDE_SOL.V(q);
-		if (!opt_V.has_value()) {
-			throw std::runtime_error("Out of Bounds Eval");
-		}
-		return opt_V.value() + p.squaredNorm() / (2 * mass);
-	}
-
-	void correct_energy(std::pair<Vector3d, Vector3d> &state) {
+	void correct_energy(std::pair<Vector3d, Vector3d> &state, double &V, Vector3d &E) {
 		constexpr double rel_energy_tol = 1e-5;
 		constexpr size_t max_iter = 10;
 		const double abs_energy_tol = std::abs(rel_energy_tol * init_energy);
 		auto [q, p] = state;
-		auto [V, E] = PDE_SOL.VE(state.first).value();
 		for (size_t i = 0; i < max_iter; i++) {
 			const double p2 = p.squaredNorm();
 			const double energy_diff = p2 / (2 * mass) + V - init_energy;
@@ -114,17 +106,23 @@ class SolvePath {
 
 	void observe(std::pair<Vector3d, Vector3d> &state, const double t) {
 		constexpr double ENERGY_REL_TOL = 0.05;
-		constexpr size_t ENERGY_CORECTION_FR = 50;
+		constexpr size_t ENERGY_CORECTION_FR = 100;
 		if (energy_correction_cnt % ENERGY_CORECTION_FR == 0) {
-			const double energy = H(state.first, state.second);
-			const double energy_rel_err = std::abs(energy / init_energy - 1);
-			if (energy_rel_err > ENERGY_REL_TOL) {
-				correct_energy(state);
+			auto VE_opt = PDE_SOL.VE(state.first);
+			if (VE_opt.has_value()) {
+				auto [V, E] = VE_opt.value();
+				const double energy = V + state.second.squaredNorm() / (2 * mass);
+				const double energy_rel_err = std::abs(energy / init_energy - 1);
+				if (energy_rel_err > ENERGY_REL_TOL) {
+					correct_energy(state, V, E);
+				}
+			} else {
+				return;
 			}
 		}
 		energy_correction_cnt++;
 
-		double cur_norm = state.first.norm();
+		const double cur_norm = state.first.norm();
 		if (prev_norm.has_value() && prev_prev_norm.has_value()) {
 			if (cur_norm < prev_norm.value() && prev_prev_norm.value() < prev_norm.value()) {
 				orbit_cnt++;
@@ -138,50 +136,53 @@ class SolvePath {
 		}
 	}
 
-	void Dq(const Vector3d &p, Vector3d &dq) { dq = p / mass; }
-
-	void Dp(const Vector3d &q, Vector3d &dp) {
-		const auto E = PDE_SOL.E(q);
-		if (!E.has_value()) {
-			throw std::runtime_error("Out of Bounds Eval");
-		}
-		dp = E.value();
-	}
-
 	void find_path(const Vector3d &init_q, const Vector3d &init_p) {
 		constexpr int MAX_RETRY = 5;
-		constexpr double STEP_REDUCTION = 0.25;
+		constexpr double STEP_REDUCTION = 0.5;
+		constexpr double STEP_INCREASE = 1.5;
+		constexpr double MIN_DT = 1e-3;
 
 		double t = 0.0;
 		double dt = max_dt;
 		auto state = std::make_pair(init_q, init_p);
-		auto system = std::make_pair([this](const Vector3d &p, Vector3d &dq) { Dq(p, dq); },
-									 [this](const Vector3d &q, Vector3d &dp) { Dp(q, dp); });
+
+		bool oob = false;
+		auto system = std::make_pair([&](auto const &p, auto &dq) { dq = p / mass; },
+									 [&](auto const &q, auto &dp) {
+										 auto e = PDE_SOL.E(q);
+										 if (!e) {
+											 oob = true;
+											 dp.setZero();
+										 } else
+											 dp = *e;
+									 });
 
 		odeint::symplectic_rkn_sb3a_m4_mclachlan<Vector3d> stepper;
-		while (true) {
-			const auto cur_state = state;
-			dt = max_dt;
-			for (int retry_cnt = 0; retry_cnt <= MAX_RETRY; retry_cnt++) {
-				try {
+		try {
+			while (true) {
+				oob = false;
+				const auto cur_state = state;
+				for (int retry_cnt = 0; retry_cnt <= MAX_RETRY; retry_cnt++) {
 					stepper.do_step(system, state, t, dt);
-					break;
-				} catch (std::exception &e) {
-					if (std::string(e.what()) == "Out of Bounds Eval") {
+					if (!oob) {
+						dt = std::min(dt * STEP_INCREASE, max_dt);
+						break;
+					} else {
 						if (retry_cnt == MAX_RETRY) {
 							sucsessful = true;
 							return;
 						} else {
 							state = cur_state;
-							dt *= STEP_REDUCTION;
+							dt = std::min(dt * STEP_REDUCTION, MIN_DT);
 						}
-					} else {
-						return;
 					}
 				}
+				t += dt;
+				observe(state, t);
 			}
-			t += dt;
-			observe(state, t);
+		} catch (std::runtime_error &e) {
+			sucsessful = false;
+			std::cerr << "Runtime Erorr: " << e.what() << std::endl;
 		}
 	}
 
