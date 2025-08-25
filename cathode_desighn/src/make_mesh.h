@@ -30,9 +30,14 @@ class MakeMesh {
 	std::string file_name;
 	size_t hash;
 
-	MakeMesh(const int app_cnt_, const double anode_radius_, const double cathode_radius_, const double wire_radius_,
-			 const int cathode_resolution = 4, const int anode_resolution = 24, const bool print = false)
-		: app_cnt(app_cnt_), anode_radius(anode_radius_), cathode_radius(cathode_radius_), wire_radius(wire_radius_) {
+	MakeMesh(const int app_cnt_,
+	         const double anode_radius_,
+	         const double cathode_radius_,
+	         const double wire_radius_,
+	         const int cathode_resolution = 4,
+	         const int anode_resolution = 24,
+	         const bool print = false)
+	    : app_cnt(app_cnt_), anode_radius(anode_radius_), cathode_radius(cathode_radius_), wire_radius(wire_radius_) {
 
 		scaled_wire_radius = wire_radius / cathode_radius;
 		scaled_anode_radius = anode_radius / cathode_radius;
@@ -47,7 +52,7 @@ class MakeMesh {
 			if (print) std::cout << "\nMesh Found in Cache" << std::endl;
 			gmsh::open(std::string(PROJECT_ROOT) + "/mesh_cache/" + file_name);
 		} else {
-			std::cout << "\nBegining mesh contruction..." << std::endl;
+			if (print) std::cout << "\nBegining mesh contruction..." << std::endl;
 
 			auto start = std::chrono::high_resolution_clock::now();
 
@@ -98,9 +103,7 @@ class MakeMesh {
 			auto end = std::chrono::high_resolution_clock::now();
 			auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
 
-			if (print)
-				std::cout << "Mesh construction finished in " << static_cast<double>(duration.count()) / 1000 << " s"
-						  << std::endl;
+			if (print) std::cout << "Mesh construction finished in " << static_cast<double>(duration.count()) / 1000 << " s" << std::endl;
 			if (print) std::cout << "Mesh Saved too: mesh_cache/" << file_name << std::endl;
 		}
 
@@ -124,15 +127,20 @@ class MakeMesh {
 		int geo_ellipse;
 
 		Ellipse()
-			: start(Vector3d::Zero()), geo_start(-1), end(Vector3d::Zero()), geo_end(-1), center(Vector3d::Zero()),
-			  geo_center(-1), major(Vector3d::Zero()), geo_major(-1), minor(Vector3d::Zero()), geo_ellipse(-1) {}
+		    : start(Vector3d::Zero()), geo_start(-1), end(Vector3d::Zero()), geo_end(-1), center(Vector3d::Zero()), geo_center(-1),
+		      major(Vector3d::Zero()), geo_major(-1), minor(Vector3d::Zero()), geo_ellipse(-1) {}
 
-		Ellipse(const double mesh_size, Vector3d start_, Vector3d end_, Vector3d center_, Vector3d major_,
-				Vector3d minor_, std::optional<int> geo_start_ = std::nullopt,
-				std::optional<int> geo_end_ = std::nullopt, std::optional<int> geo_center_ = std::nullopt,
-				std::optional<int> geo_major_ = std::nullopt)
-			: start(std::move(start_)), end(std::move(end_)), center(std::move(center_)), major(std::move(major_)),
-			  minor(std::move(minor_)) {
+		Ellipse(const double mesh_size,
+		        Vector3d start_,
+		        Vector3d end_,
+		        Vector3d center_,
+		        Vector3d major_,
+		        Vector3d minor_,
+		        std::optional<int> geo_start_ = std::nullopt,
+		        std::optional<int> geo_end_ = std::nullopt,
+		        std::optional<int> geo_center_ = std::nullopt,
+		        std::optional<int> geo_major_ = std::nullopt)
+		    : start(std::move(start_)), end(std::move(end_)), center(std::move(center_)), major(std::move(major_)), minor(std::move(minor_)) {
 			if (geo_start_.has_value()) {
 				geo_start = geo_start_.value();
 			} else {
@@ -177,9 +185,14 @@ class MakeMesh {
 
 		VertexCurves() = default;
 
-		VertexCurves(const double mesh_size, const double radius, const Vector3d &axis, const Ellipse &inter1,
-					 const Ellipse &inter2, Vector3d vertex_, int geo_vertex_)
-			: vertex(std::move(vertex_)), geo_vertex(geo_vertex_) {
+		VertexCurves(const double mesh_size,
+		             const double radius,
+		             const Vector3d &axis,
+		             const Ellipse &inter1,
+		             const Ellipse &inter2,
+		             Vector3d vertex_,
+		             int geo_vertex_)
+		    : vertex(std::move(vertex_)), geo_vertex(geo_vertex_) {
 			points[4] = inter2.start;
 			geo_points[4] = inter2.geo_start;
 			curves[0] = geo::addCircleArc(inter2.geo_start, geo_vertex, inter1.geo_start);
@@ -203,19 +216,16 @@ class MakeMesh {
 			const Vector3d major_vec = center + major * mesh_size;
 			const int geo_M = geo::addPoint(major_vec.x(), major_vec.y(), major_vec.z(), mesh_size);
 
-			const Vector3d mid =
-				((p1 - center).normalized() + (p2 - center).normalized()).normalized() * radius + center;
+			const Vector3d mid = ((p1 - center).normalized() + (p2 - center).normalized()).normalized() * radius + center;
 			const int geo_mid = geo::addPoint(mid.x(), mid.y(), mid.z(), mesh_size);
 
 			points[1] = inter1.end;
 			geo_points[1] = inter1.geo_end;
-			curves[2] =
-				geo::addEllipseArc(inter1.geo_end, geo_c, geo_M, geo_mid, -1, normal.x(), normal.y(), normal.z());
+			curves[2] = geo::addEllipseArc(inter1.geo_end, geo_c, geo_M, geo_mid, -1, normal.x(), normal.y(), normal.z());
 
 			points[2] = mid;
 			geo_points[2] = geo_mid;
-			curves[3] =
-				geo::addEllipseArc(geo_mid, geo_c, geo_M, inter2.geo_end, -1, normal.x(), normal.y(), normal.z());
+			curves[3] = geo::addEllipseArc(geo_mid, geo_c, geo_M, inter2.geo_end, -1, normal.x(), normal.y(), normal.z());
 
 			points[3] = inter2.end;
 			geo_points[3] = inter2.geo_end;
@@ -243,8 +253,7 @@ class MakeMesh {
 			std::array<std::pair<int, int>, 5> cons;
 			std::array<int, 5> mids;
 			for (size_t i = 0; i < 5; i++) {
-				auto [c1, c2, mid] = find_line_or_ellipse(mesh_size, radius, v1.points[i], v1.geo_points[i],
-														  v2.points[4 - i], v2.geo_points[4 - i]);
+				auto [c1, c2, mid] = find_line_or_ellipse(mesh_size, radius, v1.points[i], v1.geo_points[i], v2.points[4 - i], v2.geo_points[4 - i]);
 				cons[i] = std::pair<int, int>(c1, c2);
 				mids[i] = mid;
 			}
@@ -255,23 +264,20 @@ class MakeMesh {
 			}
 
 			for (size_t i = 0; i < 5; i++) {
-				loops[2 * i] =
-					geo::addCurveLoop({v1.curves[i], cons[i].first, -mid_circs[i], -cons[(i + 4) % 5].first});
-				loops[2 * i + 1] = geo::addCurveLoop(
-					{mid_circs[i], cons[i].second, v2.curves[(5 - i) % 5], -cons[(i + 4) % 5].second});
+				loops[2 * i] = geo::addCurveLoop({v1.curves[i], cons[i].first, -mid_circs[i], -cons[(i + 4) % 5].first});
+				loops[2 * i + 1] = geo::addCurveLoop({mid_circs[i], cons[i].second, v2.curves[(5 - i) % 5], -cons[(i + 4) % 5].second});
 			}
 		}
 
 	  private:
-		std::tuple<int, int, int> find_line_or_ellipse(const double mesh_size, const double radius, Vector3d p1,
-													   int geo_p1, Vector3d p2, int geo_p2,
-													   const double thresh = 1e-6) {
+		std::tuple<int, int, int> find_line_or_ellipse(
+		    const double mesh_size, const double radius, Vector3d p1, int geo_p1, Vector3d p2, int geo_p2, const double thresh = 1e-6) {
 			const Vector3d l = (p2 - p1).normalized();
 			if (l.cross(axis).norm() < thresh) {
 				const Vector3d p = (p1 + p2) / 2;
 				const Vector3d mid = p + ((vertex - p).dot(axis) / l.dot(axis)) * l;
-				assert(std::abs((mid - vertex).norm() - radius) < thresh &&
-					   std::abs((mid - vertex).dot(axis)) < thresh && "mid is not a radius away from the vertex");
+				assert(std::abs((mid - vertex).norm() - radius) < thresh && std::abs((mid - vertex).dot(axis)) < thresh
+				       && "mid is not a radius away from the vertex");
 
 				const int geo_mid = geo::addPoint(mid.x(), mid.y(), mid.z(), mesh_size);
 				const int line1 = geo::addLine(geo_p1, geo_mid);
@@ -294,14 +300,12 @@ class MakeMesh {
 
 				const double k = -tm / major.dot(axis);
 				Vector3d mid = center + major * k - minor * std::sqrt(1 - k * k);
-				assert(std::abs((mid - vertex).norm() - radius) < thresh &&
-					   std::abs((mid - vertex).dot(axis)) < thresh && "mid is not a radius away from the vertex");
+				assert(std::abs((mid - vertex).norm() - radius) < thresh && std::abs((mid - vertex).dot(axis)) < thresh
+				       && "mid is not a radius away from the vertex");
 				const int geo_mid = geo::addPoint(mid.x(), mid.y(), mid.z(), mesh_size);
 
-				const int ell1 =
-					geo::addEllipseArc(geo_p1, geo_c, geo_M, geo_mid, -1, normal.x(), normal.y(), normal.z());
-				const int ell2 =
-					geo::addEllipseArc(geo_mid, geo_c, geo_M, geo_p2, -1, normal.x(), normal.y(), normal.z());
+				const int ell1 = geo::addEllipseArc(geo_p1, geo_c, geo_M, geo_mid, -1, normal.x(), normal.y(), normal.z());
+				const int ell2 = geo::addEllipseArc(geo_mid, geo_c, geo_M, geo_p2, -1, normal.x(), normal.y(), normal.z());
 
 				return {ell1, ell2, geo_mid};
 			}
@@ -331,11 +335,11 @@ class MakeMesh {
 
 	bool check_cache(int ar, int cr, double quant = 100, size_t cache_size = 20) {
 		std::array<int, 6> param = {app_cnt,
-									static_cast<int>(std::round(anode_radius * quant)),
-									static_cast<int>(std::round(cathode_radius * quant)),
-									static_cast<int>(std::round(wire_radius * quant)),
-									ar,
-									cr};
+		                            static_cast<int>(std::round(anode_radius * quant)),
+		                            static_cast<int>(std::round(cathode_radius * quant)),
+		                            static_cast<int>(std::round(wire_radius * quant)),
+		                            ar,
+		                            cr};
 
 		hash = 0;
 		for (const int p : param) {
@@ -464,8 +468,8 @@ class MakeMesh {
 				minor.normalize();
 				minor *= scaled_wire_radius;
 
-				inter_ells.emplace_back(cathode_mesh_size, minor + v0, major + v0, v0, major.normalized(),
-										minor.normalized(), std::nullopt, std::nullopt, geo_v0);
+				inter_ells.emplace_back(
+				    cathode_mesh_size, minor + v0, major + v0, v0, major.normalized(), minor.normalized(), std::nullopt, std::nullopt, geo_v0);
 			}
 			intersection_ellipses.push_back(inter_ells);
 		}
@@ -533,8 +537,7 @@ class MakeMesh {
 				}
 
 				for (size_t i = 0; i < n; i++) {
-					const int loop =
-						geo::addCurveLoop({v_curves[i].curves[0], cons[i], cons[(i + n - 1) % n]}, -1, true);
+					const int loop = geo::addCurveLoop({v_curves[i].curves[0], cons[i], cons[(i + n - 1) % n]}, -1, true);
 					cathode_surfaces.push_back(geo::addSurfaceFilling({loop}));
 				}
 			}
@@ -550,8 +553,7 @@ class MakeMesh {
 			}
 
 			for (size_t i = 0; i < n; i++) {
-				const int loop =
-					geo::addCurveLoop({lines[i], v_curves[i].curves[2], v_curves[(i + 1) % n].curves[3]}, -1, true);
+				const int loop = geo::addCurveLoop({lines[i], v_curves[i].curves[2], v_curves[(i + 1) % n].curves[3]}, -1, true);
 				cathode_surfaces.push_back(geo::addSurfaceFilling({loop}));
 			}
 
@@ -628,8 +630,13 @@ class MakeMesh {
 		return {geo::addSurfaceLoop(s), s};
 	}
 
-	void apply_mesh_settings(const std::vector<int> &cathode_surfaces, int app_cnt, double wire_radius,
-							 double fine_size, double coarse_size, double scale = 0.75, double dist = 20.0) {
+	void apply_mesh_settings(const std::vector<int> &cathode_surfaces,
+	                         int app_cnt,
+	                         double wire_radius,
+	                         double fine_size,
+	                         double coarse_size,
+	                         double scale = 0.75,
+	                         double dist = 20.0) {
 		int dist_field = gmsh::model::mesh::field::add("Distance");
 
 		// Convert surface tags to doubles
@@ -760,18 +767,17 @@ class MakeMesh {
 		std::cout << "\n=== Mesh Statistics ===" << std::endl;
 		std::cout << "\n--- Nodes ---" << std::endl;
 		std::cout << "Total nodes: " << numNodes << std::endl;
-		std::cout << "Surface nodes: " << surfaceNodes.size() << " (" << std::fixed << std::setprecision(1)
-				  << nodeSurfaceProportion << "%)" << std::endl;
+		std::cout << "Surface nodes: " << surfaceNodes.size() << " (" << std::fixed << std::setprecision(1) << nodeSurfaceProportion << "%)"
+		          << std::endl;
 
 		std::cout << "\n--- Edges ---" << std::endl;
 		std::cout << "Total edges: " << allEdges.size() << std::endl;
-		std::cout << "Surface edges: " << surfaceEdges.size() << " (" << std::fixed << std::setprecision(1)
-				  << edgeSurfaceProportion << "%)" << std::endl;
+		std::cout << "Surface edges: " << surfaceEdges.size() << " (" << std::fixed << std::setprecision(1) << edgeSurfaceProportion << "%)"
+		          << std::endl;
 
 		std::cout << "\n--- Elements ---" << std::endl;
 		std::cout << "Tetrahedra: " << numTets << std::endl;
-		std::cout << "Triangles: " << numTriangles << " (" << std::fixed << std::setprecision(1)
-				  << cellSurfaceProportion << "%)" << std::endl;
+		std::cout << "Triangles: " << numTriangles << " (" << std::fixed << std::setprecision(1) << cellSurfaceProportion << "%)" << std::endl;
 
 		std::cout << std::resetiosflags(std::ios::fixed) << std::setprecision(16);
 
@@ -783,8 +789,7 @@ class MakeMesh {
 			gmsh::model::getPhysicalName(dim, tag, name);
 			std::vector<int> entities;
 			gmsh::model::getEntitiesForPhysicalGroup(dim, tag, entities);
-			std::cout << "Physical group '" << name << "' (dim=" << dim << ", tag=" << tag << "): " << entities.size()
-					  << " entities" << std::endl;
+			std::cout << "Physical group '" << name << "' (dim=" << dim << ", tag=" << tag << "): " << entities.size() << " entities" << std::endl;
 		}
 		std::cout << "======================\n" << std::endl;
 	}
@@ -799,8 +804,7 @@ class MakeMesh {
 		std::vector<Vector3d> mesh_nodes;
 
 		for (size_t i = 0; i < nodes.size(); i++) {
-			const Vector3d c(cords[3 * i] * cathode_radius, cords[3 * i + 1] * cathode_radius,
-							 cords[3 * i + 2] * cathode_radius);
+			const Vector3d c(cords[3 * i] * cathode_radius, cords[3 * i + 1] * cathode_radius, cords[3 * i + 2] * cathode_radius);
 
 			mesh_nodes.push_back(c);
 			X[i] = c.x();
@@ -828,15 +832,15 @@ class MakeMesh {
 
 		if (!meta_data[std::to_string(hash)].contains("app_cnt")) {
 			meta_data[std::to_string(hash)] = {{"app_cnt", app_cnt},
-											   {"anode_radius", anode_radius},
-											   {"cathode_radius", cathode_radius},
-											   {"wire_radius", wire_radius},
-											   {"X", X},
-											   {"Y", Y},
-											   {"Z", Z},
-											   {"I", I},
-											   {"J", J},
-											   {"K", K}};
+			                                   {"anode_radius", anode_radius},
+			                                   {"cathode_radius", cathode_radius},
+			                                   {"wire_radius", wire_radius},
+			                                   {"X", X},
+			                                   {"Y", Y},
+			                                   {"Z", Z},
+			                                   {"I", I},
+			                                   {"J", J},
+			                                   {"K", K}};
 			std::ofstream meta_out(std::string(PROJECT_ROOT) + "/mesh_meta_data.json");
 			meta_out << meta_data.dump();
 			meta_out.close();

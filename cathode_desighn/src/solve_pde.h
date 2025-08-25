@@ -52,10 +52,12 @@ class SolvePDE {
 			 const size_t fem_order = 3, const size_t solve_max_iter = 10000, const double solve_tol = 1e-15,
 			 const bool print_ = false)
 		: mesh_file_name(file_name_), voltage(voltage_), cathode_radius(cathode_radius_), print(print_),
-		  finite_element(fem_order), mapping(finite_element), grid_cache(triangulation),
+		  finite_element(fem_order), mapping(FE_SimplexP<3>(1)), grid_cache(triangulation),
 		  point_evaluator(mapping, finite_element, update_values | update_gradients),
 		  cached_cell_sol(finite_element.n_dofs_per_cell()) {
 		MultithreadInfo::set_thread_limit(1);
+		deal_II_exceptions::disable_abort_on_exception();
+
 		if (print) std::cout << "Starting PDE Solve..." << std::endl;
 		read_mesh();
 		setup_system();
@@ -63,10 +65,10 @@ class SolvePDE {
 		solve(solve_max_iter, solve_tol);
 	}
 
-	std::optional<double> V(const Vector3d &p) const {
+	bool V(const Vector3d &p, double &V_val) const {
 		Point<3> point(p.x() / cathode_radius, p.y() / cathode_radius, p.z() / cathode_radius);
 		auto cell_ref_opt = find_cell(point);
-		if (!cell_ref_opt.has_value()) return std::nullopt;
+		if (!cell_ref_opt.has_value()) return false;
 		auto [cell, ref_point] = cell_ref_opt.value();
 
 		const auto dof_cell = cell->as_dof_handler_iterator(dof_handler);
@@ -74,13 +76,14 @@ class SolvePDE {
 		point_evaluator.reinit(dof_cell, ArrayView<const Point<3>>(&ref_point, 1));
 		point_evaluator.evaluate(cached_cell_sol, EvaluationFlags::values);
 
-		return point_evaluator.get_value(0);
+		V_val = point_evaluator.get_value(0);
+		return true;
 	}
 
-	std::optional<Vector3d> E(const Vector3d &p) const {
+	bool E(const Vector3d &p, Vector3d &E_val) const {
 		Point<3> point(p.x() / cathode_radius, p.y() / cathode_radius, p.z() / cathode_radius);
 		auto cell_ref_opt = find_cell(point);
-		if (!cell_ref_opt.has_value()) return std::nullopt;
+		if (!cell_ref_opt.has_value()) return false;
 		const auto [cell, ref_point] = cell_ref_opt.value();
 
 		const auto dof_cell = cell->as_dof_handler_iterator(dof_handler);
@@ -89,13 +92,14 @@ class SolvePDE {
 		point_evaluator.evaluate(cached_cell_sol, EvaluationFlags::gradients);
 
 		const auto g = point_evaluator.get_gradient(0);
-		return Vector3d(-g[0] / cathode_radius, -g[1] / cathode_radius, -g[2] / cathode_radius);
+		E_val = {-g[0] / cathode_radius, -g[1] / cathode_radius, -g[2] / cathode_radius};
+		return true;
 	}
 
-	std::optional<std::pair<double, Vector3d>> VE(const Vector3d &p) const {
+	bool VE(const Vector3d &p, double &V_val, Vector3d &E_val) const {
 		Point<3> point(p.x() / cathode_radius, p.y() / cathode_radius, p.z() / cathode_radius);
 		auto cell_ref_opt = find_cell(point);
-		if (!cell_ref_opt.has_value()) return std::nullopt;
+		if (!cell_ref_opt.has_value()) return false;
 		const auto [cell, ref_point] = cell_ref_opt.value();
 
 		const auto dof_cell = cell->as_dof_handler_iterator(dof_handler);
@@ -104,8 +108,9 @@ class SolvePDE {
 		point_evaluator.evaluate(cached_cell_sol, EvaluationFlags::gradients | EvaluationFlags::values);
 
 		const auto g = point_evaluator.get_gradient(0);
-		return std::pair{point_evaluator.get_value(0),
-						 Vector3d(-g[0] / cathode_radius, -g[1] / cathode_radius, -g[2] / cathode_radius)};
+		V_val = point_evaluator.get_value(0);
+		E_val = {-g[0] / cathode_radius, -g[1] / cathode_radius, -g[2] / cathode_radius};
+		return true;
 	}
 
 	bool init_cache(const Vector3d &p) const {
@@ -134,7 +139,7 @@ class SolvePDE {
 	SparseMatrix<double> system_matrix;
 	Vector<double> solution;
 	Vector<double> system_rhs;
-
+	
 	GridTools::Cache<3, 3> grid_cache;
 	mutable typename Triangulation<3>::active_cell_iterator last_cell;
 	mutable FEPointEvaluation<1, 3> point_evaluator;

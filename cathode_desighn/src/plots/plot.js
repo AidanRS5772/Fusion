@@ -278,15 +278,66 @@ if (type === "0") {
 		mode: "lines",
 		name: "Generalized Pareto Fit",
 	}
+	const hazard_fit = {
+		type: "scatter",
+		x: data.X,
+		y: data.HAZARD_PDF,
+		mode: "lines",
+		name: "Hazard Fit",
+	}
 
 
-	traces.push(hist, exp_fit, pareto_fit);
+	traces.push(hist, exp_fit, pareto_fit, hazard_fit);
 
 	layout = {
 		title: "Fusion Probability Distribution",
 		showlegend: true,
 	};
+} else if (type === "6") {
+	const data = JSON.parse(fs.readFileSync(PATHS.plotData, "utf-8"));
+
+	const cdf = {
+		type: "scatter",
+		x: data.FP_CDF_X,
+		y: data.FP_CDF_Y,
+		mode: "markers",
+		marker: {
+			size: 1
+		},
+		name: "Emperical CDF"
+	}
+
+	const exp_fit = {
+		type: "scatter",
+		x: data.X,
+		y: data.EXP_PDF,
+		mode: "lines",
+		name: "Exponential Fit",
+	}
+	const pareto_fit = {
+		type: "scatter",
+		x: data.X,
+		y: data.PARETO_PDF,
+		mode: "lines",
+		name: "Generalized Pareto Fit",
+	}
+	const hazard_fit = {
+		type: "scatter",
+		x: data.X,
+		y: data.HAZARD_PDF,
+		mode: "lines",
+		name: "Hazard Fit",
+	}
+
+
+	traces.push(cdf, exp_fit, pareto_fit, hazard_fit);
+
+	layout = {
+		title: "Fusion Cumulitive Density Function",
+		showlegend: true,
+	};
 }
+
 
 
 const html = `
