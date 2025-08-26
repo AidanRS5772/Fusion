@@ -8,7 +8,7 @@
 #include <limits>
 #include <vector>
 
-double find_AD(const std::vector<double> &X, const std::function<double(double)> &cdf) {
+inline double find_AD(const std::vector<double> &X, const std::function<double(double)> &cdf) {
 	std::vector<double> sorted_X = X;
 	std::sort(sorted_X.begin(), sorted_X.end());
 	const size_t n = sorted_X.size();
@@ -23,7 +23,7 @@ double find_AD(const std::vector<double> &X, const std::function<double(double)>
 	return -static_cast<double>(n) - sum / static_cast<double>(n);
 }
 
-double find_Variance(const std::vector<double> &X) {
+inline double find_Variance(const std::vector<double> &X) {
 	const size_t n = X.size();
 	const double m1 = std::accumulate(X.begin(), X.end(), 0.0) / n;
 	return std::accumulate(X.begin(),
@@ -33,7 +33,7 @@ double find_Variance(const std::vector<double> &X) {
 	       / (n - 1);
 }
 
-double find_Skew(const std::vector<double> &X) {
+inline double find_Skew(const std::vector<double> &X) {
 	const size_t n = X.size();
 	const double m1 = std::accumulate(X.begin(), X.end(), 0.0) / X.size();
 	const double M2 = std::accumulate(X.begin(), X.end(), 0.0, [m1](const double acc, const double x) -> double {
@@ -45,7 +45,7 @@ double find_Skew(const std::vector<double> &X) {
 	return (n * std::sqrt(n - 1) / (n - 2)) * M3 / std::sqrt(M2 * M2 * M2);
 }
 
-double find_Kurtosis(const std::vector<double> &X) {
+inline double find_Kurtosis(const std::vector<double> &X) {
 	const size_t n = X.size();
 	const double m1 = std::accumulate(X.begin(), X.end(), 0.0) / X.size();
 	const double M2 = std::accumulate(X.begin(), X.end(), 0.0, [m1](const double acc, const double x) -> double {
@@ -101,7 +101,7 @@ struct Generalized_Pareto {
 	}
 };
 
-Generalized_Pareto fit_pareto(const std::vector<double> &X) {
+inline Generalized_Pareto fit_pareto(const std::vector<double> &X) {
 	// p(0) = lambda , p(1) = xi
 	const double mean = std::accumulate(X.begin(), X.end(), 0.0) / X.size();
 	dlib::matrix<double, 2, 1> params, upper, lower;

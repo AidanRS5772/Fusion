@@ -48,13 +48,17 @@ using Vector3d = Eigen::Vector3d;
 
 class SolvePDE {
   public:
-	SolvePDE(const std::string &file_name_, const double voltage_, const double cathode_radius_,
-			 const size_t fem_order = 3, const size_t solve_max_iter = 10000, const double solve_tol = 1e-15,
-			 const bool print_ = false)
-		: mesh_file_name(file_name_), voltage(voltage_), cathode_radius(cathode_radius_), print(print_),
-		  finite_element(fem_order), mapping(FE_SimplexP<3>(1)), grid_cache(triangulation),
-		  point_evaluator(mapping, finite_element, update_values | update_gradients),
-		  cached_cell_sol(finite_element.n_dofs_per_cell()) {
+	SolvePDE(const std::string &file_name_,
+	         const double voltage_,
+	         const double cathode_radius_,
+	         const size_t fem_order = 3,
+	         const size_t solve_max_iter = 10000,
+	         const double solve_tol = 1e-15,
+	         const bool print_ = false)
+	    : mesh_file_name(file_name_), voltage(voltage_), cathode_radius(cathode_radius_), print(print_),
+	      finite_element(fem_order), mapping(FE_SimplexP<3>(1)), grid_cache(triangulation),
+	      point_evaluator(mapping, finite_element, update_values | update_gradients),
+	      cached_cell_sol(finite_element.n_dofs_per_cell()) {
 		MultithreadInfo::set_thread_limit(1);
 		deal_II_exceptions::disable_abort_on_exception();
 
@@ -139,7 +143,7 @@ class SolvePDE {
 	SparseMatrix<double> system_matrix;
 	Vector<double> solution;
 	Vector<double> system_rhs;
-	
+
 	GridTools::Cache<3, 3> grid_cache;
 	mutable typename Triangulation<3>::active_cell_iterator last_cell;
 	mutable FEPointEvaluation<1, 3> point_evaluator;
@@ -149,7 +153,7 @@ class SolvePDE {
 	void read_mesh() {
 		GridIn<3> grid_in;
 		grid_in.attach_triangulation(triangulation);
-		std::ifstream input_file(std::string(PROJECT_ROOT) + "/mesh_cache/" + mesh_file_name);
+		std::ifstream input_file(std::string(PROJECT_ROOT) + mesh_file_name);
 
 		if (!input_file) {
 			throw std::runtime_error("Cannot open mesh file: " + mesh_file_name);
@@ -184,8 +188,8 @@ class SolvePDE {
 		if (print) std::cout << "Starting system assembly..." << std::flush;
 
 		const QGaussSimplex<3> quadrature_formula(finite_element.degree + 1);
-		FEValues<3> fe_values(mapping, finite_element, quadrature_formula,
-							  update_values | update_gradients | update_JxW_values);
+		FEValues<3> fe_values(
+		    mapping, finite_element, quadrature_formula, update_values | update_gradients | update_JxW_values);
 
 		const unsigned int dofs_per_cell = finite_element.n_dofs_per_cell();
 		const unsigned int n_q_points = quadrature_formula.size();
@@ -201,8 +205,8 @@ class SolvePDE {
 			for (unsigned int q_point = 0; q_point < n_q_points; ++q_point) {
 				for (unsigned int i = 0; i < dofs_per_cell; ++i) {
 					for (unsigned int j = 0; j < dofs_per_cell; ++j) {
-						cell_matrix(i, j) += fe_values.shape_grad(i, q_point) * fe_values.shape_grad(j, q_point) *
-											 fe_values.JxW(q_point);
+						cell_matrix(i, j) += fe_values.shape_grad(i, q_point) * fe_values.shape_grad(j, q_point)
+						                     * fe_values.JxW(q_point);
 					}
 				}
 			}
@@ -214,10 +218,10 @@ class SolvePDE {
 		}
 
 		std::map<types::global_dof_index, double> boundary_values;
-		VectorTools::interpolate_boundary_values(dof_handler, types::boundary_id(1),
-												 Functions::ConstantFunction<3>(-voltage), boundary_values);
-		VectorTools::interpolate_boundary_values(dof_handler, types::boundary_id(2), Functions::ZeroFunction<3>(),
-												 boundary_values);
+		VectorTools::interpolate_boundary_values(
+		    dof_handler, types::boundary_id(1), Functions::ConstantFunction<3>(-voltage), boundary_values);
+		VectorTools::interpolate_boundary_values(
+		    dof_handler, types::boundary_id(2), Functions::ZeroFunction<3>(), boundary_values);
 		MatrixTools::apply_boundary_values(boundary_values, system_matrix, solution, system_rhs);
 
 		if (print) std::cout << " assembly finished." << std::endl;
