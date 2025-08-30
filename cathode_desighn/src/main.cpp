@@ -10,6 +10,7 @@
 #include <cmath>
 #include <exception>
 #include <fstream>
+#include <gmsh.h>
 #include <gperftools/profiler.h>
 #include <iomanip>
 #include <memory>
@@ -21,14 +22,15 @@
 #include <stdexcept>
 #include <string>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
-constexpr double cathode_radius = 5;    // [cm]
-constexpr double anode_radius = 25;     // [cm]
-constexpr double voltage = 1;           // [MV]
-constexpr double mD = 2.08690083;       // [MeV][cm/ns]^-2 mass of a deuteron (m = E/c^2)
-constexpr double temp = 86.17333262;    // [µeV] room temprature energy
-constexpr size_t mc_sample_size = 500; // number of monte carlo samples
+constexpr double cathode_radius = 5;      // [cm]
+constexpr double anode_radius = 25;       // [cm]
+constexpr double voltage = 1;             // [MV]
+constexpr double mD = 2.08690083;         // [MeV][cm/ns]^-2 mass of a deuteron (m = E/c^2)
+constexpr double temp = 86.17333262;      // [µeV] room temprature energy
+constexpr size_t mc_sample_size = 10'000; // number of monte carlo samples
 
 template <std::size_t N> std::array<std::pair<Vector3d, Vector3d>, N> make_init_states(const unsigned int seed) {
 	std::mt19937 gen(seed);
@@ -158,12 +160,17 @@ class JSONWriter {
 		if (!fs::is_regular_file(file_name, ec))
 			throw std::runtime_error("JSONWriter: path is not a regular file: " + file_name);
 
-		std::ofstream out(file_name, std::ios::out | std::ios::trunc);
-		if (!out) throw std::runtime_error("JSONWriter: cannot open for writing: " + file_name);
+		const auto sz = fs::file_size(file_name, ec);
+		if (ec) throw std::runtime_error("JSONWriter: file_size failed for " + file_name + ": " + ec.message());
 
-		out << "{}\n";
-		out.flush();
-		if (!out) throw std::runtime_error("JSONWriter: failed to seed file with empty JSON object: " + file_name);
+		if (sz == 0) {
+			std::ofstream out(file_name, std::ios::out | std::ios::trunc);
+			if (!out) throw std::runtime_error("JSONWriter: cannot open for writing: " + file_name);
+
+			out << "{}\n";
+			out.flush();
+			if (!out) throw std::runtime_error("JSONWriter: failed to seed empty JSON: " + file_name);
+		}
 	}
 
 	void write(const size_t app_cnt, const json &res) {
@@ -184,14 +191,18 @@ template <size_t T> class ProgressTracker {
 	std::array<size_t, T> app_cnts{};
 	std::array<size_t, T> cnts{};
 
-	static constexpr size_t LINE_CNT = 4;
+	static constexpr size_t LINE_CNT = 3;
+
 	static void save_origin() { std::cout << "\x1b" << "7"; }
 	static void restore_origin() { std::cout << "\x1b" << "8"; }
-	static void move_down(size_t n) { std::cout << "\x1b[" << n << "B"; }
+	static void move_down(size_t n) {
+		if (n) std::cout << "\x1b[" << n << "B";
+	}
 	static void move_up(size_t n) {
 		if (n) std::cout << "\x1b[" << n << "A";
 	}
 	static void clear_line() { std::cout << "\x1b[2K\r"; }
+
 	static void clear_block(size_t lines) {
 		for (size_t i = 0; i < lines; ++i) {
 			clear_line();
@@ -203,7 +214,6 @@ template <size_t T> class ProgressTracker {
 	std::string format_duration(double seconds) const {
 		std::ostringstream oss;
 		oss << std::fixed << std::setprecision(1);
-
 		if (seconds < 60) {
 			oss << seconds << " s";
 		} else if (seconds < 3600) {
@@ -214,36 +224,39 @@ template <size_t T> class ProgressTracker {
 			int hours = static_cast<int>(seconds / 3600);
 			int mins = static_cast<int>((seconds - hours * 3600) / 60);
 			double secs = seconds - hours * 3600 - mins * 60;
-			oss << hours << " h " << mins << " min " << secs << " s";
+			oss << hours << " h " << mins << " m " << secs << " s";
 		}
-
 		return oss.str();
 	}
 
   public:
 	const size_t tick_rate;
 
-	ProgressTracker(const size_t tick_rate_) : tick_rate(tick_rate_) {
+	ProgressTracker(size_t tick_rate_) : tick_rate(tick_rate_) {
 		std::lock_guard<std::mutex> lk(print_mutex);
 		std::cout << "\x1b[?25l";
 		for (size_t i = 0; i < T * LINE_CNT; ++i) std::cout << "\n";
-		move_up(T * LINE_CNT + 1);
+		move_up(T * LINE_CNT);
 		save_origin();
 		std::cout << std::flush;
 	}
 
-	ProgressTracker(const ProgressTracker &) = delete;
-	ProgressTracker &operator=(const ProgressTracker &) = delete;
+	~ProgressTracker() {
+		restore_origin();
+		move_down(T * LINE_CNT);
+		std::cout << "\x1b[?25h" << std::endl; // show cursor again
+	}
 
 	void init(size_t thread_id, size_t app_cnt) {
 		starts[thread_id] = std::chrono::steady_clock::now();
 		cnts[thread_id] = 0;
 		app_cnts[thread_id] = app_cnt;
+		update(thread_id, true);
 	}
 
-	void update(size_t thread_id) {
+	void update(size_t thread_id, bool force = false) {
 		cnts[thread_id] += 1;
-		if (cnts[thread_id] % tick_rate != 0) return;
+		if (!force && cnts[thread_id] % tick_rate != 0) return;
 
 		const auto cur_time = std::chrono::steady_clock::now();
 		const auto duration = std::chrono::duration_cast<std::chrono::microseconds>(cur_time - starts[thread_id]);
@@ -255,24 +268,15 @@ template <size_t T> class ProgressTracker {
 		os << "App Cnt: " << app_cnts[thread_id] << "\n"
 		   << "Progress: " << cnts[thread_id] << "/" << mc_sample_size << " (" << std::fixed << std::setprecision(2)
 		   << percent << "%)\n"
-		   << "Average Execution: " << std::fixed << std::setprecision(2) << avg_ms
-		   << " ms (ETA: " << format_duration(eta) << ")";
-		const std::string print_statement = os.str();
+		   << "Avg Exec: " << std::fixed << std::setprecision(2) << avg_ms << " ms (ETA: " << format_duration(eta)
+		   << ")";
 
 		std::lock_guard<std::mutex> lk(print_mutex);
 		restore_origin();
-		move_down(thread_id * LINE_CNT + 1);
+		move_down(thread_id * LINE_CNT);
 		clear_block(LINE_CNT);
-		std::cout << print_statement << std::flush;
-		move_down(1);
-		clear_line();
+		std::cout << os.str() << std::flush;
 		restore_origin();
-	}
-
-	void done() {
-		restore_origin();
-		move_down(T * LINE_CNT);
-		std::cout << "\x1b[?25h" << std::endl;
 	}
 };
 
@@ -280,8 +284,8 @@ template <size_t T>
 json collect_data(const size_t app_cnt, std::shared_ptr<ProgressTracker<T>> progress, size_t thread_id) {
 	auto pde_sol = SolvePDE("/meshes/app_" + std::to_string(app_cnt) + ".msh", voltage, cathode_radius);
 
-	std::random_device rd;
-	auto init_states = make_init_states<mc_sample_size>(rd());
+	// std::random_device rd;
+	auto init_states = make_init_states<mc_sample_size>(31415926);
 
 	std::vector<double> fusion_probs;
 	std::vector<size_t> orbit_cnts;
@@ -289,6 +293,7 @@ json collect_data(const size_t app_cnt, std::shared_ptr<ProgressTracker<T>> prog
 	orbit_cnts.reserve(mc_sample_size);
 
 	auto path = SolvePath(pde_sol, mD, voltage, cathode_radius, anode_radius, temp, mc_sample_size);
+	progress->init(thread_id, app_cnt);
 	for (auto const &[q, p] : init_states) {
 		if (path.find_path(q, p)) {
 			orbit_cnts.push_back(path.path_info.orbit_cnt);
@@ -302,8 +307,8 @@ json collect_data(const size_t app_cnt, std::shared_ptr<ProgressTracker<T>> prog
 	return find_stats(fusion_probs, orbit_cnts);
 }
 
-template <size_t T> void Monte_Carlo_Simulation(const size_t max_app_cnt) {
-	std::atomic<size_t> app_cnt{6};
+template <size_t T> void Monte_Carlo_Simulation(const std::vector<size_t> &app_cnts) {
+	std::atomic<size_t> app_cnt_idx{0};
 	std::vector<std::thread> threads;
 	JSONWriter json_writer(std::string(PROJECT_ROOT) + "/MC_data.json");
 	std::shared_ptr<ProgressTracker<T>> progress_tracker =
@@ -311,10 +316,10 @@ template <size_t T> void Monte_Carlo_Simulation(const size_t max_app_cnt) {
 
 	auto worker = [&](size_t thread_id) {
 		while (true) {
-			size_t cur_app_cnt = app_cnt.fetch_add(2);
-			if (cur_app_cnt > max_app_cnt) break;
+			const size_t cur_app_cnt_idx = app_cnt_idx.fetch_add(1);
+			if (cur_app_cnt_idx >= app_cnts.size()) break;
+			const size_t cur_app_cnt = app_cnts[cur_app_cnt_idx];
 			try {
-				progress_tracker->init(thread_id, cur_app_cnt);
 				json stats = collect_data(cur_app_cnt, progress_tracker, thread_id);
 				json_writer.write(cur_app_cnt, stats);
 			} catch (const std::exception &e) {
@@ -326,12 +331,37 @@ template <size_t T> void Monte_Carlo_Simulation(const size_t max_app_cnt) {
 
 	for (size_t i = 0; i < T; i++) threads.emplace_back(worker, i);
 	for (auto &thread : threads) thread.join();
+}
 
-	progress_tracker->done();
+void cathode_visualize(size_t app_cnt) {
+	try {
+		gmsh::initialize();
+		gmsh::option::setNumber("General.Terminal", 1);
+
+		gmsh::open(std::string(PROJECT_ROOT) + "/meshes/app_" + std::to_string(app_cnt) + ".msh");
+
+		int dim = 2;
+		int physTag = 1;
+
+		std::vector<int> cathode_tags;
+		gmsh::model::getEntitiesForPhysicalGroup(dim, physTag, cathode_tags);
+
+		std::vector<std::pair<int, int>> all;
+		gmsh::model::getEntities(all);
+		for (auto &e : all) gmsh::model::setVisibility({e}, false);
+
+		for (auto &t : cathode_tags) gmsh::model::setVisibility({std::make_pair(dim, t)}, true);
+
+		gmsh::fltk::initialize();
+		gmsh::fltk::run();
+
+		gmsh::finalize();
+	} catch (const std::exception &e) {
+		std::cerr << "Error: " << e.what() << "\n";
+	}
 }
 
 int main() {
-	Monte_Carlo_Simulation<4>(22);
-
+	Monte_Carlo_Simulation<1>({160});
 	return 0;
 }

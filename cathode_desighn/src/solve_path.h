@@ -157,16 +157,19 @@ class SolvePath {
 		boost::math::quadrature::exp_sinh<double> integrator;
 		const double f_int = integrator.integrate([K0, a, Ke](const double E) {
 			const double S = a[0] + E * (a[1] + E * (a[2] + E * (a[3] + a[4] * E)));
-			return std::sqrt(E) * S * std::sinh(3 * std::sqrt(2 * K0 * E) / Ke) * std::exp(-3 * E / Ke - std::sqrt(Eg / E));
+			return std::sqrt(E) * S * std::sinh(3 * std::sqrt(2 * K0 * E) / Ke)
+			       * std::exp(-3 * E / Ke - std::sqrt(Eg / E));
 		});
 
-		const double den =
-		    std::sqrt(K0) + std::sqrt(3 * M_PI / (2 * Ke)) * (K0 + Ke / 3) * std::erf(std::sqrt(3 * K0 / (2 * Ke))) * std::exp(3 * K0 / (2 * Ke));
+		const double den = std::sqrt(K0)
+		                   + std::sqrt(3 * M_PI / (2 * Ke)) * (K0 + Ke / 3) * std::erf(std::sqrt(3 * K0 / (2 * Ke)))
+		                         * std::exp(3 * K0 / (2 * Ke));
 		return f_int / den;
 	}
 
 	template <size_t M>
-	std::pair<Eigen::Matrix<double, POLY_REG_ORDER + 1, 1>, double> poly_reg(const std::function<double(double)> f, const double a, const double b) {
+	std::pair<Eigen::Matrix<double, POLY_REG_ORDER + 1, 1>, double>
+	poly_reg(const std::function<double(double)> f, const double a, const double b) {
 		Eigen::Matrix<double, M, 1> Y;
 		Eigen::Matrix<double, M, POLY_REG_ORDER + 1> V;
 		std::vector<double> X(M);
@@ -188,7 +191,10 @@ class SolvePath {
 
 	double exp_max_energy(const double sample_size) {
 		constexpr double gamma = 0.577215664901532;
-		return V + 1e-6 * T * (std::log(2) - std::log(M_PI) / 2 + gamma + std::log(sample_size) + std::log(std::log(sample_size)));
+		return V
+		       + 1e-6 * T
+		             * (std::log(2) - std::log(M_PI) / 2 + gamma + std::log(sample_size)
+		                + std::log(std::log(sample_size)));
 	}
 
 	double fp(const double x) const {
@@ -243,7 +249,8 @@ class SolvePath {
 		constexpr double ENERGY_REL_TOL_LO = 0.01;
 		constexpr double ENERGY_REL_TOL_HI = 0.05;
 		constexpr size_t ENERGY_CORECTION_FR = 4;
-		if (energy_correction_cnt % (static_cast<size_t>(path_info.char_time / max_dt) / ENERGY_CORECTION_FR) == 0) [[unlikely]] {
+		if (energy_correction_cnt % (static_cast<size_t>(path_info.char_time / max_dt) / ENERGY_CORECTION_FR) == 0)
+		    [[unlikely]] {
 			if (VE_cache.VE_eval(state.first)) {
 				const double p_norm = state.second.norm();
 				const double energy = VE_cache.V + p_norm * p_norm / (2 * m);
@@ -278,8 +285,8 @@ class SolvePath {
 #endif
 
 	inline bool state_is_not_valid(const std::pair<Vector3d, Vector3d> &s) noexcept {
-		return is_not_valid(s.first(0)) || is_not_valid(s.first(1)) || is_not_valid(s.first(2)) || is_not_valid(s.second(0))
-		       || is_not_valid(s.second(1)) || is_not_valid(s.second(2));
+		return is_not_valid(s.first(0)) || is_not_valid(s.first(1)) || is_not_valid(s.first(2))
+		       || is_not_valid(s.second(0)) || is_not_valid(s.second(1)) || is_not_valid(s.second(2));
 	}
 
   public:
@@ -299,15 +306,20 @@ class SolvePath {
 		const double max_energy = exp_max_energy(sample_size);
 		const double fp_max_energy = fusion_probability(max_energy);
 		const auto res =
-		    poly_reg<1000>([this, fp_max_energy](const double x) { return fusion_probability(x) / fp_max_energy; }, min_energy, max_energy);
+		    poly_reg<100>([this, fp_max_energy](const double x) { return fusion_probability(x) / fp_max_energy; },
+		                  min_energy,
+		                  max_energy);
 		poly_reg_res = res.second;
 		for (size_t i = 0; i < POLY_REG_ORDER; i++) {
 			poly_reg_coefs[i] = res.first[i];
 		}
 	}
 
-	bool
-	find_path(const Vector3d &init_q, const Vector3d &init_p, const double max_dt = 0.125, const double max_fp = -1, const bool record_path = false) {
+	bool find_path(const Vector3d &init_q,
+	               const Vector3d &init_p,
+	               const double max_dt = 0.25,
+	               const double max_fp = 10'000,
+	               const bool record_path = false) {
 		constexpr int MAX_RETRY = 5;
 		constexpr double STEP_REDUCTION = 0.5;
 		constexpr double STEP_INCREASE = 1.5;
