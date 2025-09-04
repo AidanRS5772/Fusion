@@ -4,7 +4,6 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-# Detect Apple Silicon
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     execute_process(COMMAND uname -m OUTPUT_VARIABLE ARCH OUTPUT_STRIP_TRAILING_WHITESPACE)
     if(ARCH STREQUAL "arm64")
@@ -13,13 +12,11 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     endif()
 endif()
 
-# Enhanced debug/release flags
 set(CMAKE_CXX_FLAGS_DEBUG "-g3 -O0 -DDEBUG -fno-omit-frame-pointer -fno-inline \
     -Wall -Wextra -Wpedantic \
     -fstack-protector-strong")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG -march=native -mtune=native -ffast-math -funroll-loops -fvectorize -fslp-vectorize -flto=thin -w")
 
-# Enable dSYM generation for Debug builds on macOS
 if(APPLE AND CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(CMAKE_XCODE_ATTRIBUTE_DEBUG_INFORMATION_FORMAT "dwarf-with-dsym")
     set(CMAKE_XCODE_ATTRIBUTE_DWARF_DSYM_FILE_SHOULD_ACCOMPANY_PRODUCT YES)
@@ -30,11 +27,20 @@ find_package(Eigen3 3.3 REQUIRED)
 find_package(nlohmann_json 3.10.5 REQUIRED)
 find_package(dlib REQUIRED)
 
-set(CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/candi/dealii" ${CMAKE_PREFIX_PATH})
-find_package(deal.II 9.7.0 REQUIRED)
-DEAL_II_INITIALIZE_CACHED_VARIABLES()
+set(DEAL_II_ROOT "${CMAKE_SOURCE_DIR}/../dealii")
 
-# GMSH configuration
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+  set(_DEALII_PREFIX "${DEAL_II_ROOT}/Debug")
+else()
+  set(_DEALII_PREFIX "${DEAL_II_ROOT}/Release")
+endif()
+
+list(PREPEND CMAKE_PREFIX_PATH "${_DEALII_PREFIX}")
+find_package(deal.II 9.7.0 REQUIRED
+             HINTS "${_DEALII_PREFIX}" "${_DEALII_PREFIX}/lib/cmake/deal.II")
+DEAL_II_INITIALIZE_CACHED_VARIABLES()
+message(STATUS "Using deal.II: ${_DEALII_PREFIX}")
+
 set(GMSH_INCLUDE_DIR "/opt/homebrew/include")
 set(GMSH_LIBRARY "/opt/homebrew/lib/libgmsh.dylib")
 
@@ -48,15 +54,12 @@ find_library(PROFILER_LIB profiler
     NO_DEFAULT_PATH
 )
 
-# Single executable target
 add_executable(Fusion src/main.cpp)
 
-# Set output directory based on build type
 set_target_properties(Fusion PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}"
 )
 
-# Set properties based on build type
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     target_compile_definitions(Fusion PRIVATE DEBUG PROJECT_ROOT="${CMAKE_SOURCE_DIR}")
 else()
@@ -68,7 +71,6 @@ else()
     )
     set_property(TARGET Fusion PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
 
-    # M1-specific optimizations for release
     if(ARCH STREQUAL "arm64")
         target_compile_options(Fusion PRIVATE
             -mcpu=apple-m1
@@ -78,15 +80,12 @@ else()
     endif()
 endif()
 
-# Deal.II setup
 deal_ii_setup_target(Fusion)
 
-# Additional include directories
 target_include_directories(Fusion PRIVATE
     ${GMSH_INCLUDE_DIR}
 )
 
-# Link libraries
 target_link_libraries(Fusion
     ${GMSH_LIBRARY}
     ${PROFILER_LIB}
@@ -96,7 +95,6 @@ target_link_libraries(Fusion
     dlib::dlib
 )
 
-# Link with Accelerate framework on macOS
 if(APPLE)
     find_library(ACCELERATE_FRAMEWORK Accelerate)
     if(ACCELERATE_FRAMEWORK)
@@ -104,7 +102,6 @@ if(APPLE)
     endif()
 endif()
 
-# Generate dSYM for debug builds
 if(APPLE AND CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_custom_command(TARGET Fusion POST_BUILD
         COMMAND dsymutil $<TARGET_FILE:Fusion> -o $<TARGET_FILE_DIR:Fusion>/Fusion.dSYM

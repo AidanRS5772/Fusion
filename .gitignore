@@ -3,5 +3,5 @@ cathode_desighn/build-release/
 cathode_desighn/mesh_cache/*
 cathode_desighn/.clang-format
 cathode_desighn/.clangd
-cathode_desighn/candi/
+dealii/*
 .DS_Store
