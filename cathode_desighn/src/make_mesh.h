@@ -1,6 +1,5 @@
 #ifndef MAKE_MESH_H
 #define MAKE_MESH_H
-
 #include <Eigen/Dense>
 #include <algorithm>
 #include <cmath>

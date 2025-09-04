@@ -284,8 +284,8 @@ template <size_t T>
 json collect_data(const size_t app_cnt, std::shared_ptr<ProgressTracker<T>> progress, size_t thread_id) {
 	auto pde_sol = SolvePDE("/meshes/app_" + std::to_string(app_cnt) + ".msh", voltage, cathode_radius);
 
-	// std::random_device rd;
-	auto init_states = make_init_states<mc_sample_size>(31415926);
+	std::random_device rd;
+	auto init_states = make_init_states<mc_sample_size>(rd());
 
 	std::vector<double> fusion_probs;
 	std::vector<size_t> orbit_cnts;
@@ -362,6 +362,7 @@ void cathode_visualize(size_t app_cnt) {
 }
 
 int main() {
-	Monte_Carlo_Simulation<1>({160});
+	// Monte_Carlo_Simulation<1>({160});
+	cathode_visualize(12);
 	return 0;
 }
