@@ -20,69 +20,21 @@ def main():
 
     app_cnts = list(range(6, 170, 2))
     app_cnts.remove(160);
-    median = np.log(get_data(app_cnts, json_data, "fusion/percentiles/median"))
-    p75 = np.log(get_data(app_cnts, json_data, "fusion/percentiles/75"))
-    p90 = np.log(get_data(app_cnts, json_data, "fusion/percentiles/90"))
-    p95 = np.log(get_data(app_cnts, json_data, "fusion/percentiles/95"))
-    p99 = np.log(get_data(app_cnts, json_data, "fusion/percentiles/95"))
-    max = np.log(get_data(app_cnts, json_data, "fusion/fusion_max"))
+    xi = get_data(app_cnts, json_data, "distributions/pareto/xi")
 
     fig = go.Figure()
 
     fig.add_trace(
         go.Scatter(
-            x=list(app_cnts),
-            y=median,
-            mode="lines+markers",
-            name="Median",
+            x = app_cnts,
+            y = xi,
+            mode = "lines+markers",
         )
     )
 
-    fig.add_trace(
-        go.Scatter(
-            x=list(app_cnts),
-            y=p75,
-            mode="lines+markers",
-            name="75%",
-        )
-    )
-
-    fig.add_trace(
-        go.Scatter(
-            x=list(app_cnts),
-            y=p90,
-            mode="lines+markers",
-            name="90%",
-        )
-    )
-
-
-    fig.add_trace(
-        go.Scatter(
-            x=list(app_cnts),
-            y=p95,
-            mode="lines+markers",
-            name="95%",
-        )
-    )
-
-    fig.add_trace(
-        go.Scatter(
-            x=list(app_cnts),
-            y=p99,
-            mode="lines+markers",
-            name="99%",
-        )
-    )
-
-
-    fig.add_trace(
-        go.Scatter(
-            x=list(app_cnts),
-            y=max,
-            mode="lines+markers",
-            name="Maximum",
-        )
+    fig.update_layout(
+        title="Generalized Pareto XI values",
+        xaxis_title="App Counts",
     )
 
     fig.show()
