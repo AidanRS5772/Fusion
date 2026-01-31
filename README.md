@@ -8,8 +8,8 @@ The main goal of the cathode design directory is to have computational evidence 
 
 <h6>Geometry Search</h6>
 
-From a review of the literature, two key important features of an optimal cathode geometry are spherical symmetry combined with antipodal symmetry of the plasma facing cathod component. This combination allows for maximum stabalizations of the plasma and maximum transperency of the cathode to the plasma. The problem is actually generating a possible search space of geometries that abide these criteria. 
-The solution used is to use a gradient descent algorithm over over N nodes in [Real Projective Space](https://en.wikipedia.org/wiki/Real_projective_space) of two dimensions with a culomb potential. This algorithm maximizes spherical symetry for 2N apratures while enforcing antipodal symetry because of antipodal identification in RP2.
+From a review of the literature, two key important features of an optimal cathode geometry are spherical symmetry combined with antipodal symmetry of the plasma facing cathod component. This combination allows for maximum stabilization of the plasma and maximum transparency of the cathode to the plasma. The problem is actually generating a feasible search space of geometries that adhere to these criteria. 
+The solution used is to use a gradient descent algorithm over N nodes in [Real Projective Space](https://en.wikipedia.org/wiki/Real_projective_space) of two dimensions with a Coulomb potential. This algorithm maximizes spherical symmetry for 2N apertures while enforcing antipodal symmetry because of antipodal identification in RP2.
 We can then form a Delauney triangulation of the solution embeded on the two sphere and take the cograph of this triangulation to form a geometry after pruning the coplaner  cycles from the geometry.
 Doing this over hundreds of apprature counts leads to plausable geometries for any number of apprature counts the would want to be considered. With familar geometries arising such as some of the platonic solids, many of the [Goldberg Polyhedra](https://en.wikipedia.org/wiki/Goldberg_polyhedron), and many others.
 
